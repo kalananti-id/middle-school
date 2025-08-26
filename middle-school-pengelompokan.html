@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    Mengenal Pola dalam Kehidupan Sehari-hari dan Dunia Digital
+  </title>
+
+  <!-- External Libraries -->
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- Prism.js for syntax highlighting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+  <!-- KaTeX for Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"
+    integrity="sha384-5TcZemv2l/9On385z///+d7MSYlvIEw9FuZTIdZ14vJLqWphw7e7ZPuOiCHJcFCP" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"
+    integrity="sha384-cMkvdD8LoxVzGF/RPUKAcvmm49FQ0oxwDF3BGKtDXcEc+T1b2N+teh/OJfpU0jr6"
+    crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"
+    integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #f5f5f5;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Left Panel - Slides */
+    .slides-panel {
+      width: 50%;
+      background: #f8f9fa;
+      color: #2c3e50;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border-right: 2px solid #e9ecef;
+    }
+
+    .slide-header {
+      background: #ffffff;
+      padding: 20px;
+      border-bottom: 2px solid #e9ecef;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .slide-header h1 {
+      font-size: 1.4em;
+      margin-bottom: 5px;
+      color: #2c3e50;
+    }
+
+    .slide-header p {
+      font-size: 0.9em;
+      color: #6c757d;
+    }
+
+    .slide-content {
+      flex: 1;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+      min-height: 0;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    .slide.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide h2 {
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      color: #8e44ad;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .slide h3 {
+      font-size: 1.8em;
+      margin-bottom: 25px;
+      color: #8e44ad;
+    }
+
+    .slide p,
+    .slide li {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      color: #34495e;
+    }
+
+    .slide ul {
+      text-align: left;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .slide ul li {
+      margin: 10px 0;
+      padding-left: 10px;
+    }
+
+    /* Privacy visualization */
+    .privacy-visual {
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+      position: relative;
+      background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .privacy-visual:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(142, 68, 173, 0.4);
+    }
+
+    .privacy-visual::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #8e44ad, #3498db, #8e44ad);
+      border-radius: 22px;
+      z-index: -1;
+      animation: borderGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+
+      0%,
+      100% {
+        opacity: 0.5;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .privacy-icon {
+      font-size: 4em;
+      color: white;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    /* Data types cards */
+    .data-types-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .data-card {
+      background: #ffffff;
+      border: 2px solid #e9ecef;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 1;
+      transform: translateY(20px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .data-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .data-card h4 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+
+    .data-card .icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+      transition: transform 0.3s ease;
+    }
+
+    .data-card:hover .icon {
+      transform: scale(1.2) rotate(10deg);
+    }
+
+    .data-card .icon2 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .data-card:hover .icon2 {
+      transform: scale(1) rotate(10deg);
+    }
+
+
+    /* Threat simulation */
+    .threat-simulation {
+      background: #fff3cd;
+      border: 2px solid #ffeaa7;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .threat-simulation::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 193, 7, 0.1), transparent);
+      animation: sweep 3s ease-in-out infinite;
+    }
+
+    @keyframes sweep {
+      0% {
+        transform: translateX(-100%) translateY(-100%);
+      }
+
+      50% {
+        transform: translateX(0%) translateY(0%);
+      }
+
+      100% {
+        transform: translateX(100%) translateY(100%);
+      }
+    }
+
+    .threat-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Interactive privacy checker */
+    .privacy-checker {
+      background: #d4edda;
+      border: 2px solid #c3e6cb;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .privacy-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1em;
+      margin: 10px 0;
+    }
+
+    .privacy-button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: all 0.3s ease;
+    }
+
+    .privacy-button:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    .privacy-result {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .privacy-result.safe {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .privacy-result.warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    /* Code Block Styles */
+    .code-block {
+      background: #2d3748 !important;
+      border: 2px solid #4a5568;
+      border-radius: 10px;
+      padding: 0;
+      margin: 20px 0;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      max-height: 400px;
+      overflow-y: auto;
+      text-align: left !important;
+    }
+
+    .code-block pre {
+      margin: 0 !important;
+      padding: 20px !important;
+      background: #2d3748 !important;
+      border-radius: 10px;
+      font-family: "Fira Code", "Courier New", Monaco, "Lucida Console",
+        monospace !important;
+      font-size: 1.1em !important;
+      line-height: 1.6 !important;
+      overflow-x: auto;
+      text-align: left !important;
+    }
+
+    .code-block code {
+      background: transparent !important;
+      color: #e2e8f0 !important;
+      font-family: inherit !important;
+      text-align: left !important;
+    }
+
+    .code-block pre[class*="language-"] {
+      background: #2d3748 !important;
+      color: #e2e8f0 !important;
+    }
+
+    /* Floating background elements */
+    .floating-element {
+      position: absolute;
+      opacity: 0.1;
+      pointer-events: none;
+      font-size: 2em;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      33% {
+        transform: translateY(-20px) rotate(5deg);
+      }
+
+      66% {
+        transform: translateY(10px) rotate(-3deg);
+      }
+    }
+
+    /* Grouping animation */
+    .grouping-animation {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
+
+    .grouping-item {
+      width: 60px;
+      height: 60px;
+      background: #8e44ad;
+      /* oranye hangat */
+      border-radius: 10px;
+      opacity: 0;
+      /* mulai tak terlihat */
+      transform: scale(0) rotate(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.6em;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    }
+
+    /* Saat diberi class .animate, jalankan keyframes */
+    .grouping-item.animate {
+      animation: popIn .6s ease-out forwards;
+    }
+
+    /* Muncul bergiliran (stagger) */
+    .grouping-item.animate:nth-child(2) {
+      animation-delay: .12s;
+    }
+
+    .grouping-item.animate:nth-child(3) {
+      animation-delay: .24s;
+    }
+
+    .grouping-item.animate:nth-child(4) {
+      animation-delay: .36s;
+    }
+
+    .grouping-item.animate:nth-child(5) {
+      animation-delay: .48s;
+    }
+
+    .grouping-item.animate:nth-child(6) {
+      animation-delay: .60s;
+    }
+
+    .grouping-item.animate:nth-child(7) {
+      animation-delay: .72s;
+    }
+
+    .grouping-item.animate:nth-child(8) {
+      animation-delay: .84s;
+    }
+
+    /* Keyframes: dari kecil + rotasi → normal */
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0) rotate(180deg);
+      }
+
+      60% {
+        opacity: 1;
+        transform: scale(1.06) rotate(8deg);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+
+
+
+    /* Right Panel - Explanation */
+    .explanation-panel {
+      width: 50%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .explanation-content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      line-height: 1.6;
+      color: #2c3e50;
+    }
+
+    .explanation-content h3 {
+      color: #8e44ad;
+      margin-bottom: 15px;
+      font-size: 1.4em;
+    }
+
+    .explanation-content p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+
+    .explanation-content ul {
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    .explanation-content li {
+      margin-bottom: 8px;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #e9ecef;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #8e44ad, #3498db);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Navigation */
+    .slide-nav {
+      position: sticky;
+      bottom: 0;
+      background: #ffffff;
+      padding: 15px 30px;
+      border-top: 2px solid #e9ecef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+      z-index: 10;
+    }
+
+    .nav-button {
+      background: #8e44ad;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: all 0.3s ease;
+    }
+
+    .nav-button:hover {
+      background: #732d91;
+      transform: translateY(-2px);
+    }
+
+    .nav-button:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .slide-counter {
+      font-size: 1em;
+      color: #7f8c8d;
+    }
+
+    /* Utility classes */
+    .warning-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #fdcb6e;
+    }
+
+    .warning-box h4 {
+      color: #e17055;
+      margin-bottom: 10px;
+    }
+
+    .info-box {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #17a2b8;
+    }
+
+    .info-box h4 {
+      color: #138496;
+      margin-bottom: 10px;
+    }
+
+    .example-box {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #28a745;
+    }
+
+    .example-box h4 {
+      color: #155724;
+      margin-bottom: 10px;
+    }
+
+    .clickable {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .clickable:hover {
+      transform: scale(1.05);
+    }
+
+    .custom-list {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 12px;
+    }
+
+    .custom-list li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 12px;
+    }
+
+    .custom-list li::before {
+      content: "🔹";
+      position: absolute;
+      left: -16px;
+      top: 0;
+      font-size: 18px;
+    }
+
+    /* Privacy vs Security comparison */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .comparison-card {
+      background: #ffffff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .privacy-card {
+      border-left: 5px solid #8e44ad;
+    }
+
+    .security-card {
+      border-left: 5px solid #3498db;
+    }
+
+    .comparison-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Privacy Game Styles */
+    .privacy-game {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .game-scenario {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 4px solid #8e44ad;
+    }
+
+    .game-scenario h4 {
+      color: #8e44ad;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+
+    .game-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .choice-btn {
+      background: #ffffff;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1em;
+      color: #2c3e50;
+    }
+
+    .choice-btn:hover {
+      border-color: #8e44ad;
+      background: #f8f9fa;
+      transform: translateX(5px);
+    }
+
+    .choice-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .choice-btn.correct {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .choice-btn.incorrect {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .choice-btn.neutral {
+      background: #fff3cd;
+      border-color: #ffc107;
+      color: #856404;
+    }
+
+    .game-feedback {
+      background: #d1ecf1;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-left: 4px solid #17a2b8;
+    }
+
+    .feedback-content {
+      margin-bottom: 15px;
+    }
+
+    .next-scenario-btn {
+      background: #8e44ad;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: all 0.3s ease;
+    }
+
+    .next-scenario-btn:hover {
+      background: #732d91;
+      transform: translateY(-2px);
+    }
+
+    .game-score {
+      display: flex;
+      justify-content: space-between;
+      background: #e9ecef;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-weight: bold;
+      color: #495057;
+    }
+
+    .game-complete {
+      background: #d4edda;
+      border: 2px solid #28a745;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      color: #155724;
+    }
+
+    .game-complete h4 {
+      margin-bottom: 10px;
+      font-size: 1.3em;
+    }
+
+    .score-excellent {
+      color: #28a745;
+    }
+
+    .score-good {
+      color: #ffc107;
+    }
+
+    .score-needs-improvement {
+      color: #dc3545;
+    }
+
+    /* Privacy steps */
+    .privacy-steps {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .privacy-step {
+      width: 80px;
+      height: 80px;
+      background: #8e44ad;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5em;
+      box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(0) rotate(180deg);
+      position: relative;
+    }
+
+    .privacy-step:hover {
+      transform: scale(1.15) rotate(10deg);
+      background: #732d91;
+      box-shadow: 0 8px 25px rgba(142, 68, 173, 0.5);
+    }
+
+    .privacy-step::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2c3e50;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.7em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .privacy-step:hover::before {
+      opacity: 1;
+    }
+
+    /* Access Code Popup */
+    .access-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .access-popup {
+      background: white;
+      border: 3px solid #4a9eff;
+      border-radius: 15px;
+      padding: 40px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transform: scale(0.8);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .access-popup.show {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .access-popup h2 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-size: 2em;
+    }
+
+    .access-popup p {
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+
+    .access-input {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.2em;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      letter-spacing: 2px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .access-input:focus {
+      outline: none;
+      border-color: #4a9eff;
+      box-shadow: 0 0 0 3px rgba(74, 153, 255, 0.1);
+    }
+
+    .access-submit {
+      background: #4a9eff;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+    }
+
+    .access-submit:hover {
+      background: #357abd;
+      transform: translateY(-2px);
+    }
+
+    .access-error {
+      color: #e74c3c;
+      margin-top: 15px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .access-error.show {
+      opacity: 1;
+    }
+
+    .access-hint {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #856404;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Access Code Popup -->
+  <div class="access-popup-overlay" id="accessPopup">
+    <div class="access-popup">
+      <h2>🔐 Kode Akses Diperlukan</h2>
+      <p>Silakan masukkan kode akses untuk membuka materi pembelajaran ini:</p>
+      <input type="text" class="access-input" id="accessInput" placeholder="Masukkan kode akses" maxlength="10">
+      <br>
+      <button class="access-submit" onclick="checkAccessCode()">Masuk</button>
+      <div class="access-error" id="accessError">
+        Kode akses salah! Silakan coba lagi.
+      </div>
+      <div class="access-hint">
+        💡 <strong>Petunjuk:</strong> Kode akses diberikan oleh instruktur
+      </div>
+    </div>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="main-container" id="mainContent" style="display: none;">
+    <!-- Left Panel - Slides -->
+    <div class="slides-panel">
+      <div class="slide-header">
+        <h1>
+          Pengelompokan di Kehidupan Nyata & Dunia Digital
+        </h1>
+        <p>Mengenal apa itu pengelompokan dan mengapa penting di dunia nyata & digital</p>
+      </div>
+
+
+      <!-- Floating Background Elements -->
+      <div class="floating-element" style="top: 25%; left: 5%; animation-delay: 0s">
+        🗂️
+      </div>
+      <div class="floating-element" style="top: 40%; left: 15%; animation-delay: 1.5s">
+        🏠
+      </div>
+      <div class="floating-element" style="top: 60%; left: 8%; animation-delay: 3s">
+        📱
+      </div>
+      <div class="floating-element" style="top: 75%; left: 18%; animation-delay: 4.5s">
+        💻
+      </div>
+
+      <div class="slide-content">
+        <!-- Slide 1: Title -->
+        <div class="slide active" style="align-self: flex-start; max-height: calc(100vh - 200px); padding-top: 20px;">
+          <h2 style="font-size: 2.2em; margin-bottom: 20px;">Pengelompokan</h2>
+          <div class="grouping-animation" id="groupingAnim">
+            <div class="grouping-item">📚</div>
+            <div class="grouping-item">👕</div>
+            <div class="grouping-item">🧸</div>
+            <div class="grouping-item">💻</div>
+            <div class="grouping-item">📱</div>
+            <div class="grouping-item">🗂️</div>
+          </div>
+
+          <p>
+            🎯 Tanpa sadar, setiap hari kita melakukan <strong>pengelompokan</strong> —
+            dari menaruh buku di rak, pakaian di lemari, sampai aplikasi di smartphone.
+            Di sesi ini, kita akan melihat betapa pentingnya pengelompokan untuk membuat
+            hidup lebih rapi, mudah, dan efisien ✨
+          </p>
+        </div>
+
+
+        <!-- Slide 2: Apa Itu Pengelompokan -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Apa Itu Pengelompokan?</h3>
+          <p style="font-size: 1.1em; margin-top: 12px;">
+            Menyusun atau memisahkan <strong>benda, informasi, atau kegiatan</strong>
+            berdasarkan <em>jenis, fungsi, atau tujuan</em>.
+          </p>
+
+          <div class="data-types-grid">
+            <div class="data-card">
+              <div class="icon2">📚</div>
+            </div>
+            <div class="data-card">
+              <div class="icon2">🗂️</div>
+            </div>
+            <div class="data-card">
+              <div class="icon2">💻</div>
+            </div>
+            <div class="data-card">
+              <div class="icon2">📱</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 3: Preview Contoh Pengelompokan -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Contoh Pengelompokan</h3>
+
+          <div class="comparison-grid" style="margin-bottom:14px;">
+            <!-- Preview Rumah -->
+            <div class="comparison-card privacy-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2.2em; margin-bottom:10px;">🏠</div>
+              <h4>Di Rumah</h4>
+            </div>
+
+            <!-- Preview Kelas -->
+            <div class="comparison-card privacy-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2.2em; margin-bottom:10px;">👩‍🏫</div>
+              <h4>Di Kelas</h4>
+            </div>
+
+            <!-- Preview Perpustakaan -->
+            <div class="comparison-card privacy-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2.2em; margin-bottom:10px;">📖</div>
+              <h4>Di Perpustakaan</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4: Dasar-Dasar Pengelompokan -->
+        <div class="slide" id="slide-4" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Berbagai Dasar Pengelompokan</h3>
+
+          <div class="comparison-grid" style="margin-bottom:14px;">
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🎨</div>
+              <h4>Warna</h4>
+            </div>
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">📏</div>
+              <h4>Ukuran</h4>
+            </div>
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🔷</div>
+              <h4>Bentuk</h4>
+            </div>
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🏷️</div>
+              <h4>Jenis</h4>
+            </div>
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🎮</div>
+              <h4>Tingkat Kesulitan</h4>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Slide 5: Kenapa Kita Perlu Mengelompokkan? -->
+        <div class="slide" id="slide-5" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Alasan Melakukan Pengelompokan</h3>
+
+          <div class="comparison-grid" style="margin-bottom:14px;">
+            <!-- Preview 1 -->
+            <div class="comparison-card privacy-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2.2em; margin-bottom:10px;">🔍</div>
+              <h4>Mudah Ditemukan</h4>
+            </div>
+
+            <!-- Preview 2 -->
+            <div class="comparison-card privacy-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2.2em; margin-bottom:10px;">📦</div>
+              <h4>Lebih Rapi & Nyaman</h4>
+            </div>
+
+            <!-- Preview 3 -->
+            <div class="comparison-card privacy-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2.2em; margin-bottom:10px;">🤔</div>
+              <h4>Tidak Bingung</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 6: Pengelompokan di Komputer -->
+        <div class="slide" id="slide-6" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Pengelompokan di Komputer</h3>
+
+          <div class="comparison-grid" style="margin-bottom:14px;">
+            <!-- Folder Tugas -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">📂</div>
+              <h4>Tugas Sekolah</h4>
+            </div>
+
+            <!-- Folder Foto -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🖼️</div>
+              <h4>Foto Liburan</h4>
+            </div>
+
+            <!-- Folder Musik -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🎵</div>
+              <h4>Musik Favorit</h4>
+            </div>
+
+            <!-- Folder Game -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🎮</div>
+              <h4>Game</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 7: Pengelompokan di Smartphone -->
+        <div class="slide" id="slide-7" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Pengelompokan di Smartphone</h3>
+
+          <div class="comparison-grid" style="margin-bottom:14px;">
+            <!-- Galeri Foto -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🖼️</div>
+              <h4>Galeri Foto</h4>
+            </div>
+
+            <!-- Aplikasi Musik -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🎵</div>
+              <h4>Aplikasi Musik</h4>
+            </div>
+
+            <!-- Aplikasi Chat -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">💬</div>
+              <h4>Aplikasi Chat</h4>
+            </div>
+
+            <!-- File Manager -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">📁</div>
+              <h4>File Manager</h4>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Slide 8: Ringkasan Bab 1.4 -->
+        <div class="slide" id="slide-8" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Ringkasan Pengelompokan</h3>
+
+          <div class="comparison-grid" style="margin-bottom:14px;">
+            <!-- Definisi -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🗂️</div>
+              <h4>Definisi</h4>
+            </div>
+
+            <!-- Dasar -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">🎨</div>
+              <h4>Dasar</h4>
+            </div>
+
+            <!-- Manfaat -->
+            <div class="comparison-card" style="opacity:1; transform:none;">
+              <div class="icon" style="font-size:2em; margin-bottom:8px;">✨</div>
+              <h4>Manfaat</h4>
+            </div>
+          </div>
+        </div>
+
+
+
+
+
+        <!-- Slide 5: Pola Waktu -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Contoh: Pola Waktu</h3>
+
+          <div class="data-types-grid" style="margin-top:10px;">
+            <div class="data-card">
+              <div class="icon">🏫</div>
+              <h4>Jadwal Sekolah</h4>
+            </div>
+            <div class="data-card">
+              <div class="icon">🚦</div>
+              <h4>Lampu Lalu Lintas</h4>
+            </div>
+            <div class="data-card">
+              <div class="icon">⏰</div>
+              <h4>Alarm Harian</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 6: Contoh — Pola Perilaku -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Contoh: Pola Perilaku</h3>
+
+          <div class="data-types-grid" style="margin-top:10px;">
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🌅</div>
+              <h4>Rutinitas Pagi</h4>
+            </div>
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">📖</div>
+              <h4>Kebiasaan Belajar</h4>
+            </div>
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🛡️</div>
+              <h4>Etika Digital</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 7: Pola Digital -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Pola Digital</h3>
+          <div class="data-types-grid">
+
+            <!-- UI Pattern -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🖥️</div>
+              <h4>UI Pattern</h4>
+              <p style="font-size:0.9em;">
+                Menu navigasi & tombol kirim yang konsisten
+              </p>
+            </div>
+
+            <!-- Pola Interaksi -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🤳</div>
+              <h4>Pola Interaksi</h4>
+              <p style="font-size:0.9em;">
+                Swipe kiri untuk hapus, double tap untuk like
+              </p>
+            </div>
+
+            <!-- Pola Data -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">📊</div>
+              <h4>Pola Data</h4>
+              <p style="font-size:0.9em;">
+                Rekomendasi produk atau lagu dari riwayat
+              </p>
+            </div>
+
+            <!-- Pola Algoritma -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">⚙️</div>
+              <h4>Pola Algoritma</h4>
+              <p style="font-size:0.9em;">
+                Algoritma pencarian & sorting di aplikasi
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 8: Contoh — UI Pattern -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Contoh: UI Pattern</h3>
+
+          <div class="data-types-grid">
+            <!-- Menu Navigasi -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">📂</div>
+              <h4>Menu Navigasi</h4>
+              <p style="font-size:0.9em;">Selalu di atas / samping layar</p>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🔘</div>
+              <h4>Tombol Aksi</h4>
+              <p style="font-size:0.9em;">Tombol “Kirim” dibuat menonjol</p>
+            </div>
+
+            <!-- Ikon Familiar -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🔍</div>
+              <h4>Ikon Familiar</h4>
+              <p style="font-size:0.9em;">Ikon kaca pembesar = “Cari”</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 9: Pola Interaksi -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Contoh: Pola Interaksi</h3>
+
+          <div class="data-types-grid">
+            <!-- Swipe -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">👆➡️</div>
+              <h4>Swipe</h4>
+              <p style="font-size:0.9em;">Geser kiri/kanan untuk hapus/arsip</p>
+            </div>
+
+            <!-- Double Tap -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">👆👆</div>
+              <h4>Double Tap</h4>
+              <p style="font-size:0.9em;">Dua ketuk untuk “like”</p>
+            </div>
+
+            <!-- Long Press -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">✋⏳</div>
+              <h4>Long Press</h4>
+              <p style="font-size:0.9em;">Tahan untuk opsi lanjutan</p>
+            </div>
+
+            <!-- Pull to Refresh -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">⬇️🔄</div>
+              <h4>Tarik Segarkan</h4>
+              <p style="font-size:0.9em;">“Pull to refresh” daftar</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 10: Pola Data -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Contoh: Pola Data</h3>
+
+          <div class="data-types-grid">
+            <!-- Rekomendasi Belanja -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🛍️</div>
+              <h4>Rekomendasi Belanja</h4>
+              <p style="font-size:0.9em;">Produk ditampilkan sesuai riwayat pembelian</p>
+            </div>
+
+            <!-- Rekomendasi Musik -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🎶</div>
+              <h4>Rekomendasi Musik</h4>
+              <p style="font-size:0.9em;">Lagu muncul sesuai genre favorit</p>
+            </div>
+
+            <!-- Konten Media Sosial -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">📱</div>
+              <h4>Konten Media Sosial</h4>
+              <p style="font-size:0.9em;">Feed disesuaikan dengan like & follow</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 11: Pola Algoritma -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Pola Algoritma</h3>
+
+          <div class="data-types-grid">
+            <!-- Pencarian -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🔎</div>
+              <h4>Pencarian</h4>
+              <p style="font-size:0.9em;">Google menampilkan hasil paling relevan</p>
+            </div>
+
+            <!-- Sorting -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">📂</div>
+              <h4>Sorting</h4>
+              <p style="font-size:0.9em;">Urutkan file atau daftar dari A–Z</p>
+            </div>
+
+            <!-- Rekomendasi -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🤖</div>
+              <h4>Rekomendasi</h4>
+              <p style="font-size:0.9em;">Sistem AI memberi saran otomatis</p>
+            </div>
+          </div>
+
+          <div class="info-box" style="margin-top:14px;">
+            <h4>💡 Inti</h4>
+            <p style="font-size:0.95em;">
+              Pola algoritma adalah <strong>urutan langkah logis</strong> untuk
+              menyelesaikan masalah atau menghasilkan output tertentu.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 12: Aktivitas - Temukan Pola -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Aktivitas: Temukan Pola</h3>
+
+          <div class="data-types-grid">
+            <!-- Kehidupan Sehari-hari -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🏠</div>
+              <h4>Kehidupan Sehari-hari</h4>
+              <p style="font-size:0.9em;">Cari pola waktu, perilaku, atau visual di sekitarmu.</p>
+            </div>
+
+            <!-- Dunia Digital -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">💻</div>
+              <h4>Aplikasi Digital</h4>
+              <p style="font-size:0.9em;">Temukan UI pattern, interaksi, data, atau algoritma di aplikasi favoritmu.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 13: Kesimpulan -->
+        <div class="slide" style="align-self: flex-start; margin-top: -20px; padding-top: 10px;">
+          <h3>Kesimpulan</h3>
+
+          <div class="data-types-grid">
+            <!-- Pola Sehari-hari -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">🏠</div>
+              <h4>Pola Sehari-hari</h4>
+              <p style="font-size:0.9em;">Waktu, perilaku, visual</p>
+            </div>
+
+            <!-- Pola Digital -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">💻</div>
+              <h4>Pola Digital</h4>
+              <p style="font-size:0.9em;">UI, interaksi, data, algoritma</p>
+            </div>
+
+            <!-- Inti -->
+            <div class="data-card" style="opacity:1; transform:none;">
+              <div class="icon">💡</div>
+              <h4>Inti</h4>
+              <p style="font-size:0.9em;">Pola = keteraturan yang memudahkan prediksi & solusi</p>
+            </div>
+          </div>
+
+          <div class="info-box" style="margin-top:14px;">
+            <h4>🔑 Pesan Penting</h4>
+            <p style="font-size:0.95em;">
+              Dengan mengenali pola, kita belajar berpikir komputasional:
+              menganalisis, memprediksi, dan merancang solusi di dunia nyata maupun digital.
+            </p>
+          </div>
+        </div>
+
+        
+      </div>
+
+      <div class="slide-nav">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">
+          ← Sebelumnya
+        </button>
+        <span class="slide-counter">
+          <span id="currentSlide">1</span> / <span id="totalSlides">8</span>
+        </span>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">
+          Selanjutnya →
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Panel - Explanation -->
+    <div class="explanation-panel">
+      <div class="explanation-content" id="explanationContent">
+        <h3>
+          Selamat Datang di Dunia Privasi Data Digital!
+        </h3>
+
+        <p>
+          Dalam era digital yang serba terhubung ini, setiap klik, scroll, dan tap yang kamu lakukan meninggalkan jejak
+          digital. Privasi data bukan hanya tentang "menyembunyikan" informasi, tetapi tentang kontrol - kamu yang
+          menentukan siapa yang bisa mengakses data pribadi kamu dan untuk keperluan apa.
+        </p>
+
+        <h4>Mengapa Bab Ini Krusial?</h4>
+        <p>Bab ini akan membantu kamu:</p>
+        <ul>
+          <li>Memahami perbedaan antara privacy dan security</li>
+          <li>Mengenali jenis-jenis data pribadi yang perlu dilindungi</li>
+          <li>Mempelajari ancaman nyata terhadap privasi data</li>
+          <li>Menguasai teknik-teknik perlindungan yang praktis</li>
+        </ul>
+
+        <div class="example-box">
+          <h4>🎯 Tujuan Pembelajaran</h4>
+          <p>
+            Setelah mempelajari bab ini, kamu akan menjadi guardian data pribadi yang cerdas - mampu melindungi
+            informasi sensitif sambil tetap menikmati manfaat teknologi digital.
+          </p>
+        </div>
+
+        <div class="warning-box">
+          <h4>⚠️ Ingat Selalu</h4>
+          <p>
+            Data pribadi kamu adalah aset berharga. Seperti uang di dompet, kamu harus selektif dalam membagikannya dan
+            waspada terhadap yang ingin "mengambil" tanpa izin.
+          </p>
+        </div>
+
+        <p>
+          Mari mulai perjalanan menjadi digital citizen yang bijak dan bertanggung jawab! 🛡️
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CORRECT_ACCESS_CODE = 'RGMDSMS25';
+    let isAccessGranted = false;
+    let currentSlideIndex = 0;
+    const totalSlides = 8;
+
+    // Access Code Functions
+    function checkAccessCode() {
+      const input = document.getElementById('accessInput');
+      const error = document.getElementById('accessError');
+      const enteredCode = input.value.trim().toUpperCase();
+
+      if (enteredCode === CORRECT_ACCESS_CODE) {
+        // Correct code - grant access
+        isAccessGranted = true;
+        hideAccessPopup();
+      } else {
+        // Incorrect code - show error
+        error.classList.add('show');
+        input.style.borderColor = '#e74c3c';
+        input.focus();
+
+        // Reset error after 3 seconds
+        setTimeout(() => {
+          error.classList.remove('show');
+          input.style.borderColor = '#dee2e6';
+        }, 3000);
+
+        // Clear input
+        input.value = '';
+      }
+    }
+
+    function hideAccessPopup() {
+      const popup = document.getElementById('accessPopup');
+      const mainContent = document.getElementById('mainContent');
+
+      // Animate popup out
+      popup.querySelector('.access-popup').classList.remove('show');
+
+      setTimeout(() => {
+        popup.style.display = 'none';
+        mainContent.style.display = 'flex';
+
+        // Initialize content after access is granted
+        initializeContent();
+      }, 300);
+    }
+
+    function showAccessPopup() {
+      const popup = document.getElementById('accessPopup');
+      const mainContent = document.getElementById('mainContent');
+
+      popup.style.display = 'flex';
+      mainContent.style.display = 'none';
+
+      setTimeout(() => {
+        popup.querySelector('.access-popup').classList.add('show');
+        document.getElementById('accessInput').focus();
+      }, 100);
+    }
+
+    function initializeContent() {
+      // Initialize the main content after access is granted
+      updateSlide();
+
+      // Initialize syntax highlighting
+      if (typeof hljs !== "undefined") {
+        hljs.highlightAll();
+      }
+    }
+
+    // ============================================
+    // ACCESS CODE SETTING - Change this to enable/disable access code
+    // ============================================
+    const ENABLE_ACCESS_CODE = false; // Set to false to disable access code popup
+
+    // Check access on page refresh/reload
+    function checkAccess() {
+      if (ENABLE_ACCESS_CODE) {
+        // Show popup if access code is enabled
+        showAccessPopup();
+      } else {
+        // Skip access code and go directly to content
+        isAccessGranted = true;
+        const popup = document.getElementById('accessPopup');
+        const mainContent = document.getElementById('mainContent');
+
+        if (popup) {
+          popup.style.display = 'none';
+        }
+        if (mainContent) {
+          mainContent.style.display = 'flex';
+        }
+
+        initializeContent();
+      }
+    }
+    const slides = document.querySelectorAll(".slide");
+
+    // Explanations for each slide
+    const explanations = [
+      {
+        title: "Memahami Pengelompokan",
+        content: `
+        <p>Pernahkah kamu memperhatikan bagaimana kita secara alami mengelompokkan benda di sekitar kita?
+        Misalnya, kita mengelompokkan buah berdasarkan warna, bentuk, atau jenisnya.
+        Atau bagaimana di dunia digital, data diorganisir dalam folder atau kategori untuk memudahkan pencarian?</p>
+      <h4>🎯 Tujuan Pembelajaran</h4>
+      <ul>
+        <li>Menyadari bahwa kita sering melakukan pengelompokan tanpa sadar.</li>
+        <li>Membangun rasa ingin tahu tentang cara pengelompokan di kehidupan sehari-hari & di gadget.</li>
+        <li>Mempersiapkan siswa untuk memahami manfaat dan penerapannya.</li>
+      </ul>
+    `,
+      },
+      {
+        title: "Definisi Pengelompokan",
+        content: `
+        <p><strong>Pengelompokan</strong> adalah cara menyusun atau memisahkan
+        benda, informasi, atau kegiatan berdasarkan <em>jenis, fungsi, atau tujuan</em>.</p>
+
+        <h4>🔍 Mengapa Kita Mengelompokkan?</h4>
+        <ul>
+          <li>Mempermudah mencari sesuatu</li>
+          <li>Membuat lebih rapi dan teratur</li>
+          <li>Menghemat waktu saat dibutuhkan</li>
+        </ul>
+
+        <div class="example-box">
+          <h4>💬 Diskusi Cepat</h4>
+          <p>Kalau kamu punya 10 buku dengan berbagai jenis (contoh: Matematika, Sains, Novel, Komik), 
+          kamu mau kelompokkan dengan cara apa? 📚</p>
+        </div>
+    `,
+      },
+      {
+  title: "Contoh Pengelompokan di Kehidupan Sehari-hari",
+  content: `
+    <p>
+      Pengelompokan bisa kita temui di berbagai tempat. 
+      Berikut beberapa contohnya:
+    </p>
+
+    <h4>🏠 Di Rumah</h4>
+    <p>
+      Di rumah, kita menata barang agar mudah dicari dan tidak berantakan.
+      Biasanya pengelompokan dilakukan berdasarkan <strong>fungsi</strong>.
+    </p>
+    <ul>
+      <li>📚 Buku → Rak buku</li>
+      <li>👕 Pakaian → Lemari</li>
+      <li>🧸 Mainan → Kotak mainan</li>
+      <li>🍎 Makanan → Dipisah sesuai jenis</li>
+    </ul>
+
+    <h4>👩‍🏫 Di Kelas</h4>
+    <p>
+      Di sekolah, siswa bisa dibagi ke kelompok tertentu sesuai 
+      <strong>hobi atau kegiatan yang disukai</strong>. 
+      Ini membantu memudahkan kerja sama dan belajar bersama.
+    </p>
+    <ul>
+      <li>🏀 Hobi Olahraga → Basket, futsal</li>
+      <li>🎨 Hobi Seni → Melukis, paduan suara</li>
+      <li>🤖 Hobi Teknologi → Coding club, robotik</li>
+    </ul>
+
+    <h4>📖 Di Perpustakaan</h4>
+    <p>
+      Di perpustakaan, buku disusun agar mudah ditemukan. 
+      Biasanya dikelompokkan berdasarkan <strong>genre</strong> 
+      dan <strong>tingkat kesulitan</strong>.
+    </p>
+    <ul>
+      <li>📕 Fiksi mudah → Komik, cerita pendek</li>
+      <li>📗 Fiksi sedang → Novel remaja, petualangan</li>
+      <li>📘 Nonfiksi sulit → Ensiklopedia, biografi</li>
+    </ul>
+
+    <p>
+      Dari contoh di atas, terlihat bahwa dasar pengelompokan bisa berbeda-beda: 
+      <em>fungsi</em> di rumah, <em>hobi</em> di kelas, dan <em>genre/kesulitan</em> di perpustakaan.
+    </p>
+
+    <div class="info-box" style="margin-top:15px;">
+      <h4>✨ Kesimpulan</h4>
+      <p>
+        Pengelompokan ada di mana-mana.  
+        Dengan pengelompokan, semua jadi lebih <strong>rapi</strong>, 
+        <strong>mudah ditemukan</strong>, dan <strong>tidak membingungkan</strong>.
+      </p>
+    </div>
+  `,
+},
+      {
+        title: "Dasar-Dasar Pengelompokan",
+        content: `
+    <h4>🎨 Berdasarkan Warna</h4>
+    <p>Pensil warna (merah, biru, hijau, kuning), seragam sekolah (putih, biru, coklat, hijau).</p>
+
+    <h4>📏 Berdasarkan Ukuran</h4>
+    <p>Bola kecil (tenis, kasti) dan bola besar (basket, sepak bola). Buku tipis dan buku tebal.</p>
+
+    <h4>🔷 Berdasarkan Bentuk</h4>
+    <p>Penghapus bulat, segitiga, persegi. Daun lebar, runcing, menjari.</p>
+
+    <h4>🏷️ Berdasarkan Jenis/Kategori</h4>
+    <p>Hewan: mamalia, burung, reptil. Mata pelajaran: Sains, Bahasa, Seni.</p>
+
+    <h4>🎮 Berdasarkan Tingkat Kesulitan</h4>
+    <p>Soal Matematika: mudah, sedang, sulit. Game: level 1, level 2, level 3.</p>
+
+    <div class="info-box">
+      <h4>✨ Kesimpulan</h4>
+      <p>
+        Satu kumpulan benda bisa dikelompokkan dengan banyak dasar.
+        Tidak ada satu cara yang benar — semua tergantung kebutuhan.
+      </p>
+    </div>
+  `,
+      },
+      {
+        title: "Kenapa Kita Perlu Mengelompokan?",
+        content: `
+    <h4>🔍 Mudah Ditemukan</h4>
+    <p>
+      Barang atau informasi lebih cepat dicari karena sudah ada di tempat khusus.
+      Misalnya, buku pelajaran di rak belajar dan komik di rak hiburan.
+    </p>
+
+    <h4>📦 Lebih Rapi & Nyaman</h4>
+    <p>
+      Ruangan terasa lebih lega ketika semua tertata. 
+      Kita tidak perlu pusing melihat barang berserakan.
+    </p>
+
+    <h4>🤔 Tidak Bingung</h4>
+    <p>
+      Pengelompokan membantu kita membedakan jenis barang atau informasi,
+      sehingga tidak salah ambil atau tertukar.
+    </p>
+
+    <div class="info-box">
+      <h4>✨ Kesimpulan</h4>
+      <p>
+        Mengelompokkan membuat hidup sehari-hari lebih mudah, 
+        nyaman, dan efisien. Prinsip ini juga berlaku di dunia digital.
+      </p>
+    </div>
+  `,
+      },
+      {
+  title: "Pengelompokan di Komputer",
+  content: `
+    <p>
+      Kalau semua file dicampur jadi satu, kita akan <strong>kesulitan mencari</strong>
+      dokumen penting, komputer bisa <strong>lambat</strong>, dan waktu terbuang
+      hanya untuk membuka satu per satu file.
+    </p>
+    <p>
+      Supaya lebih praktis, kita bisa membuat <strong>folder khusus</strong>.
+      Folder bekerja seperti <em>lemari digital</em>: setiap file punya tempatnya sendiri.
+    </p>
+
+    <h4>📂 Contoh Folder & Manfaatnya</h4>
+    <ul>
+      <li>
+        📘 <strong>Tugas Sekolah</strong><br>
+        <em>Isi:</em> Dokumen Word, file PDF materi guru, presentasi PowerPoint.<br>
+        <em>Manfaat:</em> Semua bahan belajar dan PR tersimpan di satu tempat, 
+        jadi cepat ditemukan saat belajar atau ujian.
+      </li>
+      <li>
+        🖼️ <strong>Foto Liburan</strong><br>
+        <em>Isi:</em> Foto keluarga, foto jalan-jalan, video liburan.<br>
+        <em>Manfaat:</em> Kenangan tersimpan rapi, tidak bercampur dengan file tugas, 
+        lebih mudah saat ingin dicetak atau dibagikan.
+      </li>
+      <li>
+        🎵 <strong>Musik Favorit</strong><br>
+        <em>Isi:</em> Lagu MP3, playlist kesukaan, file audio.<br>
+        <em>Manfaat:</em> Musik bisa diputar cepat sesuai mood tanpa terganggu file lain. 
+        Playlist lebih teratur.
+      </li>
+      <li>
+        🎮 <strong>Game</strong><br>
+        <em>Isi:</em> File instalasi game, save data, update game.<br>
+        <em>Manfaat:</em> Game lebih teratur, komputer tidak penuh dengan file campur. 
+        Kalau ada error, mudah menemukan data game yang perlu diperbaiki.
+      </li>
+    </ul>
+
+    <div class="info-box">
+      <h4>✨ Kesimpulan</h4>
+      <p>
+        Dengan folder, komputer jadi lebih <strong>rapi</strong>, 
+        file lebih <strong>cepat ditemukan</strong>, 
+        dan penggunaan jadi <strong>efisien</strong>. 
+        Sama seperti menaruh pakaian di lemari dan mainan di kotak,
+        folder membantu kita <em>menemukan file dengan sekali klik</em>! 🚀
+      </p>
+    </div>
+  `,
+},
+
+      {
+  title: "Pengelompokan di Smartphone",
+  content: `
+    <p>
+      Kalau di komputer kita perlu membuat folder sendiri,
+      di smartphone banyak aplikasi sudah bisa <strong>mengelompokkan otomatis</strong>.
+      Artinya, tanpa kita atur pun, file dan data sudah ditata rapi oleh aplikasi.
+    </p>
+
+    <h4>🖼️ Galeri Foto</h4>
+    <p>
+      <em>Isi:</em> Foto dan video dari kamera atau WhatsApp.<br>
+      <em>Cara mengelompokkan:</em> Otomatis dibuat album berdasarkan tanggal, lokasi, atau wajah orang.<br>
+      <em>Manfaat:</em> Mudah mencari foto liburan tertentu, menemukan kenangan lama, 
+      atau mengelompokkan foto teman tanpa repot.
+    </p>
+
+    <h4>🎵 Aplikasi Musik</h4>
+    <p>
+      <em>Isi:</em> Lagu, file audio, playlist.<br>
+      <em>Cara mengelompokkan:</em> Lagu diurutkan berdasarkan penyanyi, album, atau genre.<br>
+      <em>Manfaat:</em> Bisa cepat memilih musik sesuai mood, 
+      tidak perlu mencari satu per satu file lagu.
+    </p>
+
+    <h4>💬 Aplikasi Chat</h4>
+    <p>
+      <em>Isi:</em> Chat pribadi, grup, dan channel.<br>
+      <em>Cara mengelompokkan:</em> Pesan otomatis dipisahkan dalam grup keluarga, sekolah, atau belajar.<br>
+      <em>Manfaat:</em> Tidak bingung membedakan percakapan, 
+      mudah fokus pada grup tertentu saat dibutuhkan.
+    </p>
+
+    <h4>📁 File Manager</h4>
+    <p>
+      <em>Isi:</em> Dokumen, gambar, video, musik, aplikasi.<br>
+      <em>Cara mengelompokkan:</em> File otomatis dikelompokkan berdasarkan jenis file.<br>
+      <em>Manfaat:</em> Dokumen sekolah, foto, dan musik lebih teratur, 
+      mudah ditemukan tanpa harus membuka satu per satu folder.
+    </p>
+
+    <div class="info-box">
+      <h4>✨ Kesimpulan</h4>
+      <p>
+        Dengan pengelompokan otomatis, smartphone jadi lebih <strong>rapi</strong> dan <strong>praktis</strong>.  
+        Foto, musik, chat, hingga dokumen bisa ditemukan <em>dalam hitungan detik</em>, 
+        sehingga kita tidak bingung lagi mencari file. 🚀
+      </p>
+    </div>
+  `,
+},
+      {
+        title: "Ringkasan",
+        content: `
+    <h4>🗂️ Apa Itu Pengelompokan?</h4>
+    <p>
+      Cara menyusun atau memisahkan benda, informasi, atau kegiatan
+      berdasarkan <em>jenis, fungsi, atau tujuan</em>.
+    </p>
+
+    <h4>🎨 Dasar Pengelompokan</h4>
+    <p>
+      Bisa berdasarkan fungsi, warna, ukuran, bentuk, jenis/kategori,
+      atau tingkat kesulitan.
+    </p>
+
+    <h4>✨ Manfaat</h4>
+    <p>
+      Memudahkan mencari, membuat rapi, menghemat waktu,
+      dan tidak membingungkan.
+    </p>
+
+    <div class="info-box">
+      <h4>🔑 Penutupan</h4>
+      <p>
+        Pengelompokan adalah prinsip sederhana tapi sangat berguna.
+        Dengan pengelompokan, hidup lebih teratur, efisien,
+        dan siap menghadapi dunia digital.
+      </p>
+    </div>
+  `,
+      },
+    ];
+
+    function updateSlide() {
+      // Hide all slides
+      slides.forEach((slide) => slide.classList.remove("active"));
+
+      // Show current slide
+      slides[currentSlideIndex].classList.add("active");
+
+      // Update navigation
+      document.getElementById("currentSlide").textContent = currentSlideIndex + 1;
+      document.getElementById("prevBtn").disabled = currentSlideIndex === 0;
+      document.getElementById("nextBtn").disabled = currentSlideIndex === totalSlides - 1;
+
+      // Update progress bar
+      const progress = ((currentSlideIndex + 1) / totalSlides) * 100;
+      document.getElementById("progressFill").style.width = progress + "%";
+
+      // Update explanation
+      updateExplanation();
+
+      // Trigger slide-specific animations
+      animateSlideEntrance(currentSlideIndex);
+    }
+
+    function animateSlideEntrance(slideIndex) {
+      const currentSlide = slides[slideIndex];
+
+      // Animate based on slide content
+      switch (slideIndex) {
+        case 1: // Privacy vs Security comparison
+          setTimeout(() => {
+            if (currentSlideIndex === 1) {
+              // Animate privacy steps first
+              animatePrivacySteps();
+
+              // Then animate comparison cards
+              setTimeout(() => {
+                const cards = currentSlide.querySelectorAll(".comparison-card");
+                cards.forEach((el) => (el.style.visibility = "visible"));
+                gsap.fromTo(
+                  cards,
+                  { opacity: 0, x: -30 },
+                  {
+                    opacity: 1,
+                    x: 0,
+                    duration: 0.6,
+                    stagger: 0.2,
+                    ease: "back.out(1.7)",
+                  }
+                );
+              }, 800);
+            }
+          }, 50);
+          break;
+
+        case 2: // Data types grid
+          setTimeout(() => {
+            if (currentSlideIndex === 2) {
+              const dataCards = currentSlide.querySelectorAll(".data-card");
+              dataCards.forEach((el) => (el.style.visibility = "visible"));
+              gsap.fromTo(
+                dataCards,
+                { opacity: 0, y: 30, scale: 0.9 },
+                {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  duration: 0.6,
+                  stagger: 0.15,
+                  ease: "back.out(1.7)",
+                }
+              );
+            }
+          }, 50);
+          break;
+
+        case 5: // Threats grid
+        case 10: // Who collects data
+          setTimeout(() => {
+            if (currentSlideIndex === slideIndex) {
+              const dataCards = currentSlide.querySelectorAll(".data-card");
+              dataCards.forEach((el) => (el.style.visibility = "visible"));
+              gsap.fromTo(
+                dataCards,
+                { opacity: 0, y: 20, rotation: 5 },
+                {
+                  opacity: 1,
+                  y: 0,
+                  rotation: 0,
+                  duration: 0.5,
+                  stagger: 0.1,
+                  ease: "back.out(1.7)",
+                }
+              );
+            }
+          }, 50);
+          break;
+      }
+    }
+
+    function animatePrivacySteps() {
+      const steps = document.querySelectorAll(".privacy-step");
+
+      // Reset all steps with smoother initial state
+      gsap.set(steps, {
+        opacity: 0,
+        scale: 0.3,
+        rotation: 180,
+        y: 20,
+        visibility: "visible",
+      });
+
+      // Create timeline for smoother sequence
+      const tl = gsap.timeline();
+
+      // Animate steps entrance
+      tl.to(steps, {
+        opacity: 1,
+        scale: 1,
+        rotation: 0,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.15,
+        ease: "back.out(1.7)",
+      });
+    }
+
+    function updateExplanation() {
+      const explanation = explanations[currentSlideIndex];
+      document.getElementById("explanationContent").innerHTML = `
+          <h3>${explanation.title}</h3>
+          ${explanation.content}
+        `;
+    }
+
+    function changeSlide(direction) {
+      const newIndex = currentSlideIndex + direction;
+      if (newIndex >= 0 && newIndex < totalSlides) {
+        currentSlideIndex = newIndex;
+        updateSlide();
+      }
+    }
+
+    // Interactive privacy checker
+    function checkPostPrivacy() {
+      const input = document.getElementById("postInput").value;
+      const resultDiv = document.getElementById("privacyResult");
+
+      if (!input.trim()) {
+        resultDiv.innerHTML = "⚠️ Masukkan teks yang ingin dicek terlebih dahulu.";
+        resultDiv.className = "privacy-result warning";
+        resultDiv.style.display = "block";
+        return;
+      }
+
+      const sensitiveInfo = [
+        'nomor hp', 'no hp', 'telepon', '08', '062', '061',
+        'alamat', 'rumah', 'jalan', 'rt', 'rw',
+        'password', 'sandi', 'pin', 'kode',
+        'nik', 'ktp', 'sim', 'passport'
+      ];
+
+      const negativeWords = [
+        'benci', 'bodoh', 'jelek', 'menyebalkan', 'goblok',
+        'anjing', 'bangsat', 'tolol', 'idiot'
+      ];
+
+      const warnings = [];
+      const postLower = input.toLowerCase();
+
+      // Check for sensitive information
+      for (const info of sensitiveInfo) {
+        if (postLower.includes(info)) {
+          warnings.push(`⚠️ Terdeteksi informasi sensitif: "${info}"`);
+        }
+      }
+
+      // Check for negative words
+      for (const word of negativeWords) {
+        if (postLower.includes(word)) {
+          warnings.push(`⚠️ Kata negatif terdeteksi: "${word}"`);
+        }
+      }
+
+      if (warnings.length > 0) {
+        resultDiv.innerHTML = `
+            <strong>❌ POSTINGAN TIDAK AMAN:</strong><br>
+            ${warnings.join('<br>')}
+            <br><br>💡 Pertimbangkan untuk mengedit sebelum posting!
+          `;
+        resultDiv.className = "privacy-result warning";
+      } else {
+        resultDiv.innerHTML = "✅ Postingan terlihat aman untuk dibagikan!";
+        resultDiv.className = "privacy-result safe";
+      }
+
+      resultDiv.style.display = "block";
+    }
+
+    // Privacy Game Logic
+    let gameState = {
+      currentScenario: 1,
+      score: 0,
+      scenarios: [
+        {
+          id: 1,
+          title: "Situasi #1",
+          text: "Kamu mendapat email dari 'bank' yang meminta konfirmasi data dengan klik link. Apa yang akan kamu lakukan?",
+          choices: [
+            { text: "A. Langsung klik link dan isi data", correct: false, explanation: "❌ Ini adalah tanda phishing! Jangan pernah klik link mencurigakan." },
+            { text: "B. Cek email bank asli dan hubungi CS", correct: true, explanation: "✅ Tepat! Selalu verifikasi melalui kanal resmi bank." },
+            { text: "C. Abaikan email tersebut", correct: false, explanation: "⚠️ Lebih baik laporkan ke bank untuk mencegah korban lain." }
+          ]
+        },
+        {
+          id: 2,
+          title: "Situasi #2",
+          text: "Aplikasi game meminta akses ke kontak, lokasi, dan kamera. Padahal ini cuma game puzzle sederhana. Apa reaksi kamu?",
+          choices: [
+            { text: "A. Kasih akses semua, yang penting bisa main", correct: false, explanation: "❌ Aplikasi game puzzle tidak butuh akses sebanyak itu!" },
+            { text: "B. Tolak semua akses dan cari game lain", correct: true, explanation: "✅ Benar! Red flag kalau aplikasi minta akses berlebihan." },
+            { text: "C. Kasih akses tapi nanti dicabut lagi", correct: false, explanation: "⚠️ Sekali akses dikasih, data sudah bisa diambil." }
+          ]
+        },
+        {
+          id: 3,
+          title: "Situasi #3",
+          text: "Teman kamu posting foto liburan dengan boarding pass terlihat jelas. Apa yang sebaiknya kamu lakukan?",
+          choices: [
+            { text: "A. Kasih like dan comment biasa", correct: false, explanation: "❌ Boarding pass berisi data sensitif seperti nama lengkap dan kode booking!" },
+            { text: "B. DM teman untuk hapus foto tersebut", correct: true, explanation: "✅ Tepat! Boarding pass bisa disalahgunakan untuk penipuan." },
+            { text: "C. Screenshot dan share ke group lain", correct: false, explanation: "❌ Ini malah memperluas penyebaran data sensitif!" }
+          ]
+        },
+        {
+          id: 4,
+          title: "Situasi #4",
+          text: "Kamu dapat pesan WhatsApp dari nomor tidak dikenal yang mengaku dari e-commerce, minta konfirmasi alamat untuk hadiah. Bagaimana?",
+          choices: [
+            { text: "A. Balas dengan alamat lengkap", correct: false, explanation: "❌ Ini bisa jadi social engineering untuk kumpulkan data pribadi!" },
+            { text: "B. Tanya dulu di akun resmi e-commerce", correct: true, explanation: "✅ Benar! Selalu verifikasi melalui kanal resmi perusahaan." },
+            { text: "C. Ignore dan block nomor tersebut", correct: false, explanation: "⚠️ Sebaiknya juga laporkan ke e-commerce untuk mencegah korban lain." }
+          ]
+        },
+        {
+          id: 5,
+          title: "Situasi #5",
+          text: "Ada trend viral di media sosial yang meminta upload foto KTP untuk 'verifikasi umur'. Teman-teman mulai ikutan. Apa yang kamu lakukan?",
+          choices: [
+            { text: "A. Ikutan biar tidak ketinggalan trend", correct: false, explanation: "❌ KTP berisi data super sensitif! Sekali bocor, bisa untuk penipuan." },
+            { text: "B. Tidak ikut dan edukasi teman-teman", correct: true, explanation: "✅ Perfect! Kamu jadi privacy advocate yang melindungi komunitas." },
+            { text: "C. Upload KTP tapi data penting ditutup", correct: false, explanation: "⚠️ Editing bisa di-reverse, masih berisiko. Lebih baik tidak upload sama sekali." }
+          ]
+        }
+      ]
+    };
+
+    function handleChoice(scenarioId, choice) {
+      const scenario = gameState.scenarios.find(s => s.id === scenarioId);
+      const choiceIndex = choice.charCodeAt(0) - 65; // Convert A,B,C to 0,1,2
+      const selectedChoice = scenario.choices[choiceIndex];
+
+      // Update score
+      if (selectedChoice.correct) {
+        gameState.score++;
+      }
+
+      // Update UI
+      const buttons = document.querySelectorAll('.choice-btn');
+      buttons.forEach((btn, index) => {
+        btn.disabled = true;
+        if (index === choiceIndex) {
+          btn.classList.add(selectedChoice.correct ? 'correct' : 'incorrect');
+        } else if (scenario.choices[index].correct) {
+          btn.classList.add('correct');
+        } else {
+          btn.classList.add('neutral');
+        }
+      });
+
+      // Show feedback
+      document.getElementById('feedbackContent').innerHTML = selectedChoice.explanation;
+      document.getElementById('gameFeedback').style.display = 'block';
+      document.getElementById('currentScore').textContent = gameState.score;
+    }
+
+    function nextScenario() {
+      if (gameState.currentScenario < gameState.scenarios.length) {
+        gameState.currentScenario++;
+        const scenario = gameState.scenarios[gameState.currentScenario - 1];
+
+        // Update scenario content
+        document.querySelector('.game-scenario h4').textContent = scenario.title;
+        document.getElementById('scenarioText').textContent = scenario.text;
+
+        // Update choice buttons
+        const buttons = document.querySelectorAll('.choice-btn');
+        buttons.forEach((btn, index) => {
+          btn.textContent = scenario.choices[index].text;
+          btn.disabled = false;
+          btn.className = 'choice-btn';
+          btn.onclick = () => handleChoice(scenario.id, String.fromCharCode(65 + index));
+        });
+
+        // Hide feedback and update counters
+        document.getElementById('gameFeedback').style.display = 'none';
+        document.getElementById('currentScenario').textContent = gameState.currentScenario;
+      } else {
+        // Game complete
+        showGameComplete();
+      }
+    }
+
+    function showGameComplete() {
+      const percentage = (gameState.score / gameState.scenarios.length) * 100;
+      let scoreClass = 'score-needs-improvement';
+      let message = 'Perlu belajar lebih banyak tentang privasi data!';
+
+      if (percentage >= 80) {
+        scoreClass = 'score-excellent';
+        message = 'Luar biasa! Kamu sudah menjadi Privacy Guardian yang handal!';
+      } else if (percentage >= 60) {
+        scoreClass = 'score-good';
+        message = 'Bagus! Kamu sudah punya kesadaran privasi yang baik.';
+      }
+
+      document.querySelector('.privacy-game').innerHTML = `
+          <div class="game-complete">
+            <h4>🎉 Challenge Selesai!</h4>
+            <p class="${scoreClass}">Skor: ${gameState.score}/${gameState.scenarios.length} (${percentage.toFixed(0)}%)</p>
+            <p>${message}</p>
+            <button class="next-scenario-btn" onclick="resetGame()">Main Lagi</button>
+          </div>
+        `;
+    }
+
+    function resetGame() {
+      gameState.currentScenario = 1;
+      gameState.score = 0;
+
+      // Reset to first scenario
+      location.reload(); // Simple reset by reloading
+    }
+
+    // Keyboard navigation
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") changeSlide(-1);
+      if (e.key === "ArrowRight") changeSlide(1);
+    });
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", function () {
+      checkAccess();
+
+      const items = document.querySelectorAll('#groupingAnim .grouping-item');
+      items.forEach((el, i) => {
+        // tambahkan class yang memicu animasi + tetap boleh override delay via CSS nth-child
+        el.classList.add('animate');
+        // jika mau kontrol delay pakai JS (opsional):
+        // el.style.animationDelay = (i * 0.12) + 's';
+      });
+    });
+  </script>
+</body>
+
+</html>
