@@ -475,7 +475,7 @@
                     { id: 'birthday', text: 'Tanggal lahir (bulan/hari)', correctZone: 'private' },
                 ],
 
-                scoring: { perCorrect: 3, perWrong: -2, minShow: 0, maxShow: 6 },
+                scoring: { perCorrect: 8, perWrong: -3, bonusAllCorrect: 2, minShow: 0, maxShow: 6 },
                 emoji: '🗂️'
             },
             {
@@ -611,6 +611,10 @@
                 span.style.left = Math.random() * 100 + 'vw';
                 span.style.animationDelay = (Math.random() * 0.4) + 's';
                 span.style.filter = `hue-rotate(${Math.floor(Math.random() * 360)}deg)`;
+                // PENTING: jangan biarkan confetti menangkap klik
+                span.style.pointerEvents = 'none';
+                // taruh sedikit di bawah z-index kontrol UI supaya tidak menutup tombol
+                span.style.zIndex = '20';
                 document.body.appendChild(span);
                 setTimeout(() => span.remove(), 2000);
             }
@@ -830,6 +834,7 @@
             checkBtn.onclick = () => {
                 const perCorrect = (round.scoring && typeof round.scoring.perCorrect === 'number') ? round.scoring.perCorrect : 10;
                 const perWrong = (round.scoring && typeof round.scoring.perWrong === 'number') ? round.scoring.perWrong : -5;
+                const bonusAllCorrect = (round.scoring && typeof round.scoring.bonusAllCorrect === 'number') ? round.scoring.bonusAllCorrect : 2;
 
                 const placed = {};
                 const publicZone = document.getElementById('publicZone');
@@ -861,7 +866,12 @@
                     }
                 });
 
+                if (wrongCount === 0 && correctCount === round.items.length) {
+                    state.score += 2; // bonus for perfect
+                }
+
                 const delta = correctCount * perCorrect + wrongCount * perWrong;
+
                 state.score = (typeof state.score === 'number' ? state.score : 0) + delta;
                 state.answers = state.answers || [];
                 state.answers.push({
