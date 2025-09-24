@@ -1,191 +1,146 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jejak Digital SMP — Slides Interaktif</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Subtle animated gradient background (gelap elegan) */
-        body {
-            background: radial-gradient(1200px 600px at 10% 10%, rgba(79, 70, 229, 0.35), transparent),
-                radial-gradient(1000px 500px at 90% 20%, rgba(236, 72, 153, 0.25), transparent),
-                radial-gradient(800px 600px at 30% 90%, rgba(34, 197, 94, 0.25), transparent),
-                #0b1020;
-            min-height: 100vh;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jejak Digital SMP — Slides Interaktif</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Subtle animated gradient background (gelap elegan) */
+    body {
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(79,70,229,.35), transparent),
+        radial-gradient(1000px 500px at 90% 20%, rgba(236,72,153,.25), transparent),
+        radial-gradient(800px 600px at 30% 90%, rgba(34,197,94,.25), transparent),
+        #0b1020;
+      min-height: 100vh;
+    }
+    /* Smooth fades between slides */
+    .fade-enter { opacity: 0; transform: translateY(8px) scale(.995); }
+    .fade-enter-active { opacity: 1; transform: translateY(0) scale(1); transition: all 260ms ease; }
+    .fade-exit { opacity: 1; }
+    .fade-exit-active { opacity: 0; transform: translateY(-8px) scale(.995); transition: all 220ms ease; }
 
-        /* Smooth fades between slides */
-        .fade-enter {
-            opacity: 0;
-            transform: translateY(8px) scale(0.995);
-        }
+    /* Glass card */
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.06));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .btn { transition: transform 120ms ease, box-shadow 200ms ease, background-color 150ms ease; }
+    .btn:active { transform: translateY(1px); }
+    .ring-focus:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,.5); }
 
-        .fade-enter-active {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            transition: all 260ms ease;
-        }
-
-        .fade-exit {
-            opacity: 1;
-        }
-
-        .fade-exit-active {
-            opacity: 0;
-            transform: translateY(-8px) scale(0.995);
-            transition: all 220ms ease;
-        }
-
-        /* Glass card */
-        .glass {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.06));
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        }
-
-        .btn {
-            transition: transform 120ms ease, box-shadow 200ms ease, background-color 150ms ease;
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-        .ring-focus:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
-        }
-
-        /* Circuit board accent for title visual */
-        .circuit {
-            background-image:
-                linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-            background-size: 22px 22px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .circuit:before,
-        .circuit:after {
-            content: "";
-            position: absolute;
-            border: 2px solid rgba(99, 102, 241, 0.45);
-            border-radius: 9999px;
-            width: 180px;
-            height: 180px;
-            filter: blur(0.2px);
-        }
-
-        .circuit:before {
-            top: -40px;
-            left: -30px;
-            transform: rotate(25deg);
-        }
-
-        .circuit:after {
-            bottom: -60px;
-            right: -50px;
-            transform: rotate(-15deg);
-        }
-    </style>
+    /* Circuit board accent for title visual */
+    .circuit {
+      background-image:
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 22px 22px;
+      position: relative; overflow: hidden;
+    }
+    .circuit:before, .circuit:after {
+      content: ""; position: absolute; border: 2px solid rgba(99,102,241,.45);
+      border-radius: 9999px; width: 180px; height: 180px; filter: blur(.2px);
+    }
+    .circuit:before { top: -40px; left: -30px; transform: rotate(25deg); }
+    .circuit:after  { bottom: -60px; right: -50px; transform: rotate(-15deg); }
+  </style>
 </head>
-
 <body class="text-slate-100 antialiased">
-    <!-- App Wrapper -->
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-        <!-- Header / Top Bar -->
-        <div class="glass rounded-2xl p-4 sm:p-5 mb-5 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div class="hidden sm:flex items-center gap-2 text-slate-300">
-                    <span class="text-xs opacity-80">Navigasi:</span>
-                    <span class="text-xs bg-slate-800/60 px-2 py-1 rounded-lg">←</span>
-                    <span class="text-xs bg-slate-800/60 px-2 py-1 rounded-lg">→</span>
-                    <span class="text-xs">atau gunakan tombol panah</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="glass rounded-xl px-3 py-2 text-sm">
-                    <span id="slideIndicator" class="font-semibold">1</span><span class="opacity-70">/<span
-                            id="totalSlides">9</span></span>
-                </div>
-            </div>
+  <!-- App Wrapper (disembunyikan default untuk mencegah flash sebelum akses granted) -->
+  <div id="mainContent" style="display:none" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+    <!-- Header / Top Bar -->
+    <div class="glass rounded-2xl p-4 sm:p-5 mb-5 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 text-slate-300">
+          <span class="text-xs opacity-80">Navigasi:</span>
+          <span class="text-xs bg-slate-800/60 px-2 py-1 rounded-lg">←</span>
+          <span class="text-xs bg-slate-800/60 px-2 py-1 rounded-lg">→</span>
+          <span class="text-xs">atau gunakan tombol panah</span>
         </div>
-
-        <!-- Slides Area -->
-        <section>
-            <div class="glass rounded-3xl p-4 sm:p-6 md:p-8 relative overflow-hidden">
-                <!-- Progress bar -->
-                <div class="absolute inset-x-0 top-0 h-1.5 bg-white/10">
-                    <div id="progress"
-                        class="h-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-emerald-400 transition-all duration-300"
-                        style="width: 10%;"></div>
-                </div>
-
-                <!-- Slide Container -->
-                <div id="slideContainer" class="min-h-[420px] md:min-h-[520px] flex items-stretch"></div>
-
-                <!-- Nav Buttons -->
-                <div class="mt-6 flex items-center justify-between">
-                    <button id="prevBtn"
-                        class="btn ring-focus inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
-                        <svg width="18" height="18" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M14 7l-5 5l5 5V7z" />
-                        </svg>
-                        Sebelumnya
-                    </button>
-                    <div class="flex gap-2">
-                        <button id="quickMenuBtn" class="hidden">
-                            <svg width="18" height="18" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z" />
-                            </svg>
-                            Daftar Slide
-                        </button>
-                        <button id="nextBtn"
-                            class="btn ring-focus inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold">
-                            Berikutnya
-                            <svg width="18" height="18" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M10 17l5-5l-5-5v10z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Menu Modal -->
-            <div id="quickMenu" class="fixed inset-0 z-40 hidden">
-                <div class="absolute inset-0 bg-black/50"></div>
-                <div
-                    class="absolute inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 top-16 sm:top-24 glass rounded-2xl max-w-2xl w-[calc(100%-2rem)] p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-semibold">Pilih Slide</h3>
-                        <button id="closeQuickMenu"
-                            class="btn ring-focus bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm">Tutup</button>
-                    </div>
-                    <div id="quickMenuGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer tip -->
-        <div class="mt-5 text-center text-xs text-slate-400">
-            Gunakan tombol panah kiri/kanan untuk navigasi.
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="glass rounded-xl px-3 py-2 text-sm">
+          <span id="slideIndicator" class="font-semibold">1</span>
+          <span class="opacity-70">/<span id="totalSlides">9</span></span>
         </div>
+      </div>
     </div>
 
-    <script>
-        // Slides data and renderers
-        const slides = [
-            {
-                title: "Judul",
-                render: () => {
-                    const container = document.createElement('div');
-                    container.className = "w-full grid md:grid-cols-2 gap-6 items-center";
-                    container.innerHTML = `
+    <!-- Slides Area -->
+    <section>
+      <div class="glass rounded-3xl p-4 sm:p-6 md:p-8 relative overflow-hidden">
+        <!-- Progress bar -->
+        <div class="absolute inset-x-0 top-0 h-1.5 bg-white/10">
+          <div id="progress" class="h-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-emerald-400 transition-all duration-300" style="width: 10%;"></div>
+        </div>
+
+        <!-- Slide Container -->
+        <div id="slideContainer" class="min-h-[420px] md:min-h-[520px] flex items-stretch"></div>
+
+        <!-- Nav Buttons -->
+        <div class="mt-6 flex items-center justify-between">
+          <button id="prevBtn" class="btn ring-focus inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14 7l-5 5l5 5V7z" /></svg>
+            Sebelumnya
+          </button>
+          <div class="flex gap-2">
+            <button id="quickMenuBtn" class="hidden">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z" /></svg>
+              Daftar Slide
+            </button>
+            <button id="nextBtn" class="btn ring-focus inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold">
+              Berikutnya
+              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M10 17l5-5l-5-5v10z" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Menu Modal -->
+      <div id="quickMenu" class="fixed inset-0 z-40 hidden">
+        <div class="absolute inset-0 bg-black/50"></div>
+        <div class="absolute inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 top-16 sm:top-24 glass rounded-2xl max-w-2xl w-[calc(100%-2rem)] p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-semibold">Pilih Slide</h3>
+            <button id="closeQuickMenu" class="btn ring-focus bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm">Tutup</button>
+          </div>
+          <div id="quickMenuGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer tip -->
+    <div class="mt-5 text-center text-xs text-slate-400">
+      Gunakan tombol panah kiri/kanan untuk navigasi.
+    </div>
+  </div>
+
+  <!-- === Access Code Popup (Overlay) === -->
+  <div id="accessPopup" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-slate-950/90">
+    <div class="glass max-w-md w-[92%] rounded-2xl p-5 text-slate-100">
+      <h2 class="text-lg font-bold mb-1">Kode Akses</h2>
+      <p class="text-sm text-slate-300 mb-4">Masukkan kode untuk membuka materi.</p>
+      <form id="accessForm" class="space-y-3">
+        <input id="accessInput" type="password" class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 ring-focus" placeholder="" />
+        <button type="submit" class="btn ring-focus bg-indigo-600 hover:bg-indigo-500 text-white w-full px-4 py-2.5 rounded-xl font-semibold">Masuk</button>
+        <div id="accessError" class="hidden text-sm text-rose-300">Kode salah. Coba lagi.</div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Slides data and renderers
+    const slides = [
+      {
+        title: "Judul",
+        render: () => {
+          const container = document.createElement('div');
+          container.className = "w-full grid md:grid-cols-2 gap-6 items-center";
+          container.innerHTML = `
             <div class="space-y-4">
               <div class="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-slate-300">
                 <span class="px-2 py-1 rounded-md bg-indigo-600/30 text-indigo-200">Jejak Digital</span>
@@ -207,38 +162,22 @@
               </div>
             </div>
           `;
-                    // Optional facilitator name preview
-                    setTimeout(() => {
-                        const input = container.querySelector('#namaGuru');
-                        const preview = container.querySelector('#guruPreview');
-                        const nameEl = container.querySelector('#guruName');
-                        input.addEventListener('input', () => {
-                            const val = input.value.trim();
-                            if (val) {
-                                nameEl.textContent = val;
-                                preview.classList.remove('hidden');
-                            } else {
-                                preview.classList.add('hidden');
-                                nameEl.textContent = "";
-                            }
-                        });
-                    }, 0);
-                    return container;
-                }
-            },
-            {
-                title: "Ice Breaking",
-                render: () => {
-                    const container = document.createElement('div');
-                    container.className = "w-full grid md:grid-cols-5 gap-6";
-                    container.innerHTML = `
+          return container;
+        }
+      },
+      {
+        title: "Ice Breaking",
+        render: () => {
+          const container = document.createElement('div');
+          container.className = "w-full grid md:grid-cols-5 gap-6";
+          container.innerHTML = `
             <div class="md:col-span-2 space-y-4">
               <h2 class="text-2xl font-bold">Ice Breaking</h2>
               <p class="text-lg">Apa yang muncul kalau kamu mengetik <span class="font-semibold text-indigo-200">namamu</span> di Google?</p>
               <p class="text-sm text-slate-300">Klik opsi untuk menghitung jawaban di kelas.</p>
             </div>
             <div class="md:col-span-3 grid sm:grid-cols-2 gap-3">
-              ${["Akun media sosial", "Foto profil", "Tugas sekolah / lomba", "Berita / artikel lain"].map((opt, idx) => `
+              ${["Akun media sosial","Foto profil","Tugas sekolah / lomba","Berita / artikel lain"].map((opt, idx) => `
                 <button data-idx="${idx}" class="voteOption btn ring-focus bg-slate-800/60 hover:bg-slate-700/70 border border-white/10 rounded-xl p-4 text-left">
                   <div class="flex items-center justify-between">
                     <span class="font-semibold">${opt}</span>
@@ -251,34 +190,34 @@
               </div>
             </div>
           `;
-                    setTimeout(() => {
-                        const buttons = container.querySelectorAll('.voteOption');
-                        const counts = JSON.parse(localStorage.getItem('iceVotes') || '[0,0,0,0]');
-                        buttons.forEach((btn, i) => {
-                            btn.querySelector('.count').textContent = counts[i];
-                            btn.addEventListener('click', () => {
-                                counts[i] += 1;
-                                btn.querySelector('.count').textContent = counts[i];
-                                localStorage.setItem('iceVotes', JSON.stringify(counts));
-                                btn.classList.add('bg-slate-700');
-                                setTimeout(() => btn.classList.remove('bg-slate-700'), 120);
-                            });
-                        });
-                        container.querySelector('#resetVotes').addEventListener('click', () => {
-                            const zero = [0, 0, 0, 0];
-                            localStorage.setItem('iceVotes', JSON.stringify(zero));
-                            buttons.forEach((b) => b.querySelector('.count').textContent = 0);
-                        });
-                    }, 0);
-                    return container;
-                }
-            },
-            {
-                title: "Apa Itu Jejak Digital?",
-                render: () => {
-                    const el = document.createElement('div');
-                    el.className = "w-full grid lg:grid-cols-3 gap-6";
-                    el.innerHTML = `
+          setTimeout(() => {
+            const buttons = container.querySelectorAll('.voteOption');
+            const counts = JSON.parse(localStorage.getItem('iceVotes') || '[0,0,0,0]');
+            buttons.forEach((btn, i) => {
+              btn.querySelector('.count').textContent = counts[i];
+              btn.addEventListener('click', () => {
+                counts[i] += 1;
+                btn.querySelector('.count').textContent = counts[i];
+                localStorage.setItem('iceVotes', JSON.stringify(counts));
+                btn.classList.add('bg-slate-700');
+                setTimeout(()=>btn.classList.remove('bg-slate-700'), 120);
+              });
+            });
+            container.querySelector('#resetVotes').addEventListener('click', () => {
+              const zero = [0,0,0,0];
+              localStorage.setItem('iceVotes', JSON.stringify(zero));
+              buttons.forEach(b => b.querySelector('.count').textContent = 0);
+            });
+          }, 0);
+          return container;
+        }
+      },
+      {
+        title: "Apa Itu Jejak Digital?",
+        render: () => {
+          const el = document.createElement('div');
+          el.className = "w-full grid lg:grid-cols-3 gap-6";
+          el.innerHTML = `
             <div class="lg:col-span-2 space-y-4">
               <h2 class="text-2xl font-bold">Apa Itu Jejak Digital?</h2>
               <p class="text-lg">Jejak digital (<em>digital footprint</em>) adalah semua rekam data yang kita tinggalkan saat menggunakan perangkat digital dan internet.</p>
@@ -291,344 +230,262 @@
                   <div class="mt-2 font-semibold">Jejak Aktif</div>
                   <ul class="mt-1 text-sm text-slate-300 list-disc pl-5 space-y-2">
                     <li>
-                    Posting foto, komentar, status
-                    <ul class="mt-1 list-disc pl-5 space-y-1 text-[13px] text-slate-400">
+                      Posting foto, komentar, status
+                      <ul class="mt-1 list-disc pl-5 space-y-1 text-[13px] text-slate-400">
                         <li>Foto kegiatan ekskul dengan caption positif</li>
                         <li>Komentar suportif di posting teman/akun sekolah</li>
                         <li>Status berbagi info lomba, beasiswa, atau karya</li>
-                    </ul>
+                      </ul>
                     </li>
                     <li>
-                    Unggah video
-                    <ul class="mt-1 list-disc pl-5 space-y-1 text-[13px] text-slate-400">
+                      Unggah video
+                      <ul class="mt-1 list-disc pl-5 space-y-1 text-[13px] text-slate-400">
                         <li>Video presentasi tugas (YouTube <code>Unlisted</code> / privat)</li>
                         <li>Video tutorial singkat tanpa data pribadi</li>
                         <li>Rekap kegiatan positif dengan izin pihak terkait</li>
-                    </ul>
+                      </ul>
                     </li>
-                    </ul>
-
+                  </ul>
                 </div>
                 <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
                   <div class="text-3xl">🛰️</div>
-  <div class="mt-2 font-semibold">Jejak Pasif</div>
-  <ul class="mt-1 text-sm text-slate-300 list-disc pl-5 space-y-2">
-    <li>
-      Riwayat browsing, lokasi
-      <ul class="mt-1 list-disc pl-5 space-y-1 text-[13px] text-slate-400">
-        <li>Halaman yang dikunjungi (tercatat oleh situs/ISP).</li>
-        <li>Perkiraan lokasi dari alamat IP atau GPS aplikasi.</li>
-      </ul>
-    </li>
-    <li>
-      Cookies dan data otomatis
-      <ul class="mt-1 list-disc pl-5 space-y-1 text-[13px] text-slate-400">
-        <li>Preferensi login dan bahasa tersimpan otomatis.</li>
-        <li>Rekomendasi/iklan dipersonalisasi dari aktivitasmu.</li>
-      </ul>
-    </li>
-  </ul>
+                  <div class="mt-2 font-semibold">Jejak Pasif</div>
+                  <ul class="mt-1 text-sm text-slate-300 list-disc pl-5 space-y-2">
+                    <li>
+                      Riwayat browsing, lokasi
+                      <ul class="mt-1 list-disc pl-5 space-y-1 text-[13px] text-slate-400">
+                        <li>Halaman yang dikunjungi (tercatat oleh situs/ISP)</li>
+                        <li>Perkiraan lokasi dari alamat IP atau GPS aplikasi</li>
+                      </ul>
+                    </li>
+                    <li>
+                      Cookies dan data otomatis
+                      <ul class="mt-1 list-disc pl-5 space-y-1 text-[13px] text-slate-400">
+                        <li>Preferensi login & bahasa tersimpan otomatis</li>
+                        <li>Rekomendasi/iklan dipersonalisasi dari aktivitasmu</li>
+                      </ul>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
-            
+
             <div class="lg:col-span-1 rounded-2xl border border-white/10 p-4 bg-slate-900/40">
               <div class="text-sm text-slate-300">Catatan</div>
               <p class="mt-1 text-sm text-slate-300">Jejak aktif = kita sengaja bagikan. Jejak pasif = terekam otomatis saat kita memakai layanan.</p>
             </div>
           `;
-                    return el;
-                }
-            },
-            {
-                title: "Contoh Jejak Digital",
-  render: () => {
-    const el = document.createElement('div');
-    el.className = "space-y-4";
-    el.innerHTML = `
-      <h2 class="text-2xl font-bold">Contoh Jejak Digital</h2>
-      <p class="text-slate-300">Contoh nyata yang sering muncul di profil siswa—gunakan ini sebagai bahan diskusi kelas.</p>
+          return el;
+        }
+      },
+      {
+        title: "Contoh Jejak Digital",
+        render: () => {
+          const el = document.createElement('div');
+          el.className = "space-y-4";
+          el.innerHTML = `
+            <h2 class="text-2xl font-bold">Contoh Jejak Digital</h2>
+            <p class="text-slate-300">Contoh nyata yang sering muncul di profil siswa—gunakan ini sebagai bahan diskusi kelas.</p>
 
-      <div class="grid md:grid-cols-2 gap-4">
-        <!-- POSITIF -->
-        <div class="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4">
-          <div class="flex items-center gap-2 text-emerald-300 font-semibold mb-2">👍 Positif</div>
-          <ul class="list-disc pl-5 space-y-2 text-slate-200">
-            <li>
-              Portofolio karya / blog pribadi
-              <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-emerald-200/90">
-                <li>Proyek coding, desain poster, fotografi.</li>
-                <li>Artikel refleksi belajar atau ringkasan buku.</li>
-              </ul>
-            </li>
-            <li>
-              Prestasi akademik / lomba yang diliput
-              <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-emerald-200/90">
-                <li>Link berita/IG sekolah tentang juara lomba (tanpa data sensitif).</li>
-                <li>Ucapan terima kasih untuk tim & pembina.</li>
-              </ul>
-            </li>
-            <li>
-              Unggahan inspiratif atau edukatif
-              <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-emerald-200/90">
-                <li>Video tutorial belajar, tips literasi digital.</li>
-                <li>Dokumentasi bakti sosial/kompetisi dengan izin pihak terkait.</li>
-              </ul>
-            </li>
-            <li>
-              Interaksi positif
-              <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-emerald-200/90">
-                <li>Komentar suportif & memberi kredit sumber.</li>
-                <li>Diskusi santun di forum/kelas online.</li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-
-        <!-- NEGATIF -->
-        <div class="rounded-2xl border border-rose-400/30 bg-rose-400/10 p-4">
-          <div class="flex items-center gap-2 text-rose-300 font-semibold mb-2">👎 Negatif</div>
-          <ul class="list-disc pl-5 space-y-2 text-slate-200">
-            <li>
-              Komentar kasar / bullying
-              <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-rose-200/90">
-                <li>Menjuluki teman, body shaming, membocorkan info pribadi.</li>
-              </ul>
-            </li>
-            <li>
-              Foto/video tidak pantas
-              <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-rose-200/90">
-                <li>Pose berbahaya/eksplisit; seragam + lokasi sekolah terlihat jelas.</li>
-                <li>Memamerkan kartu pelajar/dokumen yang berisi data pribadi.</li>
-              </ul>
-            </li>
-            <li>
-              Menyebarkan hoaks atau konten ilegal
-              <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-rose-200/90">
-                <li>Link bajakan, tugas siap pakai tanpa sumber.</li>
-                <li>Menyebar info tanpa verifikasi (clickbait).</li>
-              </ul>
-            </li>
-            <li>
-              Jejak konflik
-              <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-rose-200/90">
-                <li>Drama komentar publik, debat memanas yang terekam lama.</li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="rounded-xl bg-white/5 border border-white/10 p-3 text-xs text-slate-300">
-        <span class="font-semibold">Tips cepat:</span> sebelum unggah, cek 3 hal — <span class="italic">baik</span> (bermanfaat?), <span class="italic">benar</span> (sumber jelas?), <span class="italic">bijak</span> (aman untuk masa depan?).
-      </div>
-    `;
-                    return el;
-                }
-            },
-            {
-  title: "Dampak Jejak Digital",
-  render: () => {
-    const el = document.createElement('div');
-    el.className = "space-y-4";
-    el.innerHTML = `
-      <h2 class="text-2xl font-bold">Dampak Jejak Digital</h2>
-      <p class="text-slate-300">Jejak hari ini bisa memengaruhi hubungan, peluang, dan reputasi di masa depan.</p>
-
-      <!-- Timeline (tetap) -->
-      <div class="relative rounded-2xl border border-white/10 p-5 bg-slate-900/40">
-        <div class="flex items-center gap-2 text-sm text-slate-300">
-          <span>Timeline</span>
-          <span class="text-xs bg-slate-800/60 px-2 py-1 rounded-md">Sekarang → Masa Depan</span>
-        </div>
-
-        <div class="mt-6 relative">
-          <div class="h-1 bg-white/10 rounded-full"></div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 text-sm">
-            <!-- Jangka Pendek -->
-            <div class="space-y-2 rounded-xl border border-white/10 p-3 bg-slate-900/30 min-w-0">
-              <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
-                <div class="font-semibold">Jangka Pendek</div>
-                <span class="ml-auto text-[11px] bg-emerald-500/20 text-emerald-200 px-2 py-0.5 rounded">Risiko: Rendah–Sedang</span>
+            <div class="grid md:grid-cols-2 gap-4">
+              <!-- POSITIF -->
+              <div class="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4">
+                <div class="flex items-center gap-2 text-emerald-300 font-semibold mb-2">👍 Positif</div>
+                <ul class="list-disc pl-5 space-y-2 text-slate-200">
+                  <li>
+                    Portofolio karya / blog pribadi
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-emerald-200/90">
+                      <li>Proyek coding, desain poster, fotografi</li>
+                      <li>Artikel refleksi belajar atau ringkasan buku</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Prestasi akademik / lomba yang diliput
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-emerald-200/90">
+                      <li>Link berita/IG sekolah tentang juara lomba (tanpa data sensitif)</li>
+                      <li>Ucapan terima kasih untuk tim & pembina</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Unggahan inspiratif atau edukatif
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-emerald-200/90">
+                      <li>Video tutorial belajar, tips literasi digital</li>
+                      <li>Dokumentasi bakti sosial/kompetisi (dengan izin)</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Interaksi positif
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-emerald-200/90">
+                      <li>Komentar suportif & memberi kredit sumber</li>
+                      <li>Diskusi santun di forum/kelas online</li>
+                    </ul>
+                  </li>
+                </ul>
               </div>
-              <ul class="list-disc pl-5 text-slate-300 space-y-1">
-                <li>Teguran guru/orang tua; konflik pertemanan</li>
-                <li>Akun diprivat/diblokir; posting dilaporkan</li>
-                <li>Screenshot tersebar di grup</li>
-              </ul>
-              
-              <div class="hidden text-[13px] text-slate-300/90 space-y-1">
-                <div><span class="inline-block w-4 text-center">💬</span>Komentar sarkas memicu adu argumen.</div>
-                <div><span class="inline-block w-4 text-center">📸</span>Foto bercanda jadi bahan olok-olok.</div>
+
+              <!-- NEGATIF -->
+              <div class="rounded-2xl border border-rose-400/30 bg-rose-400/10 p-4">
+                <div class="flex items-center gap-2 text-rose-300 font-semibold mb-2">👎 Negatif</div>
+                <ul class="list-disc pl-5 space-y-2 text-slate-200">
+                  <li>
+                    Komentar kasar / bullying
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-rose-200/90">
+                      <li>Menjuluki teman, body shaming, membocorkan info pribadi</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Foto/video tidak pantas
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-rose-200/90">
+                      <li>Pose berbahaya/eksplisit; seragam + lokasi sekolah terlihat jelas</li>
+                      <li>Memamerkan kartu pelajar/dokumen yang berisi data pribadi</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Menyebarkan hoaks atau konten ilegal
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-rose-200/90">
+                      <li>Link bajakan, tugas siap pakai tanpa sumber</li>
+                      <li>Menyebar info tanpa verifikasi (clickbait)</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Jejak konflik
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-[13px] text-rose-200/90">
+                      <li>Drama komentar publik, debat memanas yang terekam lama</li>
+                    </ul>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <!-- Transisi -->
-            <div class="space-y-2 rounded-xl border border-white/10 p-3 bg-slate-900/30 min-w-0">
-              <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-indigo-400"></div>
-                <div class="font-semibold">Transisi</div>
-                <span class="ml-auto text-[11px] bg-indigo-500/20 text-indigo-200 px-2 py-0.5 rounded">Risiko: Sedang</span>
+            <div class="rounded-xl bg-white/5 border border-white/10 p-3 text-xs text-slate-300">
+              <span class="font-semibold">Tips cepat:</span> sebelum unggah, cek 3 hal — <span class="italic">baik</span> (bermanfaat?), <span class="italic">benar</span> (sumber jelas?), <span class="italic">bijak</span> (aman untuk masa depan?).
+            </div>
+          `;
+          return el;
+        }
+      },
+      {
+        title: "Dampak Jejak Digital",
+        render: () => {
+          const el = document.createElement('div');
+          el.className = "space-y-4";
+          el.innerHTML = `
+            <h2 class="text-2xl font-bold">Dampak Jejak Digital</h2>
+            <p class="text-slate-300">Jejak hari ini bisa memengaruhi hubungan, peluang, dan reputasi di masa depan.</p>
+
+            <!-- Timeline -->
+            <div class="relative rounded-2xl border border-white/10 p-5 bg-slate-900/40">
+              <div class="flex items-center gap-2 text-sm text-slate-300">
+                <span>Timeline</span>
+                <span class="text-xs bg-slate-800/60 px-2 py-1 rounded-md">Sekarang → Masa Depan</span>
               </div>
-              <p class="text-slate-300">Jejak mulai dinilai panitia lomba/komunitas/guru BK.</p>
-              
-              <div class="hidden text-[13px] text-slate-300/90 space-y-1">
-                <div><span class="inline-block w-4 text-center">🔎</span>Hasil Google menurunkan penilaian sikap.</div>
-                <div><span class="inline-block w-4 text-center">📝</span>Unggahan ditolak karena riwayat komentar toksik.</div>
+
+              <div class="mt-6 relative">
+                <div class="h-1 bg-white/10 rounded-full"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 text-sm">
+                  <!-- Jangka Pendek -->
+                  <div class="space-y-2 rounded-xl border border-white/10 p-3 bg-slate-900/30 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                      <div class="font-semibold">Jangka Pendek</div>
+                      <span class="ml-auto text-[11px] bg-emerald-500/20 text-emerald-200 px-2 py-0.5 rounded">Risiko: Rendah–Sedang</span>
+                    </div>
+                    <ul class="list-disc pl-5 text-slate-300 space-y-1">
+                      <li>Teguran guru/orang tua; konflik pertemanan</li>
+                      <li>Akun diprivat/diblokir; posting dilaporkan</li>
+                      <li>Screenshot tersebar di grup</li>
+                    </ul>
+                  </div>
+
+                  <!-- Transisi -->
+                  <div class="space-y-2 rounded-xl border border-white/10 p-3 bg-slate-900/30 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <div class="w-3 h-3 rounded-full bg-indigo-400"></div>
+                      <div class="font-semibold">Transisi</div>
+                      <span class="ml-auto text-[11px] bg-indigo-500/20 text-indigo-200 px-2 py-0.5 rounded">Risiko: Sedang</span>
+                    </div>
+                    <p class="text-slate-300">Jejak mulai dinilai panitia lomba/komunitas/guru BK.</p>
+                  </div>
+
+                  <!-- Jangka Panjang -->
+                  <div class="space-y-2 rounded-xl border border-white/10 p-3 bg-slate-900/30 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <div class="w-3 h-3 rounded-full bg-fuchsia-400"></div>
+                      <div class="font-semibold">Jangka Panjang</div>
+                      <span class="ml-auto text-[11px] bg-fuchsia-500/20 text-fuchsia-200 px-2 py-0.5 rounded">Risiko: Tinggi</span>
+                    </div>
+                    <ul class="list-disc pl-5 text-slate-300 space-y-1">
+                      <li>Dinilai sekolah/organisasi saat pendaftaran</li>
+                      <li>Menghambat beasiswa/pekerjaan/keanggotaan</li>
+                      <li>Reputasi buruk sulit dihapus</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div aria-hidden="true" class="h-4 sm:h-6 md:h-8 w-full"></div>
+              <hr class="border-white/10" />
+              <div aria-hidden="true" class="h-4 sm:h-6 md:h-8 w-full"></div>
+
+              <!-- Mitigasi Cepat -->
+              <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40 min-w-0">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                  <h3 class="font-semibold">Mitigasi Cepat (24 jam)</h3>
+                  <button id="resetImpactChecklist" class="btn ring-focus text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg">Reset</button>
+                  <p class="text-sm text-slate-300">Centang langkah darurat dalam 24 jam pertama saat ada jejak bermasalah.</p>
+                </div>
+
+                <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                  ${[
+                    "Privatkan/hapus unggahan bermasalah",
+                    "Minta takedown ke admin/moderator",
+                    "Tinggalkan klarifikasi & minta maaf (jika perlu)",
+                    "Simpan bukti (screenshot, tautan)",
+                    "Aktifkan 2FA & ganti sandi jika akun disusupi",
+                    "Isi linimasa dengan konten positif (counter-signal)"
+                  ].map((t,i)=>`
+                    <li>
+                      <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full">
+                        <input type="checkbox" data-step="${i}" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
+                        <span class="leading-relaxed">${t}</span>
+                      </label>
+                    </li>
+                  `).join("")}
+                </ul>
               </div>
             </div>
-
-            <!-- Jangka Panjang -->
-            <div class="space-y-2 rounded-xl border border-white/10 p-3 bg-slate-900/30 min-w-0">
-              <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-fuchsia-400"></div>
-                <div class="font-semibold">Jangka Panjang</div>
-                <span class="ml-auto text-[11px] bg-fuchsia-500/20 text-fuchsia-200 px-2 py-0.5 rounded">Risiko: Tinggi</span>
-              </div>
-              <ul class="list-disc pl-5 text-slate-300 space-y-1">
-                <li>Dinilai sekolah/organisasi saat pendaftaran</li>
-                <li>Menghambat beasiswa/pekerjaan/ keanggotaan</li>
-                <li>Reputasi buruk sulit dihapus</li>
-              </ul>
-              
-              <div class="hidden text-[13px] text-slate-300/90 space-y-1">
-                <div><span class="inline-block w-4 text-center">🏫</span>Arsip komentar lama ikut dipertimbangkan.</div>
-                <div><span class="inline-block w-4 text-center">🧭</span>Konten negatif masih muncul bertahun-tahun.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div aria-hidden="true" class="h-4 sm:h-6 md:h-8 w-full"></div>
-        <hr class="border-white/10" />
-        <div aria-hidden="true" class="h-4 sm:h-6 md:h-8 w-full"></div>
-
-        <!-- Mitigasi Cepat (DISEMPURNAKAN) -->
-        <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40 min-w-0">
-          <div class="flex items-center justify-between gap-2 flex-wrap">
-            <h3 class="font-semibold">Mitigasi Cepat (24 jam)</h3>
-            <button id="resetImpactChecklist" class="btn ring-focus text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg">Reset</button>
-            <p class="text-sm text-slate-300">Centang langkah darurat yang bisa kamu lakukan dalam 24 jam pertama saat ada jejak digital yang bermasalah—tujuannya untuk mengurangi penyebaran, dampak sosial, dan risiko akun.</p>
-            
-          </div>
-
-          <!-- gunakan <ul><li> agar stabil di semua browser -->
-          <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-            <li>
-              <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full break-words">
-                <input type="checkbox" data-step="0" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
-                <span class="leading-relaxed">Privatkan/hapus unggahan bermasalah</span>
-              </label>
-            </li>
-            <li>
-              <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full break-words">
-                <input type="checkbox" data-step="1" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
-                <span class="leading-relaxed">Minta takedown ke admin/moderator</span>
-              </label>
-            </li>
-            <li>
-              <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full break-words">
-                <input type="checkbox" data-step="2" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
-                <span class="leading-relaxed">Tinggalkan klarifikasi & minta maaf (jika perlu)</span>
-              </label>
-            </li>
-            <li>
-              <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full break-words">
-                <input type="checkbox" data-step="3" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
-                <span class="leading-relaxed">Simpan bukti (screenshot, tautan)</span>
-              </label>
-            </li>
-            <li>
-              <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full break-words">
-                <input type="checkbox" data-step="4" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
-                <span class="leading-relaxed">Aktifkan 2FA & ganti sandi jika akun disusupi</span>
-              </label>
-            </li>
-            <li>
-              <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full break-words">
-                <input type="checkbox" data-step="5" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
-                <span class="leading-relaxed">Isi linimasa dengan konten positif (counter-signal)</span>
-              </label>
-            </li>
-          </ul>
-
-          
-        </div>
-    `;
-
-    // Interaksi: toggle + buka/tutup semua + checklist (tidak diubah)
-    setTimeout(() => {
-      // Toggle per blok
-      el.querySelectorAll('[data-toggle]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const details = btn.parentElement.nextElementSibling;
-          if (!details) return;
-          const willOpen = details.classList.contains('hidden');
-          details.classList.toggle('hidden', !willOpen ? true : false);
-
-          const caretClosed = btn.querySelector('[data-caret-closed]');
-          const caretOpen   = btn.querySelector('[data-caret-open]');
-          const showLbl     = btn.querySelector('[data-label-show]');
-          const hideLbl     = btn.querySelector('[data-label-hide]');
-          caretClosed?.classList.toggle('hidden', willOpen);
-          caretOpen?.classList.toggle('hidden', !willOpen);
-          showLbl?.classList.toggle('hidden', willOpen);
-          hideLbl?.classList.toggle('hidden', !willOpen);
-        });
-      });
-
-      // Buka/tutup semua
-      const openAll  = el.querySelector('#openAllImpact');
-      const closeAll = el.querySelector('#closeAllImpact');
-      const toggleButtons = el.querySelectorAll('[data-toggle]');
-      const detailBlocks  = Array.from(toggleButtons).map(b => b.parentElement.nextElementSibling);
-
-      const setAll = (open) => {
-        detailBlocks.forEach((blk, idx) => {
-          if (!blk) return;
-          const isOpen = !blk.classList.contains('hidden');
-          if (open && !isOpen) toggleButtons[idx].click();
-          if (!open && isOpen) toggleButtons[idx].click();
-        });
-      };
-      openAll?.addEventListener('click', () => setAll(true));
-      closeAll?.addEventListener('click', () => setAll(false));
-
-      // Checklist localStorage
-      const key = 'impactChecklist';
-      const boxes = el.querySelectorAll('input[type="checkbox"][data-step]');
-      const saved = JSON.parse(localStorage.getItem(key) || '[]');
-      boxes.forEach((box,i) => {
-        box.checked = !!saved[i];
-        box.addEventListener('change', () => {
-          const current = JSON.parse(localStorage.getItem(key) || '[]');
-          current[i] = box.checked;
-          localStorage.setItem(key, JSON.stringify(current));
-        });
-      });
-      el.querySelector('#resetImpactChecklist')?.addEventListener('click', () => {
-        const zero = Array.from({length: boxes.length}, () => false);
-        localStorage.setItem(key, JSON.stringify(zero));
-        boxes.forEach(b => b.checked = false);
-      });
-    }, 0);
-
-    return el;
-  }
-},
-            {
-                title: "Aktivitas Kelompok",
-                render: () => {
-                    const el = document.createElement('div');
-                    el.className = "grid lg:grid-cols-2 gap-6";
-                    el.innerHTML = `
+          `;
+          setTimeout(() => {
+            const key='impactChecklist';
+            const boxes=el.querySelectorAll('input[type="checkbox"][data-step]');
+            const saved=JSON.parse(localStorage.getItem(key)||'[]');
+            boxes.forEach((box,i)=>{
+              box.checked=!!saved[i];
+              box.addEventListener('change',()=>{
+                const cur=JSON.parse(localStorage.getItem(key)||'[]');
+                cur[i]=box.checked;
+                localStorage.setItem(key, JSON.stringify(cur));
+              });
+            });
+            el.querySelector('#resetImpactChecklist')?.addEventListener('click',()=>{
+              const zero=Array.from({length:boxes.length},()=>false);
+              localStorage.setItem(key, JSON.stringify(zero));
+              boxes.forEach(b=>b.checked=false);
+            });
+          },0);
+          return el;
+        }
+      },
+      {
+        title: "Aktivitas Kelompok",
+        render: () => {
+          const el = document.createElement('div');
+          el.className = "grid lg:grid-cols-2 gap-6";
+          el.innerHTML = `
             <div class="space-y-4">
               <h2 class="text-2xl font-bold">Aktivitas Kelompok (Studi Kasus)</h2>
-                <p class="text-lg">Diskusikan dalam kelompok 3-4 orang:</p>
-
-
+              <p class="text-lg">Diskusikan dalam kelompok 3–4 orang:</p>
               <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
                 <div class="text-sm text-slate-300">Kasus</div>
                 <p class="mt-1 text-slate-300">Seorang siswa memposting foto temannya dengan caption mengejek.</p>
@@ -641,309 +498,262 @@
                   <li>Apa solusi atau tindakan bijak yang seharusnya?</li>
                 </ol>
               </div>
-             
             </div>
             <div class="space-y-4">
               <div class="rounded-2xl border border-white/10 p-4 bg-slate-600/40">
                 <div class="text-sm text-slate-300 mb-1">Tips Kolaborasi</div>
                 <ul class="list-disc pl-5 text-slate-300 text-sm space-y-1">
-                  <li>Tentukan peran: pencatat, pembicara, pengatur waktu.</li>
-                  <li>Batasi giliran bicara agar semua terdengar.</li>
-                  <li>Gunakan bahasa yang sopan dan menghargai pendapat.</li>
+                  <li>Tentukan peran: pencatat, pembicara, pengatur waktu</li>
+                  <li>Batasi giliran bicara agar semua terdengar</li>
+                  <li>Gunakan bahasa yang sopan dan menghargai pendapat</li>
                 </ul>
               </div>
             </div>
           `;
-                    return el;
-                }
-            },
-            {
-  title: "Cara Menjaga Jejak Digital",
-  render: () => {
-    const el = document.createElement('div');
-    el.className = "space-y-4";
-    el.innerHTML = `
-      <h2 class="text-2xl font-bold">Cara Menjaga Jejak Digital</h2>
-      <p class="text-slate-300 text-sm">Centang poin untuk menampilkan langkah praktisnya.</p>
+          return el;
+        }
+      },
+      {
+        title: "Cara Menjaga Jejak Digital",
+        render: () => {
+          const el = document.createElement('div');
+          el.className = "space-y-4";
+          el.innerHTML = `
+            <h2 class="text-2xl font-bold">Cara Menjaga Jejak Digital</h2>
+            <p class="text-slate-300 text-sm">Centang poin untuk menampilkan langkah praktisnya.</p>
 
-      <div class="grid sm:grid-cols-2 gap-4">
-        ${[
-          {
-            t: "<em> Think before you post </em> (pikir sebelum unggah).",
-            d: [
-              "Gunakan uji 3B: <em>Baik</em>, <em>Benar</em>, <em>Bijak</em>—kalau ragu, jangan unggah.",
-              "Tunda 3–5 detik sebelum kirim; baca ulang nada & konteks.",
-              "Bayangkan dibaca wali kelas/guru BK/masa depanmu—masih oke?"
-            ]
-          },
-          {
-            t: "Atur privasi akun sesuai kebutuhan.",
-            d: [
-              "Instagram/TikTok: aktifkan <em>Private Account</em> atau <em>Close Friends</em>.",
-              "Batasi komentar & mention; review tag sebelum tampil di profil.",
-              "Matikan pelacakan lokasi & <em>location sticker</em> pada unggahan rutin."
-            ]
-          },
-          {
-            t: "Jangan sebar data pribadi (alamat, nomor HP, password).",
-            d: [
-              "Jangan unggah kartu identitas/kartu pelajar/boarding pass utuh (blur bila perlu).",
-              "Hapus metadata (EXIF) lokasi pada foto sebelum sebar.",
-              "Pakai nama pengguna/alias berbeda untuk forum publik."
-            ]
-          },
-          {
-            t: "Keamanan akun (password & 2FA).",
-            d: [
-              "Pakai kata sandi unik per layanan + <em>password manager</em>.",
-              "Aktifkan verifikasi 2 langkah (2FA); cek email/nomor pemulihan.",
-              "Tinjau perangkat & sesi yang login; keluarkan yang tidak dikenali."
-            ]
-          },
-          {
-            t: "Kurasi jejakmu secara berkala.",
-            d: [
-              "Cari namamu di Google setiap bulan; hapus/arsipkan unggahan bermasalah.",
-              "Minta takedown ke admin/moderator jika melanggar aturan.",
-              "Isi linimasa dengan karya/prestasi agar sinyal positif lebih kuat."
-            ]
-          },
-          {
-            t: "Gunakan internet untuk hal positif (belajar, berbagi ide, karya).",
-            d: [
-              "Bangun portofolio (GitHub/Blog) & dokumentasi kegiatan.",
-              "Komentar suportif, beri kredit sumber, hindari debat panas di publik.",
-              "Ikuti komunitas belajar; bagikan ringkasan materi/kegiatan."
-            ]
-          }
-        ].map((item, i) => `
-          <label class="flex items-start gap-3 rounded-2xl border border-white/10 p-4 bg-slate-900/40 cursor-pointer">
-            <input type="checkbox" data-tip="${i}" class="mt-1.5 w-5 h-5 rounded-md bg-slate-800 border-white/20">
-            <span class="leading-relaxed text-slate-200">
-              ${item.t}
-              <div data-tip-detail="${i}" class="mt-2 hidden text-[13px] text-slate-300/90">
-                <ul class="list-disc pl-5 space-y-1">
-                  ${item.d.map(x => `<li>${x}</li>`).join("")}
+            <div class="grid sm:grid-cols-2 gap-4">
+              ${[
+                {
+                  t: "<em> Think before you post </em> (pikir sebelum unggah).",
+                  d: [
+                    "Gunakan uji 3B: <em>Baik</em>, <em>Benar</em>, <em>Bijak</em>—kalau ragu, jangan unggah.",
+                    "Tunda 3–5 detik sebelum kirim; baca ulang nada & konteks.",
+                    "Bayangkan dibaca wali kelas/guru BK/masa depanmu—masih oke?"
+                  ]
+                },
+                {
+                  t: "Atur privasi akun sesuai kebutuhan.",
+                  d: [
+                    "Instagram/TikTok: aktifkan <em>Private Account</em> atau <em>Close Friends</em>.",
+                    "Batasi komentar & mention; review tag sebelum tampil di profil.",
+                    "Matikan pelacakan lokasi & <em>location sticker</em> pada unggahan rutin."
+                  ]
+                },
+                {
+                  t: "Jangan sebar data pribadi (alamat, nomor HP, password).",
+                  d: [
+                    "Jangan unggah kartu identitas/kartu pelajar/boarding pass utuh (blur bila perlu).",
+                    "Hapus metadata (EXIF) lokasi pada foto sebelum sebar.",
+                    "Pakai nama pengguna/alias berbeda untuk forum publik."
+                  ]
+                },
+                {
+                  t: "Keamanan akun (password & 2FA).",
+                  d: [
+                    "Pakai kata sandi unik per layanan + <em>password manager</em>.",
+                    "Aktifkan verifikasi 2 langkah (2FA); cek email/nomor pemulihan.",
+                    "Tinjau perangkat & sesi yang login; keluarkan yang tidak dikenali."
+                  ]
+                },
+                {
+                  t: "Kurasi jejakmu secara berkala.",
+                  d: [
+                    "Cari namamu di Google setiap bulan; hapus/arsipkan unggahan bermasalah.",
+                    "Minta takedown ke admin/moderator jika melanggar aturan.",
+                    "Isi linimasa dengan karya/prestasi agar sinyal positif lebih kuat."
+                  ]
+                },
+                {
+                  t: "Gunakan internet untuk hal positif (belajar, berbagi ide, karya).",
+                  d: [
+                    "Bangun portofolio (GitHub/Blog) & dokumentasi kegiatan.",
+                    "Komentar suportif, beri kredit sumber, hindari debat panas di publik.",
+                    "Ikuti komunitas belajar; bagikan ringkasan materi/kegiatan."
+                  ]
+                }
+              ].map((item, i) => `
+                <label class="flex items-start gap-3 rounded-2xl border border-white/10 p-4 bg-slate-900/40 cursor-pointer">
+                  <input type="checkbox" data-tip="${i}" class="mt-1.5 w-5 h-5 rounded-md bg-slate-800 border-white/20">
+                  <span class="leading-relaxed text-slate-200">
+                    ${item.t}
+                    <div data-tip-detail="${i}" class="mt-2 hidden text-[13px] text-slate-300/90">
+                      <ul class="list-disc pl-5 space-y-1">
+                        ${item.d.map(x => `<li>${x}</li>`).join("")}
+                      </ul>
+                    </div>
+                  </span>
+                </label>
+              `).join("")}
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+              <button id="openAllTips" class="btn ring-focus bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-xs font-semibold">Buka semua detail</button>
+              <button id="closeAllTips" class="btn ring-focus bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-xs font-semibold">Tutup semua detail</button>
+              <button id="resetChecklist" class="btn ring-focus bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">Reset Centang</button>
+            </div>
+          `;
+          setTimeout(() => {
+            const key='tipsCheck';
+            const boxes=el.querySelectorAll('input[type="checkbox"][data-tip]');
+            const detailBlocks=el.querySelectorAll('[data-tip-detail]');
+            let state=[]; try{ state=JSON.parse(localStorage.getItem(key)||'[]'); }catch{ state=[]; }
+            if(!Array.isArray(state)||state.length!==boxes.length){ state=Array.from({length:boxes.length},()=>false); }
+
+            boxes.forEach((box,i)=>{
+              box.checked=!!state[i];
+              const panel=el.querySelector(`[data-tip-detail="${i}"]`);
+              if(panel) panel.classList.toggle('hidden', !box.checked);
+              box.addEventListener('change', ()=>{
+                state[i]=box.checked; localStorage.setItem(key, JSON.stringify(state));
+                if(panel) panel.classList.toggle('hidden', !box.checked);
+              });
+            });
+
+            el.querySelector('#resetChecklist')?.addEventListener('click', ()=>{
+              state=Array.from({length:boxes.length},()=>false);
+              localStorage.setItem(key, JSON.stringify(state));
+              boxes.forEach(b=>b.checked=false);
+              detailBlocks.forEach(p=>p.classList.add('hidden'));
+            });
+            el.querySelector('#openAllTips')?.addEventListener('click', ()=>{
+              boxes.forEach((b,i)=>{ b.checked=true; state[i]=true; });
+              localStorage.setItem(key, JSON.stringify(state));
+              detailBlocks.forEach(p=>p.classList.remove('hidden'));
+            });
+            el.querySelector('#closeAllTips')?.addEventListener('click', ()=>{
+              boxes.forEach((b,i)=>{ b.checked=false; state[i]=false; });
+              localStorage.setItem(key, JSON.stringify(state));
+              detailBlocks.forEach(p=>p.classList.add('hidden'));
+            });
+          },0);
+          return el;
+        }
+      },
+      {
+        title: "Ringkasan",
+        render: () => {
+          const el = document.createElement('div');
+          el.className = "space-y-4";
+          el.innerHTML = `
+            <h2 class="text-2xl font-bold">Ringkasan</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
+                <div class="text-3xl">⚠️</div>
+                <div class="mt-2 font-semibold">Selalu Ada</div>
+                <p class="text-sm text-slate-300">Jejak digital sulit dihapus total.</p>
+                <ul class="mt-2 text-[13px] text-slate-300/90 list-disc pl-5 space-y-1">
+                  <li>Konten bisa dihapus, tapi sudah terlanjur <em>di-screenshot</em>/diarsip.</li>
+                  <li>Metadata & cache dapat tersimpan di layanan pihak ketiga.</li>
+                  <li>Lebih mudah mencegah daripada memperbaiki.</li>
+                </ul>
+                <div class="mt-2 text-[12px] text-amber-200/90">Tip: tunda 3–5 detik sebelum menekan “Kirim”.</div>
+              </div>
+              <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
+                <div class="text-3xl">🔍</div>
+                <div class="mt-2 font-semibold">Positif vs Negatif</div>
+                <p class="text-sm text-slate-300">Jejak bisa membuka peluang atau jadi penghambat.</p>
+                <ul class="mt-2 text-[13px] text-slate-300/90 list-disc pl-5 space-y-1">
+                  <li>Positif: portofolio, prestasi, konten edukatif, interaksi santun.</li>
+                  <li>Negatif: bullying, hoaks, konten tidak pantas, drama publik.</li>
+                  <li>Gunakan uji 3B: <em>Baik</em>, <em>Benar</em>, <em>Bijak</em>.</li>
                 </ul>
               </div>
-            </span>
-          </label>
-        `).join("")}
-      </div>
+              <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
+                <div class="text-3xl">✅</div>
+                <div class="mt-2 font-semibold">Kelola Bijak</div>
+                <p class="text-sm text-slate-300">Kendalikan privasi & kurasi jejak secara rutin.</p>
+                <ul class="mt-2 text-[13px] text-slate-300/90 list-disc pl-5 space-y-1">
+                  <li>Atur privasi, batasi komentar & tag otomatis.</li>
+                  <li>Audit bulanan: cari nama sendiri & rapikan unggahan.</li>
+                  <li>Bangun jejak profesional (blog/portofolio).</li>
+                </ul>
+              </div>
+            </div>
 
-      <div class="flex items-center gap-2 flex-wrap">
-        <button id="openAllTips" class="btn ring-focus bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-xs font-semibold">Buka semua detail</button>
-        <button id="closeAllTips" class="btn ring-focus bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-xs font-semibold">Tutup semua detail</button>
-        <button id="resetChecklist" class="btn ring-focus bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">Reset Centang</button>
-        
-      </div>
-    `;
+            <div aria-hidden="true" class="h-4 sm:h-6 w-full"></div>
 
-    setTimeout(() => {
-      const key = 'tipsCheck';
-      const boxes = el.querySelectorAll('input[type="checkbox"][data-tip]');
-      const detailBlocks = el.querySelectorAll('[data-tip-detail]');
-      // Ambil state lama (jika panjang beda, sesuaikan)
-      let state = [];
-      try { state = JSON.parse(localStorage.getItem(key) || '[]'); } catch { state = []; }
-      if (!Array.isArray(state) || state.length !== boxes.length) {
-        state = Array.from({ length: boxes.length }, () => false);
-      }
+            <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <h3 class="font-semibold">Komitmen Minggu Ini</h3>
+                <div class="flex items-center gap-2">
+                  <button id="copySummary" class="btn ring-focus text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg">Salin Ringkasan</button>
+                  <button id="resetCommit" class="btn ring-focus text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg">Reset</button>
+                </div>
+              </div>
+              <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                ${[
+                  "Cari namaku di Google & simpan catatan hasilnya",
+                  "Arsipkan/hapus 3 unggahan yang kurang pantas",
+                  "Aktifkan 2FA & cek perangkat yang login",
+                  "Posting 1 konten positif (karya/refleksi)"
+                ].map((t,i)=>`
+                  <li>
+                    <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full">
+                      <input type="checkbox" data-commit="${i}" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
+                      <span class="leading-relaxed">${t}</span>
+                    </label>
+                  </li>
+                `).join("")}
+              </ul>
+              <div id="copyNote" class="mt-2 hidden text-[12px] text-emerald-300">Ringkasan disalin ke clipboard! 🎉</div>
+            </div>
+          `;
+          setTimeout(() => {
+            const key='summaryCommit';
+            const boxes=el.querySelectorAll('input[type="checkbox"][data-commit]');
+            let state=[]; try{ state=JSON.parse(localStorage.getItem(key)||'[]'); }catch{ state=[]; }
+            if(!Array.isArray(state)||state.length!==boxes.length){ state=Array.from({length:boxes.length},()=>false); }
+            boxes.forEach((box,i)=>{
+              box.checked=!!state[i];
+              box.addEventListener('change',()=>{ state[i]=box.checked; localStorage.setItem(key, JSON.stringify(state)); });
+            });
+            el.querySelector('#resetCommit')?.addEventListener('click',()=>{
+              state=Array.from({length:boxes.length},()=>false);
+              localStorage.setItem(key, JSON.stringify(state));
+              boxes.forEach(b=>b.checked=false);
+            });
 
-      // Inisialisasi UI dari state
-      boxes.forEach((box, i) => {
-        box.checked = !!state[i];
-        const panel = el.querySelector(`[data-tip-detail="${i}"]`);
-        if (panel) panel.classList.toggle('hidden', !box.checked);
+            const copyBtn=el.querySelector('#copySummary');
+            const copyNote=el.querySelector('#copyNote');
+            const summaryText=[
+              'Ringkasan Jejak Digital:',
+              '- Jejak digital sulit dihapus; cegah lebih mudah daripada memperbaiki.',
+              '- Jejak positif: portofolio, prestasi, konten edukatif; negatif: bullying, hoaks, konten tidak pantas.',
+              '- Kelola bijak: setel privasi, audit bulanan, bangun portofolio.',
+              '',
+              'Komitmen Minggu Ini:',
+              '1) Cari nama di Google & catat hasilnya',
+              '2) Arsip/hapus 3 unggahan kurang pantas',
+              '3) Aktifkan 2FA & cek sesi login',
+              '4) Posting 1 konten positif'
+            ].join('\n');
 
-        // Toggle & simpan
-        box.addEventListener('change', () => {
-          state[i] = box.checked;
-          localStorage.setItem(key, JSON.stringify(state));
-          if (panel) panel.classList.toggle('hidden', !box.checked);
-        });
-      });
-
-      // Reset
-      el.querySelector('#resetChecklist')?.addEventListener('click', () => {
-        state = Array.from({ length: boxes.length }, () => false);
-        localStorage.setItem(key, JSON.stringify(state));
-        boxes.forEach(b => b.checked = false);
-        detailBlocks.forEach(p => p.classList.add('hidden'));
-      });
-
-      // Buka/Tutup semua detail
-      el.querySelector('#openAllTips')?.addEventListener('click', () => {
-        boxes.forEach((b, i) => { b.checked = true; state[i] = true; });
-        localStorage.setItem(key, JSON.stringify(state));
-        detailBlocks.forEach(p => p.classList.remove('hidden'));
-      });
-      el.querySelector('#closeAllTips')?.addEventListener('click', () => {
-        boxes.forEach((b, i) => { b.checked = false; state[i] = false; });
-        localStorage.setItem(key, JSON.stringify(state));
-        detailBlocks.forEach(p => p.classList.add('hidden'));
-      });
-    }, 0);
-
-    return el;
-  }
-},
-           {
-  title: "Ringkasan",
-  render: () => {
-    const el = document.createElement('div');
-    el.className = "space-y-4";
-    el.innerHTML = `
-      <h2 class="text-2xl font-bold">Ringkasan</h2>
-
-      <div class="grid md:grid-cols-3 gap-4">
-        <!-- Selalu Ada -->
-        <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
-          <div class="text-3xl">⚠️</div>
-          <div class="mt-2 font-semibold">Selalu Ada</div>
-          <p class="text-sm text-slate-300">Jejak digital sulit dihapus total.</p>
-          <ul class="mt-2 text-[13px] text-slate-300/90 list-disc pl-5 space-y-1">
-            <li>Konten bisa dihapus, tapi sudah terlanjur <em>di-screenshot</em> / diarsip.</li>
-            <li>Metadata & cache dapat tersimpan di layanan pihak ketiga.</li>
-            <li>Lebih mudah mencegah daripada memperbaiki.</li>
-          </ul>
-          <div class="mt-2 text-[12px] text-amber-200/90">Tip: tunda 3–5 detik sebelum menekan “Kirim”.</div>
-        </div>
-
-        <!-- Positif vs Negatif -->
-        <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
-          <div class="text-3xl">🔍</div>
-          <div class="mt-2 font-semibold">Positif vs Negatif</div>
-          <p class="text-sm text-slate-300">Jejak bisa membuka peluang atau jadi penghambat.</p>
-          <ul class="mt-2 text-[13px] text-slate-300/90 list-disc pl-5 space-y-1">
-            <li>Positif: portofolio, prestasi, konten edukatif, interaksi santun.</li>
-            <li>Negatif: bullying, hoaks, konten tidak pantas, drama publik.</li>
-            <li>Gunakan uji 3B: <em>Baik</em>, <em>Benar</em>, <em>Bijak</em>.</li>
-          </ul>
-        </div>
-
-        <!-- Kelola Bijak -->
-        <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
-          <div class="text-3xl">✅</div>
-          <div class="mt-2 font-semibold">Kelola Bijak</div>
-          <p class="text-sm text-slate-300">Kendalikan privasi & kurasi jejak secara rutin.</p>
-          <ul class="mt-2 text-[13px] text-slate-300/90 list-disc pl-5 space-y-1">
-            <li>Atur privasi, batasi komentar & tag otomatis.</li>
-            <li>Audit bulanan: cari nama sendiri & rapikan unggahan.</li>
-            <li>Bangun jejak profesional (blog/portofolio).</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Spacer -->
-      <div aria-hidden="true" class="h-4 sm:h-6 w-full"></div>
-
-      <!-- Komitmen Minggu Ini -->
-      <div class="rounded-2xl border border-white/10 p-4 bg-slate-900/40">
-        <div class="flex items-center justify-between gap-2 flex-wrap">
-          <h3 class="font-semibold">Komitmen Minggu Ini</h3>
-          <div class="flex items-center gap-2">
-            <button id="copySummary" class="btn ring-focus text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg">Salin Ringkasan</button>
-            <button id="resetCommit" class="btn ring-focus text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg">Reset</button>
-          </div>
-        </div>
-        <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-          ${[
-            "Cari namaku di Google & simpan catatan hasilnya",
-            "Arsipkan/hapus 3 unggahan yang kurang pantas",
-            "Aktifkan 2FA & cek perangkat yang login",
-            "Posting 1 konten positif (karya/refleksi)"
-          ].map((t, i) => `
-            <li>
-              <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full">
-                <input type="checkbox" data-commit="${i}" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
-                <span class="leading-relaxed">${t}</span>
-              </label>
-            </li>
-          `).join("")}
-        </ul>
-        <div id="copyNote" class="mt-2 hidden text-[12px] text-emerald-300">Ringkasan disalin ke clipboard! 🎉</div>
-      </div>
-    `;
-    // interaksi
-    setTimeout(() => {
-      // Checklist localStorage
-      const key = 'summaryCommit';
-      const boxes = el.querySelectorAll('input[type="checkbox"][data-commit]');
-      let state = [];
-      try { state = JSON.parse(localStorage.getItem(key) || '[]'); } catch { state = []; }
-      if (!Array.isArray(state) || state.length !== boxes.length) {
-        state = Array.from({ length: boxes.length }, () => false);
-      }
-      boxes.forEach((box, i) => {
-        box.checked = !!state[i];
-        box.addEventListener('change', () => {
-          state[i] = box.checked;
-          localStorage.setItem(key, JSON.stringify(state));
-        });
-      });
-      el.querySelector('#resetCommit')?.addEventListener('click', () => {
-        state = Array.from({ length: boxes.length }, () => false);
-        localStorage.setItem(key, JSON.stringify(state));
-        boxes.forEach(b => b.checked = false);
-      });
-
-      // Salin Ringkasan
-      const copyBtn  = el.querySelector('#copySummary');
-      const copyNote = el.querySelector('#copyNote');
-      const summaryText = [
-        'Ringkasan Jejak Digital:',
-        '- Jejak digital sulit dihapus; cegah lebih mudah daripada memperbaiki.',
-        '- Jejak positif: portofolio, prestasi, konten edukatif; negatif: bullying, hoaks, konten tidak pantas.',
-        '- Kelola bijak: setel privasi, audit bulanan, bangun portofolio.',
-        '',
-        'Komitmen Minggu Ini:',
-        '1) Cari nama di Google & catat hasilnya',
-        '2) Arsip/hapus 3 unggahan kurang pantas',
-        '3) Aktifkan 2FA & cek sesi login',
-        '4) Posting 1 konten positif'
-      ].join('\n');
-
-      function copyToClipboard(txt) {
-        if (navigator.clipboard?.writeText) {
-          return navigator.clipboard.writeText(txt);
+            function copyToClipboard(txt){
+              if(navigator.clipboard?.writeText){ return navigator.clipboard.writeText(txt); }
+              return new Promise((resolve,reject)=>{
+                try{
+                  const ta=document.createElement('textarea');
+                  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+                  document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+                  document.body.removeChild(ta); resolve();
+                }catch(e){ reject(e); }
+              });
+            }
+            copyBtn?.addEventListener('click', async ()=>{
+              try{ await copyToClipboard(summaryText); copyNote?.classList.remove('hidden'); setTimeout(()=>copyNote?.classList.add('hidden'),1500); }
+              catch{ alert('Gagal menyalin. Silakan salin manual.'); }
+            });
+          },0);
+          return el;
         }
-        // fallback
-        return new Promise((resolve, reject) => {
-          try {
-            const ta = document.createElement('textarea');
-            ta.value = txt;
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            resolve();
-          } catch (e) { reject(e); }
-        });
-      }
-
-      copyBtn?.addEventListener('click', async () => {
-        try {
-          await copyToClipboard(summaryText);
-          copyNote?.classList.remove('hidden');
-          setTimeout(() => copyNote?.classList.add('hidden'), 1500);
-        } catch {
-          alert('Gagal menyalin. Silakan salin manual.');
-        }
-      });
-    }, 0);
-
-    return el;
-  }
-},
-            {
-                title: "Penutup",
-                render: () => {
-                    const el = document.createElement('div');
-                    el.className = "space-y-5";
-                    el.innerHTML = `
+      },
+      {
+        title: "Penutup",
+        render: () => {
+          const el = document.createElement('div');
+          el.className = "space-y-5";
+          el.innerHTML = `
             <h2 class="text-2xl font-bold">Penutup</h2>
             <blockquote class="rounded-2xl border border-white/10 p-5 bg-slate-900/40 text-lg">
               “Jejak digitalmu adalah cerminan masa depanmu. Tinggalkan jejak yang membanggakan.”
@@ -952,14 +762,14 @@
               <div class="font-semibold mb-2">Kuis Cepat</div>
               <div class="space-y-3" id="quizWrap">
                 ${[
-                            { q: "Jejak digital pasif itu contohnya apa?", a: ["Posting foto", "Riwayat browsing", "Mengunggah video"], correct: 1 },
-                            { q: "Mana yang termasuk jejak digital positif?", a: ["Komentar kasar", "Menyebar hoaks", "Portofolio karya"], correct: 2 },
-                            { q: "Apa dampak jangka panjang jejak digital negatif?", a: ["Ditertawakan sebentar", "Tidak ada pengaruh", "Menghambat beasiswa/pekerjaan"], correct: 2 },
-                        ].map((item, qi) => `
+                  { q:"Jejak digital pasif itu contohnya apa?", a:["Posting foto","Riwayat browsing","Mengunggah video"], correct:1 },
+                  { q:"Mana yang termasuk jejak digital positif?", a:["Komentar kasar","Menyebar hoaks","Portofolio karya"], correct:2 },
+                  { q:"Apa dampak jangka panjang jejak digital negatif?", a:["Ditertawakan sebentar","Tidak ada pengaruh","Menghambat beasiswa/pekerjaan"], correct:2 },
+                ].map((item, qi)=>`
                   <div class="rounded-xl border border-white/10 p-3 bg-slate-900/40">
-                    <div class="text-sm mb-2">${qi + 1}. ${item.q}</div>
+                    <div class="text-sm mb-2">${qi+1}. ${item.q}</div>
                     <div class="grid sm:grid-cols-3 gap-2">
-                      ${item.a.map((opt, ai) => `
+                      ${item.a.map((opt, ai)=>`
                         <button data-q="${qi}" data-a="${ai}" class="quizOpt btn ring-focus bg-slate-800/60 hover:bg-slate-700/70 px-3 py-2 rounded-lg text-sm text-left">${opt}</button>
                       `).join("")}
                     </div>
@@ -973,126 +783,181 @@
               </div>
             </div>
           `;
-                    // quiz interactions
-                    setTimeout(() => {
-                        const correctMap = { 0: 1, 1: 2, 2: 2 };
-                        const resNodes = {};
-                        el.querySelectorAll('[data-qres]').forEach(n => { resNodes[n.getAttribute('data-qres')] = n; });
-                        const scoreEl = el.querySelector('#quizScore');
-                        let answered = {};
-                        const updateScore = () => {
-                            const vals = Object.values(answered);
-                            const correct = vals.filter(v => v === true).length;
-                            const total = 3;
-                            scoreEl.textContent = vals.length ? `Skor: ${correct}/${total}` : "";
-                        };
-                        el.querySelectorAll('.quizOpt').forEach(btn => {
-                            btn.addEventListener('click', () => {
-                                const q = Number(btn.getAttribute('data-q'));
-                                const a = Number(btn.getAttribute('data-a'));
-                                const correct = correctMap[q] === a;
-                                answered[q] = correct;
-                                const res = resNodes[q];
-                                res.textContent = correct ? "Benar! 🎉" : "Kurang tepat. Coba lagi!";
-                                res.className = "mt-2 text-sm " + (correct ? "text-emerald-300" : "text-rose-300");
-                                btn.closest('.grid').querySelectorAll('button').forEach(b => b.classList.remove('bg-emerald-700', 'bg-rose-700'));
-                                btn.classList.add(correct ? 'bg-emerald-700' : 'bg-rose-700');
-                                updateScore();
-                            });
-                        });
-                        el.querySelector('#resetQuiz').addEventListener('click', () => {
-                            answered = {}; updateScore();
-                            Object.values(resNodes).forEach(n => { n.textContent = ""; n.className = "mt-2 text-sm"; });
-                            el.querySelectorAll('.quizOpt').forEach(b => b.classList.remove('bg-emerald-700', 'bg-rose-700'));
-                        });
-                    }, 0);
-                    return el;
-                }
-            },
-        ];
-
-        // Build Quick Menu (tanpa Outline)
-        function buildQuickMenu() {
-            const qm = document.getElementById('quickMenuGrid');
-            qm.innerHTML = "";
-            slides.forEach((s, i) => {
-                const card = document.createElement('button');
-                card.className = "text-left rounded-xl border border-white/10 bg-slate-900/40 hover:bg-slate-900/60 p-3 ring-focus";
-                card.innerHTML = `<div class="text-xs opacity-80">Slide ${i + 1}</div><div class="font-semibold">${s.title}</div>`;
-                card.addEventListener('click', () => { goTo(i); closeQuickMenu(); });
-                qm.appendChild(card);
+          setTimeout(()=>{
+            const correctMap={0:1,1:2,2:2};
+            const resNodes={};
+            el.querySelectorAll('[data-qres]').forEach(n=>{ resNodes[n.getAttribute('data-qres')]=n; });
+            const scoreEl=el.querySelector('#quizScore');
+            let answered={};
+            const updateScore=()=>{
+              const vals=Object.values(answered);
+              const correct=vals.filter(v=>v===true).length;
+              const total=3;
+              scoreEl.textContent=vals.length?`Skor: ${correct}/${total}`:"";
+            };
+            el.querySelectorAll('.quizOpt').forEach(btn=>{
+              btn.addEventListener('click',()=>{
+                const q=Number(btn.getAttribute('data-q'));
+                const a=Number(btn.getAttribute('data-a'));
+                const correct=correctMap[q]===a;
+                answered[q]=correct;
+                const res=resNodes[q];
+                res.textContent=correct?"Benar! 🎉":"Kurang tepat. Coba lagi!";
+                res.className="mt-2 text-sm "+(correct?"text-emerald-300":"text-rose-300");
+                btn.closest('.grid').querySelectorAll('button').forEach(b=>b.classList.remove('bg-emerald-700','bg-rose-700'));
+                btn.classList.add(correct?'bg-emerald-700':'bg-rose-700');
+                updateScore();
+              });
             });
+            el.querySelector('#resetQuiz').addEventListener('click', ()=>{
+              answered={}; updateScore();
+              Object.values(resNodes).forEach(n=>{ n.textContent=""; n.className="mt-2 text-sm"; });
+              el.querySelectorAll('.quizOpt').forEach(b=>b.classList.remove('bg-emerald-700','bg-rose-700'));
+            });
+          },0);
+          return el;
         }
+      },
+    ];
 
-        // Navigation and rendering
-        let current = 0;
-        let total = 0;
-        const slideContainer = document.getElementById('slideContainer');
-        const slideIndicator = document.getElementById('slideIndicator');
-        const totalSlidesEl = document.getElementById('totalSlides');
-        const progress = document.getElementById('progress');
+    // Build Quick Menu
+    function buildQuickMenu() {
+      const qm = document.getElementById('quickMenuGrid');
+      qm.innerHTML = "";
+      slides.forEach((s, i) => {
+        const card = document.createElement('button');
+        card.className = "text-left rounded-xl border border-white/10 bg-slate-900/40 hover:bg-slate-900/60 p-3 ring-focus";
+        card.innerHTML = `<div class="text-xs opacity-80">Slide ${i+1}</div><div class="font-semibold">${s.title}</div>`;
+        card.addEventListener('click', () => { goTo(i); closeQuickMenu(); });
+        qm.appendChild(card);
+      });
+    }
 
-        function renderSlide(index) {
-            // fade out current
-            const old = slideContainer.firstElementChild;
-            if (old) {
-                old.classList.add('fade-exit');
-                requestAnimationFrame(() => {
-                    old.classList.add('fade-exit-active');
-                    setTimeout(() => { if (old.parentNode) old.parentNode.removeChild(old); enterNew(); }, 220);
-                });
-            } else {
-                enterNew();
-            }
-            function enterNew() {
-                const node = slides[index].render();
-                node.classList.add('w-full', 'fade-enter');
-                slideContainer.appendChild(node);
-                requestAnimationFrame(() => {
-                    node.classList.add('fade-enter-active');
-                    setTimeout(() => { node.classList.remove('fade-enter', 'fade-enter-active'); }, 260);
-                });
-                // Wire "Daftar Slide" di Slide 1 jika ada
-                const qm2 = node.querySelector('#quickMenuBtn2');
-                if (qm2) qm2.addEventListener('click', openQuickMenu);
-            }
-            slideIndicator.textContent = (index + 1).toString();
-            progress.style.width = `${((index + 1) / total) * 100}%`;
-            document.getElementById('prevBtn').disabled = index === 0;
-            document.getElementById('nextBtn').disabled = index === total - 1;
-        }
+    // Navigation and rendering
+    let current = 0;
+    let total = 0;
+    const slideContainer = document.getElementById('slideContainer');
+    const slideIndicator = document.getElementById('slideIndicator');
+    const totalSlidesEl  = document.getElementById('totalSlides');
+    const progress       = document.getElementById('progress');
 
-        function goTo(i) { current = Math.max(0, Math.min(total - 1, i)); renderSlide(current); }
-        function goNext() { goTo(current + 1); }
-        function goPrev() { goTo(current - 1); }
-        window.goNext = goNext; // for inline handler
-
-        // Quick Menu controls
-        function openQuickMenu() { document.getElementById('quickMenu').classList.remove('hidden'); }
-        function closeQuickMenu() { document.getElementById('quickMenu').classList.add('hidden'); }
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
-            const isTyping = tag === 'input' || tag === 'textarea';
-            if (isTyping) return;
-            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
-            if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
+    function renderSlide(index) {
+      // fade out current
+      const old = slideContainer.firstElementChild;
+      if (old) {
+        old.classList.add('fade-exit');
+        requestAnimationFrame(()=>{
+          old.classList.add('fade-exit-active');
+          setTimeout(()=>{ if (old.parentNode) old.parentNode.removeChild(old); enterNew(); }, 220);
         });
+      } else { enterNew(); }
+      function enterNew() {
+        const node = slides[index].render();
+        node.classList.add('w-full','fade-enter');
+        slideContainer.appendChild(node);
+        requestAnimationFrame(()=>{
+          node.classList.add('fade-enter-active');
+          setTimeout(()=>{ node.classList.remove('fade-enter','fade-enter-active'); }, 260);
+        });
+      }
+      slideIndicator.textContent = (index+1).toString();
+      progress.style.width = `${((index+1)/total)*100}%`;
+      document.getElementById('prevBtn').disabled = index === 0;
+      document.getElementById('nextBtn').disabled = index === total - 1;
+    }
 
-        // Buttons wiring
-        document.getElementById('prevBtn').addEventListener('click', goPrev);
-        document.getElementById('nextBtn').addEventListener('click', goNext);
-        document.getElementById('quickMenuBtn').addEventListener('click', openQuickMenu);
-        document.getElementById('closeQuickMenu').addEventListener('click', closeQuickMenu);
+    function goTo(i){ current = Math.max(0, Math.min(total-1, i)); renderSlide(current); }
+    function goNext(){ goTo(current+1); }
+    function goPrev(){ goTo(current-1); }
+    window.goNext = goNext;
 
-        // Initialize
-        buildQuickMenu();
-        total = slides.length;
-        if (totalSlidesEl) totalSlidesEl.textContent = total;
-        renderSlide(current);
-    </script>
-    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'983959b6913b8e9d',t:'MTc1ODYyMzI1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+    // Quick Menu controls
+    function openQuickMenu(){ document.getElementById('quickMenu').classList.remove('hidden'); }
+    function closeQuickMenu(){ document.getElementById('quickMenu').classList.add('hidden'); }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e)=>{
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+      const isTyping = tag === 'input' || tag === 'textarea';
+      if (isTyping) return;
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
+    });
+
+    // Buttons wiring
+    document.getElementById('prevBtn').addEventListener('click', goPrev);
+    document.getElementById('nextBtn').addEventListener('click', goNext);
+    document.getElementById('quickMenuBtn').addEventListener('click', openQuickMenu);
+    document.getElementById('closeQuickMenu').addEventListener('click', closeQuickMenu);
+
+    // ====== INIT DIPINDAH KE FUNGSI ======
+    function initializeContent(){
+      buildQuickMenu();
+      total = slides.length;
+      if (totalSlidesEl) totalSlidesEl.textContent = total;
+      renderSlide(current);
+      // tampilkan konten jika belum
+      const main = document.getElementById('mainContent');
+      if (main && main.style.display === 'none') main.style.display = '';
+    }
+
+    // ============================================
+    // ACCESS CODE SETTING
+    // ============================================
+    const ENABLE_ACCESS_CODE   = true;             // set false untuk menonaktifkan popup
+    const ACCESS_CODE_PLAINTEXT= "RGMDSMS25";       // UBAH kode akses di sini
+    const ACCESS_SESSION_KEY   = "access_ok_v1";
+
+    function showAccessPopup(){
+      const popup = document.getElementById('accessPopup');
+      popup.classList.remove('hidden');
+      popup.classList.add('flex');
+    }
+
+    function grantAccess(){
+      sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+      const popup = document.getElementById('accessPopup');
+      popup.classList.add('hidden'); popup.classList.remove('flex');
+      initializeContent();
+    }
+
+    function checkAccess(){
+      if (!ENABLE_ACCESS_CODE){
+        grantAccess(); // langsung masuk tanpa popup
+        return;
+      }
+      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1"){
+        grantAccess();
+      } else {
+        showAccessPopup();
+      }
+    }
+
+    // Wiring form popup
+    (function wireAccessForm(){
+      const form  = document.getElementById('accessForm');
+      const input = document.getElementById('accessInput');
+      const err   = document.getElementById('accessError');
+      if (!form) return;
+      form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        err?.classList.add('hidden');
+        const code = (input?.value || "").trim();
+        if (!code){ if(err){ err.textContent="Kode tidak boleh kosong."; err.classList.remove('hidden'); } return; }
+        if (code === ACCESS_CODE_PLAINTEXT) {
+          grantAccess();
+        } else {
+          if(err){ err.textContent="Kode salah. Coba lagi."; err.classList.remove('hidden'); }
+          if(input){ input.value=""; input.focus(); }
+        }
+      });
+    })();
+
+    // START
+    document.addEventListener('DOMContentLoaded', checkAccess);
+  </script>
+
+  <!-- (biarkan script bawaan jika memang ada di file asli) -->
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'983959b6913b8e9d',t:'MTc1ODYyMzI1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
-
 </html>
