@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,46 +10,92 @@
     /* Subtle animated gradient background (gelap elegan) */
     body {
       background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(79,70,229,.35), transparent),
-        radial-gradient(1000px 500px at 90% 20%, rgba(236,72,153,.25), transparent),
-        radial-gradient(800px 600px at 30% 90%, rgba(34,197,94,.25), transparent),
+        radial-gradient(1200px 600px at 10% 10%, rgba(79, 70, 229, .35), transparent),
+        radial-gradient(1000px 500px at 90% 20%, rgba(236, 72, 153, .25), transparent),
+        radial-gradient(800px 600px at 30% 90%, rgba(34, 197, 94, .25), transparent),
         #0b1020;
       min-height: 100vh;
     }
+
     /* Smooth fades between slides */
-    .fade-enter { opacity: 0; transform: translateY(8px) scale(.995); }
-    .fade-enter-active { opacity: 1; transform: translateY(0) scale(1); transition: all 260ms ease; }
-    .fade-exit { opacity: 1; }
-    .fade-exit-active { opacity: 0; transform: translateY(-8px) scale(.995); transition: all 220ms ease; }
+    .fade-enter {
+      opacity: 0;
+      transform: translateY(8px) scale(.995);
+    }
+
+    .fade-enter-active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: all 260ms ease;
+    }
+
+    .fade-exit {
+      opacity: 1;
+    }
+
+    .fade-exit-active {
+      opacity: 0;
+      transform: translateY(-8px) scale(.995);
+      transition: all 220ms ease;
+    }
 
     /* Glass card */
     .glass {
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.06));
+      background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .06));
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
+      border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .08);
     }
-    .btn { transition: transform 120ms ease, box-shadow 200ms ease, background-color 150ms ease; }
-    .btn:active { transform: translateY(1px); }
-    .ring-focus:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,.5); }
+
+    .btn {
+      transition: transform 120ms ease, box-shadow 200ms ease, background-color 150ms ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .ring-focus:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .5);
+    }
 
     /* Circuit board accent for title visual */
     .circuit {
       background-image:
-        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px),
-        linear-gradient(0deg, rgba(255,255,255,.06) 1px, transparent 1px);
+        linear-gradient(90deg, rgba(255, 255, 255, .06) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255, 255, 255, .06) 1px, transparent 1px);
       background-size: 22px 22px;
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
     }
-    .circuit:before, .circuit:after {
-      content: ""; position: absolute; border: 2px solid rgba(99,102,241,.45);
-      border-radius: 9999px; width: 180px; height: 180px; filter: blur(.2px);
+
+    .circuit:before,
+    .circuit:after {
+      content: "";
+      position: absolute;
+      border: 2px solid rgba(99, 102, 241, .45);
+      border-radius: 9999px;
+      width: 180px;
+      height: 180px;
+      filter: blur(.2px);
     }
-    .circuit:before { top: -40px; left: -30px; transform: rotate(25deg); }
-    .circuit:after  { bottom: -60px; right: -50px; transform: rotate(-15deg); }
+
+    .circuit:before {
+      top: -40px;
+      left: -30px;
+      transform: rotate(25deg);
+    }
+
+    .circuit:after {
+      bottom: -60px;
+      right: -50px;
+      transform: rotate(-15deg);
+    }
   </style>
 </head>
+
 <body class="text-slate-100 antialiased">
   <!-- App Wrapper (disembunyikan default untuk mencegah flash sebelum akses granted) -->
   <div id="mainContent" style="display:none" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
@@ -75,7 +122,9 @@
       <div class="glass rounded-3xl p-4 sm:p-6 md:p-8 relative overflow-hidden">
         <!-- Progress bar -->
         <div class="absolute inset-x-0 top-0 h-1.5 bg-white/10">
-          <div id="progress" class="h-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-emerald-400 transition-all duration-300" style="width: 10%;"></div>
+          <div id="progress"
+            class="h-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-emerald-400 transition-all duration-300"
+            style="width: 10%;"></div>
         </div>
 
         <!-- Slide Container -->
@@ -83,18 +132,26 @@
 
         <!-- Nav Buttons -->
         <div class="mt-6 flex items-center justify-between">
-          <button id="prevBtn" class="btn ring-focus inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14 7l-5 5l5 5V7z" /></svg>
+          <button id="prevBtn"
+            class="btn ring-focus inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M14 7l-5 5l5 5V7z" />
+            </svg>
             Sebelumnya
           </button>
           <div class="flex gap-2">
             <button id="quickMenuBtn" class="hidden">
-              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z" /></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z" />
+              </svg>
               Daftar Slide
             </button>
-            <button id="nextBtn" class="btn ring-focus inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold">
+            <button id="nextBtn"
+              class="btn ring-focus inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold">
               Berikutnya
-              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M10 17l5-5l-5-5v10z" /></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M10 17l5-5l-5-5v10z" />
+              </svg>
             </button>
           </div>
         </div>
@@ -103,10 +160,12 @@
       <!-- Quick Menu Modal -->
       <div id="quickMenu" class="fixed inset-0 z-40 hidden">
         <div class="absolute inset-0 bg-black/50"></div>
-        <div class="absolute inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 top-16 sm:top-24 glass rounded-2xl max-w-2xl w-[calc(100%-2rem)] p-4">
+        <div
+          class="absolute inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 top-16 sm:top-24 glass rounded-2xl max-w-2xl w-[calc(100%-2rem)] p-4">
           <div class="flex items-center justify-between mb-2">
             <h3 class="font-semibold">Pilih Slide</h3>
-            <button id="closeQuickMenu" class="btn ring-focus bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm">Tutup</button>
+            <button id="closeQuickMenu"
+              class="btn ring-focus bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm">Tutup</button>
           </div>
           <div id="quickMenuGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm"></div>
         </div>
@@ -125,8 +184,11 @@
       <h2 class="text-lg font-bold mb-1">Kode Akses</h2>
       <p class="text-sm text-slate-300 mb-4">Masukkan kode untuk membuka materi.</p>
       <form id="accessForm" class="space-y-3">
-        <input id="accessInput" type="password" class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 ring-focus" placeholder="" />
-        <button type="submit" class="btn ring-focus bg-indigo-600 hover:bg-indigo-500 text-white w-full px-4 py-2.5 rounded-xl font-semibold">Masuk</button>
+        <input id="accessInput" type="text" placeholder="Kode akses"
+          class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 ring-focus" autocomplete="off"
+          autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <button type="submit"
+          class="btn ring-focus bg-indigo-600 hover:bg-indigo-500 text-white w-full px-4 py-2.5 rounded-xl font-semibold">Masuk</button>
         <div id="accessError" class="hidden text-sm text-rose-300">Kode salah. Coba lagi.</div>
       </form>
     </div>
@@ -177,7 +239,7 @@
               <p class="text-sm text-slate-300">Klik opsi untuk menghitung jawaban di kelas.</p>
             </div>
             <div class="md:col-span-3 grid sm:grid-cols-2 gap-3">
-              ${["Akun media sosial","Foto profil","Tugas sekolah / lomba","Berita / artikel lain"].map((opt, idx) => `
+              ${["Akun media sosial", "Foto profil", "Tugas sekolah / lomba", "Berita / artikel lain"].map((opt, idx) => `
                 <button data-idx="${idx}" class="voteOption btn ring-focus bg-slate-800/60 hover:bg-slate-700/70 border border-white/10 rounded-xl p-4 text-left">
                   <div class="flex items-center justify-between">
                     <span class="font-semibold">${opt}</span>
@@ -200,11 +262,11 @@
                 btn.querySelector('.count').textContent = counts[i];
                 localStorage.setItem('iceVotes', JSON.stringify(counts));
                 btn.classList.add('bg-slate-700');
-                setTimeout(()=>btn.classList.remove('bg-slate-700'), 120);
+                setTimeout(() => btn.classList.remove('bg-slate-700'), 120);
               });
             });
             container.querySelector('#resetVotes').addEventListener('click', () => {
-              const zero = [0,0,0,0];
+              const zero = [0, 0, 0, 0];
               localStorage.setItem('iceVotes', JSON.stringify(zero));
               buttons.forEach(b => b.querySelector('.count').textContent = 0);
             });
@@ -438,13 +500,13 @@
 
                 <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                   ${[
-                    "Privatkan/hapus unggahan bermasalah",
-                    "Minta takedown ke admin/moderator",
-                    "Tinggalkan klarifikasi & minta maaf (jika perlu)",
-                    "Simpan bukti (screenshot, tautan)",
-                    "Aktifkan 2FA & ganti sandi jika akun disusupi",
-                    "Isi linimasa dengan konten positif (counter-signal)"
-                  ].map((t,i)=>`
+              "Privatkan/hapus unggahan bermasalah",
+              "Minta takedown ke admin/moderator",
+              "Tinggalkan klarifikasi & minta maaf (jika perlu)",
+              "Simpan bukti (screenshot, tautan)",
+              "Aktifkan 2FA & ganti sandi jika akun disusupi",
+              "Isi linimasa dengan konten positif (counter-signal)"
+            ].map((t, i) => `
                     <li>
                       <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full">
                         <input type="checkbox" data-step="${i}" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
@@ -457,23 +519,23 @@
             </div>
           `;
           setTimeout(() => {
-            const key='impactChecklist';
-            const boxes=el.querySelectorAll('input[type="checkbox"][data-step]');
-            const saved=JSON.parse(localStorage.getItem(key)||'[]');
-            boxes.forEach((box,i)=>{
-              box.checked=!!saved[i];
-              box.addEventListener('change',()=>{
-                const cur=JSON.parse(localStorage.getItem(key)||'[]');
-                cur[i]=box.checked;
+            const key = 'impactChecklist';
+            const boxes = el.querySelectorAll('input[type="checkbox"][data-step]');
+            const saved = JSON.parse(localStorage.getItem(key) || '[]');
+            boxes.forEach((box, i) => {
+              box.checked = !!saved[i];
+              box.addEventListener('change', () => {
+                const cur = JSON.parse(localStorage.getItem(key) || '[]');
+                cur[i] = box.checked;
                 localStorage.setItem(key, JSON.stringify(cur));
               });
             });
-            el.querySelector('#resetImpactChecklist')?.addEventListener('click',()=>{
-              const zero=Array.from({length:boxes.length},()=>false);
+            el.querySelector('#resetImpactChecklist')?.addEventListener('click', () => {
+              const zero = Array.from({ length: boxes.length }, () => false);
               localStorage.setItem(key, JSON.stringify(zero));
-              boxes.forEach(b=>b.checked=false);
+              boxes.forEach(b => b.checked = false);
             });
-          },0);
+          }, 0);
           return el;
         }
       },
@@ -524,55 +586,55 @@
 
             <div class="grid sm:grid-cols-2 gap-4">
               ${[
-                {
-                  t: "<em> Think before you post </em> (pikir sebelum unggah).",
-                  d: [
-                    "Gunakan uji 3B: <em>Baik</em>, <em>Benar</em>, <em>Bijak</em>—kalau ragu, jangan unggah.",
-                    "Tunda 3–5 detik sebelum kirim; baca ulang nada & konteks.",
-                    "Bayangkan dibaca wali kelas/guru BK/masa depanmu—masih oke?"
-                  ]
-                },
-                {
-                  t: "Atur privasi akun sesuai kebutuhan.",
-                  d: [
-                    "Instagram/TikTok: aktifkan <em>Private Account</em> atau <em>Close Friends</em>.",
-                    "Batasi komentar & mention; review tag sebelum tampil di profil.",
-                    "Matikan pelacakan lokasi & <em>location sticker</em> pada unggahan rutin."
-                  ]
-                },
-                {
-                  t: "Jangan sebar data pribadi (alamat, nomor HP, password).",
-                  d: [
-                    "Jangan unggah kartu identitas/kartu pelajar/boarding pass utuh (blur bila perlu).",
-                    "Hapus metadata (EXIF) lokasi pada foto sebelum sebar.",
-                    "Pakai nama pengguna/alias berbeda untuk forum publik."
-                  ]
-                },
-                {
-                  t: "Keamanan akun (password & 2FA).",
-                  d: [
-                    "Pakai kata sandi unik per layanan + <em>password manager</em>.",
-                    "Aktifkan verifikasi 2 langkah (2FA); cek email/nomor pemulihan.",
-                    "Tinjau perangkat & sesi yang login; keluarkan yang tidak dikenali."
-                  ]
-                },
-                {
-                  t: "Kurasi jejakmu secara berkala.",
-                  d: [
-                    "Cari namamu di Google setiap bulan; hapus/arsipkan unggahan bermasalah.",
-                    "Minta takedown ke admin/moderator jika melanggar aturan.",
-                    "Isi linimasa dengan karya/prestasi agar sinyal positif lebih kuat."
-                  ]
-                },
-                {
-                  t: "Gunakan internet untuk hal positif (belajar, berbagi ide, karya).",
-                  d: [
-                    "Bangun portofolio (GitHub/Blog) & dokumentasi kegiatan.",
-                    "Komentar suportif, beri kredit sumber, hindari debat panas di publik.",
-                    "Ikuti komunitas belajar; bagikan ringkasan materi/kegiatan."
-                  ]
-                }
-              ].map((item, i) => `
+              {
+                t: "<em> Think before you post </em> (pikir sebelum unggah).",
+                d: [
+                  "Gunakan uji 3B: <em>Baik</em>, <em>Benar</em>, <em>Bijak</em>—kalau ragu, jangan unggah.",
+                  "Tunda 3–5 detik sebelum kirim; baca ulang nada & konteks.",
+                  "Bayangkan dibaca wali kelas/guru BK/masa depanmu—masih oke?"
+                ]
+              },
+              {
+                t: "Atur privasi akun sesuai kebutuhan.",
+                d: [
+                  "Instagram/TikTok: aktifkan <em>Private Account</em> atau <em>Close Friends</em>.",
+                  "Batasi komentar & mention; review tag sebelum tampil di profil.",
+                  "Matikan pelacakan lokasi & <em>location sticker</em> pada unggahan rutin."
+                ]
+              },
+              {
+                t: "Jangan sebar data pribadi (alamat, nomor HP, password).",
+                d: [
+                  "Jangan unggah kartu identitas/kartu pelajar/boarding pass utuh (blur bila perlu).",
+                  "Hapus metadata (EXIF) lokasi pada foto sebelum sebar.",
+                  "Pakai nama pengguna/alias berbeda untuk forum publik."
+                ]
+              },
+              {
+                t: "Keamanan akun (password & 2FA).",
+                d: [
+                  "Pakai kata sandi unik per layanan + <em>password manager</em>.",
+                  "Aktifkan verifikasi 2 langkah (2FA); cek email/nomor pemulihan.",
+                  "Tinjau perangkat & sesi yang login; keluarkan yang tidak dikenali."
+                ]
+              },
+              {
+                t: "Kurasi jejakmu secara berkala.",
+                d: [
+                  "Cari namamu di Google setiap bulan; hapus/arsipkan unggahan bermasalah.",
+                  "Minta takedown ke admin/moderator jika melanggar aturan.",
+                  "Isi linimasa dengan karya/prestasi agar sinyal positif lebih kuat."
+                ]
+              },
+              {
+                t: "Gunakan internet untuk hal positif (belajar, berbagi ide, karya).",
+                d: [
+                  "Bangun portofolio (GitHub/Blog) & dokumentasi kegiatan.",
+                  "Komentar suportif, beri kredit sumber, hindari debat panas di publik.",
+                  "Ikuti komunitas belajar; bagikan ringkasan materi/kegiatan."
+                ]
+              }
+            ].map((item, i) => `
                 <label class="flex items-start gap-3 rounded-2xl border border-white/10 p-4 bg-slate-900/40 cursor-pointer">
                   <input type="checkbox" data-tip="${i}" class="mt-1.5 w-5 h-5 rounded-md bg-slate-800 border-white/20">
                   <span class="leading-relaxed text-slate-200">
@@ -594,39 +656,39 @@
             </div>
           `;
           setTimeout(() => {
-            const key='tipsCheck';
-            const boxes=el.querySelectorAll('input[type="checkbox"][data-tip]');
-            const detailBlocks=el.querySelectorAll('[data-tip-detail]');
-            let state=[]; try{ state=JSON.parse(localStorage.getItem(key)||'[]'); }catch{ state=[]; }
-            if(!Array.isArray(state)||state.length!==boxes.length){ state=Array.from({length:boxes.length},()=>false); }
+            const key = 'tipsCheck';
+            const boxes = el.querySelectorAll('input[type="checkbox"][data-tip]');
+            const detailBlocks = el.querySelectorAll('[data-tip-detail]');
+            let state = []; try { state = JSON.parse(localStorage.getItem(key) || '[]'); } catch { state = []; }
+            if (!Array.isArray(state) || state.length !== boxes.length) { state = Array.from({ length: boxes.length }, () => false); }
 
-            boxes.forEach((box,i)=>{
-              box.checked=!!state[i];
-              const panel=el.querySelector(`[data-tip-detail="${i}"]`);
-              if(panel) panel.classList.toggle('hidden', !box.checked);
-              box.addEventListener('change', ()=>{
-                state[i]=box.checked; localStorage.setItem(key, JSON.stringify(state));
-                if(panel) panel.classList.toggle('hidden', !box.checked);
+            boxes.forEach((box, i) => {
+              box.checked = !!state[i];
+              const panel = el.querySelector(`[data-tip-detail="${i}"]`);
+              if (panel) panel.classList.toggle('hidden', !box.checked);
+              box.addEventListener('change', () => {
+                state[i] = box.checked; localStorage.setItem(key, JSON.stringify(state));
+                if (panel) panel.classList.toggle('hidden', !box.checked);
               });
             });
 
-            el.querySelector('#resetChecklist')?.addEventListener('click', ()=>{
-              state=Array.from({length:boxes.length},()=>false);
+            el.querySelector('#resetChecklist')?.addEventListener('click', () => {
+              state = Array.from({ length: boxes.length }, () => false);
               localStorage.setItem(key, JSON.stringify(state));
-              boxes.forEach(b=>b.checked=false);
-              detailBlocks.forEach(p=>p.classList.add('hidden'));
+              boxes.forEach(b => b.checked = false);
+              detailBlocks.forEach(p => p.classList.add('hidden'));
             });
-            el.querySelector('#openAllTips')?.addEventListener('click', ()=>{
-              boxes.forEach((b,i)=>{ b.checked=true; state[i]=true; });
+            el.querySelector('#openAllTips')?.addEventListener('click', () => {
+              boxes.forEach((b, i) => { b.checked = true; state[i] = true; });
               localStorage.setItem(key, JSON.stringify(state));
-              detailBlocks.forEach(p=>p.classList.remove('hidden'));
+              detailBlocks.forEach(p => p.classList.remove('hidden'));
             });
-            el.querySelector('#closeAllTips')?.addEventListener('click', ()=>{
-              boxes.forEach((b,i)=>{ b.checked=false; state[i]=false; });
+            el.querySelector('#closeAllTips')?.addEventListener('click', () => {
+              boxes.forEach((b, i) => { b.checked = false; state[i] = false; });
               localStorage.setItem(key, JSON.stringify(state));
-              detailBlocks.forEach(p=>p.classList.add('hidden'));
+              detailBlocks.forEach(p => p.classList.add('hidden'));
             });
-          },0);
+          }, 0);
           return el;
         }
       },
@@ -683,11 +745,11 @@
               </div>
               <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                 ${[
-                  "Cari namaku di Google & simpan catatan hasilnya",
-                  "Arsipkan/hapus 3 unggahan yang kurang pantas",
-                  "Aktifkan 2FA & cek perangkat yang login",
-                  "Posting 1 konten positif (karya/refleksi)"
-                ].map((t,i)=>`
+              "Cari namaku di Google & simpan catatan hasilnya",
+              "Arsipkan/hapus 3 unggahan yang kurang pantas",
+              "Aktifkan 2FA & cek perangkat yang login",
+              "Posting 1 konten positif (karya/refleksi)"
+            ].map((t, i) => `
                   <li>
                     <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 bg-slate-900/30 w-full">
                       <input type="checkbox" data-commit="${i}" class="mt-1 w-5 h-5 rounded bg-slate-800 border-white/20 shrink-0">
@@ -700,23 +762,23 @@
             </div>
           `;
           setTimeout(() => {
-            const key='summaryCommit';
-            const boxes=el.querySelectorAll('input[type="checkbox"][data-commit]');
-            let state=[]; try{ state=JSON.parse(localStorage.getItem(key)||'[]'); }catch{ state=[]; }
-            if(!Array.isArray(state)||state.length!==boxes.length){ state=Array.from({length:boxes.length},()=>false); }
-            boxes.forEach((box,i)=>{
-              box.checked=!!state[i];
-              box.addEventListener('change',()=>{ state[i]=box.checked; localStorage.setItem(key, JSON.stringify(state)); });
+            const key = 'summaryCommit';
+            const boxes = el.querySelectorAll('input[type="checkbox"][data-commit]');
+            let state = []; try { state = JSON.parse(localStorage.getItem(key) || '[]'); } catch { state = []; }
+            if (!Array.isArray(state) || state.length !== boxes.length) { state = Array.from({ length: boxes.length }, () => false); }
+            boxes.forEach((box, i) => {
+              box.checked = !!state[i];
+              box.addEventListener('change', () => { state[i] = box.checked; localStorage.setItem(key, JSON.stringify(state)); });
             });
-            el.querySelector('#resetCommit')?.addEventListener('click',()=>{
-              state=Array.from({length:boxes.length},()=>false);
+            el.querySelector('#resetCommit')?.addEventListener('click', () => {
+              state = Array.from({ length: boxes.length }, () => false);
               localStorage.setItem(key, JSON.stringify(state));
-              boxes.forEach(b=>b.checked=false);
+              boxes.forEach(b => b.checked = false);
             });
 
-            const copyBtn=el.querySelector('#copySummary');
-            const copyNote=el.querySelector('#copyNote');
-            const summaryText=[
+            const copyBtn = el.querySelector('#copySummary');
+            const copyNote = el.querySelector('#copyNote');
+            const summaryText = [
               'Ringkasan Jejak Digital:',
               '- Jejak digital sulit dihapus; cegah lebih mudah daripada memperbaiki.',
               '- Jejak positif: portofolio, prestasi, konten edukatif; negatif: bullying, hoaks, konten tidak pantas.',
@@ -729,22 +791,22 @@
               '4) Posting 1 konten positif'
             ].join('\n');
 
-            function copyToClipboard(txt){
-              if(navigator.clipboard?.writeText){ return navigator.clipboard.writeText(txt); }
-              return new Promise((resolve,reject)=>{
-                try{
-                  const ta=document.createElement('textarea');
-                  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+            function copyToClipboard(txt) {
+              if (navigator.clipboard?.writeText) { return navigator.clipboard.writeText(txt); }
+              return new Promise((resolve, reject) => {
+                try {
+                  const ta = document.createElement('textarea');
+                  ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
                   document.body.appendChild(ta); ta.select(); document.execCommand('copy');
                   document.body.removeChild(ta); resolve();
-                }catch(e){ reject(e); }
+                } catch (e) { reject(e); }
               });
             }
-            copyBtn?.addEventListener('click', async ()=>{
-              try{ await copyToClipboard(summaryText); copyNote?.classList.remove('hidden'); setTimeout(()=>copyNote?.classList.add('hidden'),1500); }
-              catch{ alert('Gagal menyalin. Silakan salin manual.'); }
+            copyBtn?.addEventListener('click', async () => {
+              try { await copyToClipboard(summaryText); copyNote?.classList.remove('hidden'); setTimeout(() => copyNote?.classList.add('hidden'), 1500); }
+              catch { alert('Gagal menyalin. Silakan salin manual.'); }
             });
-          },0);
+          }, 0);
           return el;
         }
       },
@@ -762,14 +824,14 @@
               <div class="font-semibold mb-2">Kuis Cepat</div>
               <div class="space-y-3" id="quizWrap">
                 ${[
-                  { q:"Jejak digital pasif itu contohnya apa?", a:["Posting foto","Riwayat browsing","Mengunggah video"], correct:1 },
-                  { q:"Mana yang termasuk jejak digital positif?", a:["Komentar kasar","Menyebar hoaks","Portofolio karya"], correct:2 },
-                  { q:"Apa dampak jangka panjang jejak digital negatif?", a:["Ditertawakan sebentar","Tidak ada pengaruh","Menghambat beasiswa/pekerjaan"], correct:2 },
-                ].map((item, qi)=>`
+              { q: "Jejak digital pasif itu contohnya apa?", a: ["Posting foto", "Riwayat browsing", "Mengunggah video"], correct: 1 },
+              { q: "Mana yang termasuk jejak digital positif?", a: ["Komentar kasar", "Menyebar hoaks", "Portofolio karya"], correct: 2 },
+              { q: "Apa dampak jangka panjang jejak digital negatif?", a: ["Ditertawakan sebentar", "Tidak ada pengaruh", "Menghambat beasiswa/pekerjaan"], correct: 2 },
+            ].map((item, qi) => `
                   <div class="rounded-xl border border-white/10 p-3 bg-slate-900/40">
-                    <div class="text-sm mb-2">${qi+1}. ${item.q}</div>
+                    <div class="text-sm mb-2">${qi + 1}. ${item.q}</div>
                     <div class="grid sm:grid-cols-3 gap-2">
-                      ${item.a.map((opt, ai)=>`
+                      ${item.a.map((opt, ai) => `
                         <button data-q="${qi}" data-a="${ai}" class="quizOpt btn ring-focus bg-slate-800/60 hover:bg-slate-700/70 px-3 py-2 rounded-lg text-sm text-left">${opt}</button>
                       `).join("")}
                     </div>
@@ -783,38 +845,38 @@
               </div>
             </div>
           `;
-          setTimeout(()=>{
-            const correctMap={0:1,1:2,2:2};
-            const resNodes={};
-            el.querySelectorAll('[data-qres]').forEach(n=>{ resNodes[n.getAttribute('data-qres')]=n; });
-            const scoreEl=el.querySelector('#quizScore');
-            let answered={};
-            const updateScore=()=>{
-              const vals=Object.values(answered);
-              const correct=vals.filter(v=>v===true).length;
-              const total=3;
-              scoreEl.textContent=vals.length?`Skor: ${correct}/${total}`:"";
+          setTimeout(() => {
+            const correctMap = { 0: 1, 1: 2, 2: 2 };
+            const resNodes = {};
+            el.querySelectorAll('[data-qres]').forEach(n => { resNodes[n.getAttribute('data-qres')] = n; });
+            const scoreEl = el.querySelector('#quizScore');
+            let answered = {};
+            const updateScore = () => {
+              const vals = Object.values(answered);
+              const correct = vals.filter(v => v === true).length;
+              const total = 3;
+              scoreEl.textContent = vals.length ? `Skor: ${correct}/${total}` : "";
             };
-            el.querySelectorAll('.quizOpt').forEach(btn=>{
-              btn.addEventListener('click',()=>{
-                const q=Number(btn.getAttribute('data-q'));
-                const a=Number(btn.getAttribute('data-a'));
-                const correct=correctMap[q]===a;
-                answered[q]=correct;
-                const res=resNodes[q];
-                res.textContent=correct?"Benar! 🎉":"Kurang tepat. Coba lagi!";
-                res.className="mt-2 text-sm "+(correct?"text-emerald-300":"text-rose-300");
-                btn.closest('.grid').querySelectorAll('button').forEach(b=>b.classList.remove('bg-emerald-700','bg-rose-700'));
-                btn.classList.add(correct?'bg-emerald-700':'bg-rose-700');
+            el.querySelectorAll('.quizOpt').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const q = Number(btn.getAttribute('data-q'));
+                const a = Number(btn.getAttribute('data-a'));
+                const correct = correctMap[q] === a;
+                answered[q] = correct;
+                const res = resNodes[q];
+                res.textContent = correct ? "Benar! 🎉" : "Kurang tepat. Coba lagi!";
+                res.className = "mt-2 text-sm " + (correct ? "text-emerald-300" : "text-rose-300");
+                btn.closest('.grid').querySelectorAll('button').forEach(b => b.classList.remove('bg-emerald-700', 'bg-rose-700'));
+                btn.classList.add(correct ? 'bg-emerald-700' : 'bg-rose-700');
                 updateScore();
               });
             });
-            el.querySelector('#resetQuiz').addEventListener('click', ()=>{
-              answered={}; updateScore();
-              Object.values(resNodes).forEach(n=>{ n.textContent=""; n.className="mt-2 text-sm"; });
-              el.querySelectorAll('.quizOpt').forEach(b=>b.classList.remove('bg-emerald-700','bg-rose-700'));
+            el.querySelector('#resetQuiz').addEventListener('click', () => {
+              answered = {}; updateScore();
+              Object.values(resNodes).forEach(n => { n.textContent = ""; n.className = "mt-2 text-sm"; });
+              el.querySelectorAll('.quizOpt').forEach(b => b.classList.remove('bg-emerald-700', 'bg-rose-700'));
             });
-          },0);
+          }, 0);
           return el;
         }
       },
@@ -827,7 +889,7 @@
       slides.forEach((s, i) => {
         const card = document.createElement('button');
         card.className = "text-left rounded-xl border border-white/10 bg-slate-900/40 hover:bg-slate-900/60 p-3 ring-focus";
-        card.innerHTML = `<div class="text-xs opacity-80">Slide ${i+1}</div><div class="font-semibold">${s.title}</div>`;
+        card.innerHTML = `<div class="text-xs opacity-80">Slide ${i + 1}</div><div class="font-semibold">${s.title}</div>`;
         card.addEventListener('click', () => { goTo(i); closeQuickMenu(); });
         qm.appendChild(card);
       });
@@ -838,45 +900,45 @@
     let total = 0;
     const slideContainer = document.getElementById('slideContainer');
     const slideIndicator = document.getElementById('slideIndicator');
-    const totalSlidesEl  = document.getElementById('totalSlides');
-    const progress       = document.getElementById('progress');
+    const totalSlidesEl = document.getElementById('totalSlides');
+    const progress = document.getElementById('progress');
 
     function renderSlide(index) {
       // fade out current
       const old = slideContainer.firstElementChild;
       if (old) {
         old.classList.add('fade-exit');
-        requestAnimationFrame(()=>{
+        requestAnimationFrame(() => {
           old.classList.add('fade-exit-active');
-          setTimeout(()=>{ if (old.parentNode) old.parentNode.removeChild(old); enterNew(); }, 220);
+          setTimeout(() => { if (old.parentNode) old.parentNode.removeChild(old); enterNew(); }, 220);
         });
       } else { enterNew(); }
       function enterNew() {
         const node = slides[index].render();
-        node.classList.add('w-full','fade-enter');
+        node.classList.add('w-full', 'fade-enter');
         slideContainer.appendChild(node);
-        requestAnimationFrame(()=>{
+        requestAnimationFrame(() => {
           node.classList.add('fade-enter-active');
-          setTimeout(()=>{ node.classList.remove('fade-enter','fade-enter-active'); }, 260);
+          setTimeout(() => { node.classList.remove('fade-enter', 'fade-enter-active'); }, 260);
         });
       }
-      slideIndicator.textContent = (index+1).toString();
-      progress.style.width = `${((index+1)/total)*100}%`;
+      slideIndicator.textContent = (index + 1).toString();
+      progress.style.width = `${((index + 1) / total) * 100}%`;
       document.getElementById('prevBtn').disabled = index === 0;
       document.getElementById('nextBtn').disabled = index === total - 1;
     }
 
-    function goTo(i){ current = Math.max(0, Math.min(total-1, i)); renderSlide(current); }
-    function goNext(){ goTo(current+1); }
-    function goPrev(){ goTo(current-1); }
+    function goTo(i) { current = Math.max(0, Math.min(total - 1, i)); renderSlide(current); }
+    function goNext() { goTo(current + 1); }
+    function goPrev() { goTo(current - 1); }
     window.goNext = goNext;
 
     // Quick Menu controls
-    function openQuickMenu(){ document.getElementById('quickMenu').classList.remove('hidden'); }
-    function closeQuickMenu(){ document.getElementById('quickMenu').classList.add('hidden'); }
+    function openQuickMenu() { document.getElementById('quickMenu').classList.remove('hidden'); }
+    function closeQuickMenu() { document.getElementById('quickMenu').classList.add('hidden'); }
 
     // Keyboard navigation
-    document.addEventListener('keydown', (e)=>{
+    document.addEventListener('keydown', (e) => {
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
       const isTyping = tag === 'input' || tag === 'textarea';
       if (isTyping) return;
@@ -891,7 +953,7 @@
     document.getElementById('closeQuickMenu').addEventListener('click', closeQuickMenu);
 
     // ====== INIT DIPINDAH KE FUNGSI ======
-    function initializeContent(){
+    function initializeContent() {
       buildQuickMenu();
       total = slides.length;
       if (totalSlidesEl) totalSlidesEl.textContent = total;
@@ -904,29 +966,34 @@
     // ============================================
     // ACCESS CODE SETTING
     // ============================================
-    const ENABLE_ACCESS_CODE   = true;             // set false untuk menonaktifkan popup
-    const ACCESS_CODE_PLAINTEXT= "RGMDSMS25";       // UBAH kode akses di sini
-    const ACCESS_SESSION_KEY   = "access_ok_v1";
+    const ENABLE_ACCESS_CODE = true;             // set false untuk menonaktifkan popup
+    const ACCESS_CODE_PLAINTEXT = "RGMDSMS25";       // UBAH kode akses di sini
+    const ACCESS_SESSION_KEY = "access_ok_v1";
 
-    function showAccessPopup(){
+    function normalize(v) {
+      return String(v || "").trim().toLowerCase();
+    }
+
+
+    function showAccessPopup() {
       const popup = document.getElementById('accessPopup');
       popup.classList.remove('hidden');
       popup.classList.add('flex');
     }
 
-    function grantAccess(){
+    function grantAccess() {
       sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
       const popup = document.getElementById('accessPopup');
       popup.classList.add('hidden'); popup.classList.remove('flex');
       initializeContent();
     }
 
-    function checkAccess(){
-      if (!ENABLE_ACCESS_CODE){
+    function checkAccess() {
+      if (!ENABLE_ACCESS_CODE) {
         grantAccess(); // langsung masuk tanpa popup
         return;
       }
-      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1"){
+      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") {
         grantAccess();
       } else {
         showAccessPopup();
@@ -934,21 +1001,20 @@
     }
 
     // Wiring form popup
-    (function wireAccessForm(){
-      const form  = document.getElementById('accessForm');
+    (function wireAccessForm() {
+      const form = document.getElementById('accessForm');
       const input = document.getElementById('accessInput');
-      const err   = document.getElementById('accessError');
+      const err = document.getElementById('accessError');
       if (!form) return;
-      form.addEventListener('submit', (e)=>{
+      form.addEventListener('submit', (e) => {
         e.preventDefault();
         err?.classList.add('hidden');
-        const code = (input?.value || "").trim();
-        if (!code){ if(err){ err.textContent="Kode tidak boleh kosong."; err.classList.remove('hidden'); } return; }
-        if (code === ACCESS_CODE_PLAINTEXT) {
+        const code = normalize(input?.value);
+        if (normalize(ACCESS_CODE_PLAINTEXT) === code) {
           grantAccess();
         } else {
-          if(err){ err.textContent="Kode salah. Coba lagi."; err.classList.remove('hidden'); }
-          if(input){ input.value=""; input.focus(); }
+          if (err) { err.textContent = "Kode salah. Coba lagi."; err.classList.remove("hidden"); }
+          if (input) { input.select(); input.focus(); }
         }
       });
     })();
@@ -958,6 +1024,7 @@
   </script>
 
   <!-- (biarkan script bawaan jika memang ada di file asli) -->
-  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'983959b6913b8e9d',t:'MTc1ODYyMzI1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+  <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'983959b6913b8e9d',t:'MTc1ODYyMzI1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
 </body>
+
 </html>
