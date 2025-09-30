@@ -903,30 +903,70 @@
     const totalSlidesEl = document.getElementById('totalSlides');
     const progress = document.getElementById('progress');
 
+    let transitionToken = 0;   // penanda transisi terbaru
+    let exitTimer = null;      // id setTimeout untuk fade-out yang berjalan
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+
     function renderSlide(index) {
-      // fade out current
+      const token = ++transitionToken; // batalkan transisi sebelumnya
+
+      // Update UI segera
+      slideIndicator.textContent = String(index + 1);
+      progress.style.width = `${((index + 1) / total) * 100}%`;
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === total - 1;
+
       const old = slideContainer.firstElementChild;
+
+      // Jika ada fade-out yang masih jalan, hentikan
+      if (exitTimer) {
+        clearTimeout(exitTimer);
+        exitTimer = null;
+      }
+
+      // Helper untuk benar-benar merender slide baru
+      function enterNew() {
+        // Jangan lanjut kalau sudah ada transisi yang lebih baru
+        if (token !== transitionToken) return;
+
+        // Pastikan container bersih (anti-duplikasi)
+        while (slideContainer.firstChild) slideContainer.removeChild(slideContainer.firstChild);
+
+        const node = slides[index].render();
+        node.classList.add('w-full', 'fade-enter');
+        slideContainer.appendChild(node);
+
+        requestAnimationFrame(() => {
+          node.classList.add('fade-enter-active');
+          setTimeout(() => {
+            if (token !== transitionToken) return;
+            node.classList.remove('fade-enter', 'fade-enter-active');
+          }, 260);
+        });
+      }
+
+      // Jika ada slide lama, lakukan fade-out lalu render baru
       if (old) {
         old.classList.add('fade-exit');
         requestAnimationFrame(() => {
           old.classList.add('fade-exit-active');
-          setTimeout(() => { if (old.parentNode) old.parentNode.removeChild(old); enterNew(); }, 220);
+          exitTimer = setTimeout(() => {
+            exitTimer = null;
+            // Slide lama mungkin sudah hilang; bersihkan sisa apa pun
+            if (old.parentNode) old.parentNode.removeChild(old);
+            while (slideContainer.firstChild) slideContainer.removeChild(slideContainer.firstChild);
+            enterNew();
+          }, 200); // durasi harus selaras dengan CSS .fade-exit-active
         });
-      } else { enterNew(); }
-      function enterNew() {
-        const node = slides[index].render();
-        node.classList.add('w-full', 'fade-enter');
-        slideContainer.appendChild(node);
-        requestAnimationFrame(() => {
-          node.classList.add('fade-enter-active');
-          setTimeout(() => { node.classList.remove('fade-enter', 'fade-enter-active'); }, 260);
-        });
+      } else {
+        // Tidak ada slide lama, langsung render
+        enterNew();
       }
-      slideIndicator.textContent = (index + 1).toString();
-      progress.style.width = `${((index + 1) / total) * 100}%`;
-      document.getElementById('prevBtn').disabled = index === 0;
-      document.getElementById('nextBtn').disabled = index === total - 1;
     }
+
 
     function goTo(i) { current = Math.max(0, Math.min(total - 1, i)); renderSlide(current); }
     function goNext() { goTo(current + 1); }
