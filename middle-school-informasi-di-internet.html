@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informasi Kredibel dan Aplikasinya dalam Pengembangan Aplikasi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --topBarH: 8px;
+      /* tinggi progress bar */
+      --navH: 64px;
+      /* tinggi nav bawah */
+    }
+
+    /* Pakai 100dvh agar stabil di mobile browser, dan aktifkan scroll per-slide */
+    .slide {
+      display: none;
+      min-height: 100dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-top: calc(var(--topBarH) + 1rem);
+      /* beri ruang utk progress bar */
+      padding-bottom: calc(var(--navH) + 1.5rem);
+      /* beri ruang utk nav bawah */
+      animation: fadeIn .5s ease-in-out;
+    }
+
+    /* Override util Tailwind 'items-center' -> start supaya konten panjang enak dibaca */
+    .slide.active {
+      display: flex;
+      align-items: flex-start;
+      /* penting agar konten mulai dari atas */
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .quiz-option {
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .quiz-option:hover {
+      transform: scale(1.05);
+    }
+
+    .quiz-option.correct {
+      background: linear-gradient(135deg, #10b981, #059669) !important;
+      color: #fff !important;
+    }
+
+    .quiz-option.incorrect {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      color: #fff !important;
+    }
+
+    .progress-bar {
+      transition: width .3s ease;
+    }
+
+    .floating-icon {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-10px)
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .slide {
+        animation: none !important;
+      }
+
+      .quiz-option,
+      .progress-bar {
+        transition: none !important;
+      }
+
+      .floating-icon {
+        animation: none !important;
+      }
+    }
+
+    .safe-bottom {
+      height: calc(var(--navH));
+    }
+
+    /* Nav auto-hide */
+    .nav-fade {
+      opacity: 0;
+      pointer-events: none;
+      /* biar konten di bawah tetap bisa diklik */
+      transition: opacity .25s ease;
+      /* halus saat muncul/hilang */
+    }
+
+    .nav-fade.nav-show,
+    .nav-fade:focus-within {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Di device tanpa hover (mobile), jangan disembunyikan */
+    @media (hover: none) {
+      .nav-fade {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans relative overflow-x-hidden">
+
+
+  <!-- Progress Bar -->
+  <div class="fixed top-0 left-0 w-full h-2 bg-gray-200 z-50" aria-hidden="true">
+    <div id="progressBar" class="progress-bar h-full bg-gradient-to-r from-blue-500 to-indigo-600" style="width:0%">
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 transform-gpu bg-white rounded-full shadow-lg px-6 py-3 flex items-center gap-4 z-40 nav-fade">
+    <button id="prevBtn"
+      class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+      aria-label="Slide sebelumnya" disabled>
+      ← Sebelumnya
+    </button>
+    <span id="slideCounter" class="text-sm font-medium text-gray-600" aria-live="polite">1 / 10</span>
+    <button id="nextBtn" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+      aria-label="Slide berikutnya">
+      Selanjutnya →
+    </button>
+  </div>
+
+  <!-- Slide 1: Judul & Pembuka -->
+  <div class="slide active min-h-screen items-center justify-center p-8">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="floating-icon text-6xl mb-6">🕵️‍♀️</div>
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
+        Informasi Kredibel di Internet dan Penerapannya dalam Pengembangan Aplikasi
+      </h1>
+      <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div class="flex items-center justify-center gap-8 mb-6">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-blue-500 rounded-full grid place-items-center text-white text-2xl font-bold mb-2">
+              UOB</div>
+            <p class="text-sm text-gray-600">MyDigital Space</p>
+          </div>
+          <div class="text-2xl">×</div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-green-500 rounded-full grid place-items-center text-white text-2xl font-bold mb-2">
+              RG</div>
+            <p class="text-sm text-gray-600">Ruangguru</p>
+          </div>
+        </div>
+        <div class="text-6xl mb-4">📱</div>
+        <p class="text-lg text-gray-700 italic">"Pernah nggak, baca berita yang ternyata hoaks?"</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 2: Tujuan -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4">🎯</div>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Tujuan Hari Ini</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6 transform-gpu hover:scale-105">
+          <div class="flex items-center mb-4">
+            <div class="w-8 h-8 bg-blue-500 rounded-full grid place-items-center text-white font-bold mr-3">1</div>
+            <h3 class="font-semibold text-gray-800">Menjelaskan ciri-ciri informasi kredibel</h3>
+          </div>
+          <p class="text-gray-600">Memahami karakteristik informasi yang dapat dipercaya</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 transform-gpu hover:scale-105">
+          <div class="flex items-center mb-4">
+            <div class="w-8 h-8 bg-green-500 rounded-full grid place-items-center text-white font-bold mr-3">2</div>
+            <h3 class="font-semibold text-gray-800">Membedakan informasi benar dan menyesatkan</h3>
+          </div>
+          <p class="text-gray-600">Mengidentifikasi perbedaan fakta dan hoaks</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 transform-gpu hover:scale-105">
+          <div class="flex items-center mb-4">
+            <div class="w-8 h-8 bg-purple-500 rounded-full grid place-items-center text-white font-bold mr-3">3</div>
+            <h3 class="font-semibold text-gray-800">Menerapkan cek fakta 5 langkah</h3>
+          </div>
+          <p class="text-gray-600">Menggunakan metode sistematis untuk verifikasi</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 transform-gpu hover:scale-105">
+          <div class="flex items-center mb-4">
+            <div class="w-8 h-8 bg-orange-500 rounded-full grid place-items-center text-white font-bold mr-3">4</div>
+            <h3 class="font-semibold text-gray-800">Menggunakan informasi kredibel dalam ide aplikasi</h3>
+          </div>
+          <p class="text-gray-600">Menerapkan dalam pengembangan aplikasi sederhana</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Apa Itu Informasi Kredibel? -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Apa Itu Informasi Kredibel?</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-gray-800 mb-6">Ciri-ciri Informasi Kredibel:</h3>
+          <div class="space-y-4">
+            <div class="flex items-center">
+              <div class="w-6 h-6 bg-green-500 rounded-full grid place-items-center mr-3">✓</div><span
+                class="text-lg">Sumber terpercaya</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-6 h-6 bg-green-500 rounded-full grid place-items-center mr-3">✓</div><span
+                class="text-lg">Berdasarkan fakta</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-6 h-6 bg-green-500 rounded-full grid place-items-center mr-3">✓</div><span
+                class="text-lg">Bisa dibuktikan kebenarannya</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-6 h-6 bg-green-500 rounded-full grid place-items-center mr-3">✓</div><span
+                class="text-lg">Tidak menyesatkan</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-gray-800 mb-6">Contoh Perbandingan:</h3>
+          <div class="space-y-4">
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+              <div class="flex items-center mb-2"><span class="text-green-600 text-xl mr-2">✔</span><span
+                  class="font-semibold text-green-800">Situs Terpercaya</span></div>
+              <p class="text-green-700">kominfo.go.id</p>
+              <p class="text-green-700">kemdikbud.go.id</p>
+            </div>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+              <div class="flex items-center mb-2"><span class="text-red-600 text-xl mr-2">❌</span><span
+                  class="font-semibold text-red-800">Situs Meragukan</span></div>
+              <p class="text-red-700">beritaheboh24.com</p>
+              <p class="text-red-700">infocepat.net</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: Langkah Cek Fakta + Mini Kuis -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4">🔍</div>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Langkah Cek Fakta (5 Langkah)</h2>
+      </div>
+      <div class="grid md:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center transform-gpu hover:scale-105">
+          <div
+            class="w-12 h-12 bg-blue-500 rounded-full grid place-items-center text-white text-xl font-bold mx-auto mb-4">
+            1</div>
+          <h3 class="font-bold text-gray-800 mb-2">Cek URL</h3>
+          <p class="text-sm text-gray-600">Periksa alamat situs</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center transform-gpu hover:scale-105">
+          <div
+            class="w-12 h-12 bg-green-500 rounded-full grid place-items-center text-white text-xl font-bold mx-auto mb-4">
+            2</div>
+          <h3 class="font-bold text-gray-800 mb-2">Cek Penulis</h3>
+          <p class="text-sm text-gray-600">Siapa yang menulis?</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center transform-gpu hover:scale-105">
+          <div
+            class="w-12 h-12 bg-purple-500 rounded-full grid place-items-center text-white text-xl font-bold mx-auto mb-4">
+            3</div>
+          <h3 class="font-bold text-gray-800 mb-2">Lihat Tanggal</h3>
+          <p class="text-sm text-gray-600">Kapan diterbitkan?</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center transform-gpu hover:scale-105">
+          <div
+            class="w-12 h-12 bg-orange-500 rounded-full grid place-items-center text-white text-xl font-bold mx-auto mb-4">
+            4</div>
+          <h3 class="font-bold text-gray-800 mb-2">Bandingkan</h3>
+          <p class="text-sm text-gray-600">Cek sumber lain</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center transform-gpu hover:scale-105">
+          <div
+            class="w-12 h-12 bg-red-500 rounded-full grid place-items-center text-white text-xl font-bold mx-auto mb-4">
+            5</div>
+          <h3 class="font-bold text-gray-800 mb-2">Pahami Konteks</h3>
+          <p class="text-sm text-gray-600">Apa tujuannya?</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Aktivitas Mini</h3>
+        <div class="bg-gray-50 rounded-lg p-6 mb-4">
+          <p class="text-lg text-gray-800 mb-1">"Vaksin COVID-19 mengandung chip untuk melacak manusia"</p>
+          <p class="text-sm text-gray-600">Sumber: viralinfo.net</p>
+        </div>
+        <div class="flex justify-center gap-4">
+          <button class="quiz-option px-8 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold"
+            onclick="checkAnswer(this, false)">✓ Kredibel</button>
+          <button class="quiz-option px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold"
+            onclick="checkAnswer(this, true)">❌ Tidak Kredibel</button>
+        </div>
+        <div id="answer4" class="mt-4 text-center hidden">
+          <p class="text-lg font-semibold text-green-600">Benar! Ini adalah hoaks yang sudah dibantah oleh WHO dan
+            Kemenkes.</p>
+        </div>
+        <div id="answer4-wrong" class="mt-2 text-center hidden" aria-live="polite">
+          <p class="text-lg font-semibold text-red-600">
+            Kurang tepat. Perhatikan tandanya: domain tidak resmi, klaim besar tanpa sumber,
+            dan tidak ada rujukan yang dapat diverifikasi. Coba bandingkan dengan sumber tepercaya
+            (Kemenkes/WHO) dan media arus utama.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Bahaya Informasi Palsu & Bias -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4">🚫</div>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Bahaya Informasi Palsu & Bias</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-red-600 mb-6">Bahaya Hoaks:</h3>
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="w-6 h-6 bg-red-500 rounded-full grid place-items-center mr-3 mt-1">⚠</div>
+              <div>
+                <h4 class="font-semibold text-gray-800">Menyesatkan orang lain</h4>
+                <p class="text-gray-600 text-sm">Membuat orang percaya hal yang salah</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="w-6 h-6 bg-red-500 rounded-full grid place-items-center mr-3 mt-1">⚠</div>
+              <div>
+                <h4 class="font-semibold text-gray-800">Merusak reputasi</h4>
+                <p class="text-gray-600 text-sm">Mencemarkan nama baik seseorang/institusi</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div class="w-6 h-6 bg-red-500 rounded-full grid place-items-center mr-3 mt-1">⚠</div>
+              <div>
+                <h4 class="font-semibold text-gray-800">Membuat keputusan salah</h4>
+                <p class="text-gray-600 text-sm">Mengambil tindakan berdasarkan info palsu</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-orange-600 mb-6">Apa itu Bias?</h3>
+          <div class="bg-orange-50 rounded-lg p-6 mb-4">
+            <p class="text-lg text-gray-800 mb-2">Berita yang tidak netral atau memihak</p>
+            <p class="text-sm text-gray-600">Informasi yang disajikan dengan sudut pandang tertentu</p>
+          </div>
+          <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <h4 class="font-semibold text-red-800 mb-2">Contoh Bias:</h4>
+            <p class="text-red-700 italic">"Semua gamer pemalas dan tidak produktif"</p>
+            <p class="text-sm text-red-600 mt-2">Generalisasi yang tidak berdasar pada data</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: Menghubungkan ke Dunia Coding -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Menghubungkan ke Dunia Coding</h2>
+        <div class="bg-blue-50 rounded-xl p-6 mb-8">
+          <p class="text-xl text-blue-800 italic">"Kalau kamu membuat aplikasi yang sumber informasinya salah, apa
+            dampaknya bagi pengguna?"</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-4">📱❌</div>
+            <h3 class="text-2xl font-bold text-red-600">Informasi Salah</h3>
+          </div>
+          <div class="space-y-4">
+            <div class="bg-red-50 rounded-lg p-4">
+              <p class="text-red-800 font-semibold">Aplikasi menyesatkan</p>
+              <p class="text-red-600 text-sm">Pengguna mendapat informasi yang salah</p>
+            </div>
+            <div class="bg-red-50 rounded-lg p-4">
+              <p class="text-red-800 font-semibold">Kehilangan kepercayaan</p>
+              <p class="text-red-600 text-sm">User tidak mau menggunakan aplikasi lagi</p>
+            </div>
+            <div class="bg-red-50 rounded-lg p-4">
+              <p class="text-red-800 font-semibold">Dampak negatif</p>
+              <p class="text-red-600 text-sm">Bisa merugikan kesehatan atau keuangan user</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-4">📱✅</div>
+            <h3 class="text-2xl font-bold text-green-600">Informasi Kredibel</h3>
+          </div>
+          <div class="space-y-4">
+            <div class="bg-green-50 rounded-lg p-4">
+              <p class="text-green-800 font-semibold">Aplikasi membantu</p>
+              <p class="text-green-600 text-sm">Memberikan solusi yang tepat</p>
+            </div>
+            <div class="bg-green-50 rounded-lg p-4">
+              <p class="text-green-800 font-semibold">Dipercaya pengguna</p>
+              <p class="text-green-600 text-sm">User merasa aman menggunakan aplikasi</p>
+            </div>
+            <div class="bg-green-50 rounded-lg p-4">
+              <p class="text-green-800 font-semibold">Dampak positif</p>
+              <p class="text-green-600 text-sm">Meningkatkan kualitas hidup pengguna</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+        <h4 class="text-xl font-bold text-gray-800 mb-4">Contoh Kasus Aplikasi:</h4>
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <div class="text-3xl mb-2">🏥</div>
+            <p class="font-semibold text-blue-800">Kesehatan</p>
+            <p class="text-sm text-blue-600">Info medis harus akurat</p>
+          </div>
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <div class="text-3xl mb-2">🌱</div>
+            <p class="font-semibold text-green-800">Lingkungan</p>
+            <p class="text-sm text-green-600">Data lingkungan terpercaya</p>
+          </div>
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <div class="text-3xl mb-2">📚</div>
+            <p class="font-semibold text-purple-800">Edukasi</p>
+            <p class="text-sm text-purple-600">Materi pembelajaran valid</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: Aktivitas Ide Aplikasi -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4">💡</div>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Aktivitas: Ide Aplikasi Kredibel</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-gray-800 mb-6">Tugas Kelompok (20 menit):</h3>
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-blue-500 rounded-full grid place-items-center text-white font-bold mr-3 mt-1">1
+              </div>
+              <p class="text-gray-700">Pilih topik aplikasi (kesehatan, lingkungan, edukasi, budaya)</p>
+            </div>
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-green-500 rounded-full grid place-items-center text-white font-bold mr-3 mt-1">2
+              </div>
+              <p class="text-gray-700">Tentukan informasi yang digunakan dan sumbernya</p>
+            </div>
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-purple-500 rounded-full grid place-items-center text-white font-bold mr-3 mt-1">3
+              </div>
+              <p class="text-gray-700">Cek apakah sumber itu kredibel</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-green-600 mb-6">Contoh:</h3>
+          <div class="bg-green-50 rounded-lg p-6">
+            <div class="flex items-center mb-4">
+              <div class="text-3xl mr-3">🌱</div>
+              <h4 class="text-xl font-bold text-green-800">App "EcoWise"</h4>
+            </div>
+            <p class="text-green-700 mb-2"><strong>Tujuan:</strong> Tips ramah lingkungan</p>
+            <p class="text-green-700 mb-2"><strong>Sumber:</strong> KLHK & Kompas.com</p>
+            <p class="text-green-700"><strong>Kenapa kredibel:</strong> Sumber resmi pemerintah dan media terpercaya</p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 bg-white rounded-xl shadow-lg p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Template untuk Kelompok:</h3>
+        <div class="grid md:grid-cols-4 gap-4">
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <div class="text-2xl mb-2">📱</div>
+            <h4 class="font-bold text-blue-800">Nama Aplikasi</h4>
+            <p class="text-sm text-blue-600">Apa nama aplikasimu?</p>
+          </div>
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <div class="text-2xl mb-2">🎯</div>
+            <h4 class="font-bold text-green-800">Tujuan</h4>
+            <p class="text-sm text-green-600">Untuk apa aplikasi ini?</p>
+          </div>
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <div class="text-2xl mb-2">📚</div>
+            <h4 class="font-bold text-purple-800">Sumber Informasi</h4>
+            <p class="text-sm text-purple-600">Dari mana datanya?</p>
+          </div>
+          <div class="text-center p-4 bg-orange-50 rounded-lg">
+            <div class="text-2xl mb-2">✅</div>
+            <h4 class="font-bold text-orange-800">Kenapa Kredibel</h4>
+            <p class="text-sm text-orange-600">Mengapa bisa dipercaya?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Presentasi Mini & Refleksi -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4">🤝💡</div>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Presentasi Mini & Refleksi</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-blue-600 mb-6">Setiap Kelompok:</h3>
+          <div class="space-y-4">
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-blue-500 rounded-full grid place-items-center text-white font-bold mr-3">1</div>
+              <p class="text-gray-700">Menjelaskan ide aplikasinya (1 menit)</p>
+            </div>
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-green-500 rounded-full grid place-items-center text-white font-bold mr-3">2</div>
+              <p class="text-gray-700">Menunjukkan sumber informasi</p>
+            </div>
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-purple-500 rounded-full grid place-items-center text-white font-bold mr-3">3</div>
+              <p class="text-gray-700">Menjelaskan mengapa sumber tersebut kredibel</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-green-600 mb-6">Pesan Guru:</h3>
+          <div class="bg-green-50 rounded-lg p-6">
+            <div class="text-4xl mb-4 text-center">👨‍💻</div>
+            <p class="text-lg text-green-800 italic text-center leading-relaxed">
+              "Pengembang aplikasi yang baik bukan hanya kreatif, tapi juga bertanggung jawab pada kebenaran informasi."
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 bg-white rounded-xl shadow-lg p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Contoh Presentasi:</h3>
+        <div class="bg-gray-50 rounded-lg p-6">
+          <div class="grid md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div class="text-3xl mb-2">🏥</div>
+              <h4 class="font-bold text-blue-800">HealthCheck</h4>
+              <p class="text-sm text-gray-600">Cek gejala penyakit</p>
+            </div>
+            <div>
+              <div class="text-3xl mb-2">🎯</div>
+              <p class="text-sm text-gray-700">Membantu identifikasi gejala awal penyakit</p>
+            </div>
+            <div>
+              <div class="text-3xl mb-2">📚</div>
+              <p class="text-sm text-gray-700">WHO, Kemenkes, RS terpercaya</p>
+            </div>
+            <div>
+              <div class="text-3xl mb-2">✅</div>
+              <p class="text-sm text-gray-700">Sumber resmi dan terverifikasi medis</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 9: Kuis Ringan -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4">🧠</div>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">Kuis Ringan: Cek Fakta atau Hoaks?</h2>
+      </div>
+      <div class="space-y-6">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">1. "Minum air lemon bisa menyembuhkan Covid-19"</h3>
+          <div class="flex justify-center gap-4">
+            <button class="quiz-option px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg"
+              onclick="checkQuizAnswer(this, false, 1)">✔ Fakta</button>
+            <button class="quiz-option px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+              onclick="checkQuizAnswer(this, true, 1)">❌ Hoaks</button>
+          </div>
+          <div id="quiz1" class="mt-4 text-center hidden">
+            <p class="text-green-600 font-semibold">Benar! Ini hoaks. Tidak ada bukti ilmiah yang mendukung klaim ini.
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">2. "Pendaftaran sekolah bisa dicek di kemdikbud.go.id"</h3>
+          <div class="flex justify-center gap-4">
+            <button class="quiz-option px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg"
+              onclick="checkQuizAnswer(this, true, 2)">✔ Fakta</button>
+            <button class="quiz-option px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+              onclick="checkQuizAnswer(this, false, 2)">❌ Hoaks</button>
+          </div>
+          <div id="quiz2" class="mt-4 text-center hidden">
+            <p class="text-green-600 font-semibold">Benar! Situs resmi Kemendikbud adalah sumber terpercaya.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-xl font-bold text-gray-800 mb-4">3. "Semua makanan organik 100% bebas pestisida"</h3>
+          <div class="flex justify-center gap-4">
+            <button class="quiz-option px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg"
+              onclick="checkQuizAnswer(this, false, 3)">✔ Fakta</button>
+            <button class="quiz-option px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+              onclick="checkQuizAnswer(this, true, 3)">❌ Hoaks</button>
+          </div>
+          <div id="quiz3" class="mt-4 text-center hidden">
+            <p class="text-green-600 font-semibold">Benar! Ini generalisasi yang tidak akurat. Organik tidak selalu 100%
+              bebas pestisida.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: Penutup -->
+  <div class="slide min-h-screen items-center justify-center p-8">
+    <div class="max-w-5xl mx-auto text-center">
+      <div class="text-6xl mb-6">🎉</div>
+      <h2 class="text-4xl font-bold text-gray-800 mb-8">Rangkuman</h2>
+      <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h3 class="text-2xl font-bold text-blue-600 mb-6">Yang Sudah Kita Pelajari:</h3>
+          <div class="space-y-4 text-left">
+            <div class="flex items-center">
+              <div class="w-6 h-6 bg-blue-500 rounded-full grid place-items-center text-white text-sm mr-3">✓</div>
+              <span>Ciri-ciri informasi kredibel</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-6 h-6 bg-green-500 rounded-full grid place-items-center text-white text-sm mr-3">✓</div>
+              <span>Langkah cek fakta 5 tahap</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-6 h-6 bg-purple-500 rounded-full grid place-items-center text-white text-sm mr-3">✓</div>
+              <span>Bahaya hoaks & bias</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-6 h-6 bg-orange-500 rounded-full grid place-items-center text-white text-sm mr-3">✓</div>
+              <span>Pentingnya informasi benar dalam pengembangan aplikasi</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg p-8 text-white">
+          <h3 class="text-2xl font-bold mb-6">Pesan Akhir</h3>
+          <div class="text-4xl mb-4">💙</div>
+          <p class="text-xl italic leading-relaxed">"Gunakan data yang benar untuk membuat dampak yang baik."</p>
+          <div class="mt-6 bg-white/20 rounded-lg p-4">
+            <p class="text-sm">Sebagai developer masa depan, kalian bertanggung jawab memastikan aplikasi memberi
+              informasi akurat dan bermanfaat.</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">Terima Kasih!</h3>
+        <p class="text-lg text-gray-600 mb-4">Semoga materi hari ini bermanfaat untuk perjalanan coding kalian!</p>
+        <div class="flex justify-center items-center gap-4">
+          <div class="text-2xl">🚀</div>
+          <span class="text-lg font-semibold text-gray-700">Happy Coding with Credible Information!</span>
+          <div class="text-2xl">💻</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideCounter = document.getElementById('slideCounter');
+    const progressBar = document.getElementById('progressBar');
+    // --- Auto safe-space & auto-hide navbar ---
+    const navBar = document.querySelector('div.fixed.bottom-6');
+
+    function setNavSafeSpace() {
+      if (!navBar) return;
+      const rect = navBar.getBoundingClientRect();
+      const gapBelow = Math.max(0, window.innerHeight - rect.bottom); // jarak nav ke tepi bawah
+      const safe = rect.height + gapBelow + 8; // buffer
+      document.documentElement.style.setProperty('--navH', safe + 'px');
+    }
+    setNavSafeSpace();
+    window.addEventListener('resize', setNavSafeSpace);
+    window.addEventListener('load', setNavSafeSpace);
+    if (window.ResizeObserver && navBar) new ResizeObserver(setNavSafeSpace).observe(navBar);
+
+    // Auto-hide: tampil saat mouse mendekati bawah layar / hover / fokus
+    let hideTO;
+    function showNav(tempMs = 1500) {
+      if (!navBar) return;
+      navBar.classList.add('nav-show');
+      clearTimeout(hideTO);
+      if (window.matchMedia('(hover: hover)').matches) {
+        hideTO = setTimeout(() => navBar.classList.remove('nav-show'), tempMs);
+      }
+    }
+    if (navBar) {
+      // Muncul saat kursor mendekati bawah (<=120px dari bawah)
+      document.addEventListener('mousemove', (e) => {
+        const threshold = 120;
+        if (window.innerHeight - e.clientY <= threshold) showNav();
+      });
+      // Tetap muncul saat di-hover
+      navBar.addEventListener('mouseenter', () => { clearTimeout(hideTO); navBar.classList.add('nav-show'); });
+      navBar.addEventListener('mouseleave', () => { hideTO = setTimeout(() => navBar.classList.remove('nav-show'), 600); });
+      // Tampil saat tombol di dalam nav mendapat fokus (keyboard)
+      navBar.addEventListener('focusin', () => { clearTimeout(hideTO); navBar.classList.add('nav-show'); });
+      navBar.addEventListener('focusout', () => { hideTO = setTimeout(() => navBar.classList.remove('nav-show'), 600); });
+    }
+
+
+
+    function updateSlide() {
+      slides.forEach((slide, idx) => slide.classList.toggle('active', idx === currentSlide));
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+      slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+      progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+
+      // reset posisi scroll
+      const active = slides[currentSlide];
+      if (active) active.scrollTop = 0;
+      window.scrollTo(0, 0);
+    }
+
+    // Buttons
+    prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide--; updateSlide(); } });
+    nextBtn.addEventListener('click', () => { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } });
+
+    // Keyboard
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && currentSlide > 0) { currentSlide--; updateSlide(); }
+      else if (e.key === 'ArrowRight' && currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); }
+    });
+
+    // Quiz (Slide 4)
+    function checkAnswer(button, isCorrect) {
+      const group = button.parentElement.querySelectorAll('.quiz-option');
+      group.forEach(btn => btn.disabled = true);
+
+      // reset hasil sebelumnya
+      const correctEl = document.getElementById('answer4');
+      const wrongEl = document.getElementById('answer4-wrong');
+      if (correctEl) correctEl.classList.add('hidden');
+      if (wrongEl) wrongEl.classList.add('hidden');
+
+      // beri highlight tombol yang dipilih
+      button.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+      // tampilkan feedback
+      if (isCorrect) {
+        if (correctEl) correctEl.classList.remove('hidden');
+      } else {
+        if (wrongEl) wrongEl.classList.remove('hidden');
+      }
+    }
+
+    // jika dipanggil via onclick inline
+    window.checkAnswer = checkAnswer;
+
+
+    // Quiz (Slide 9)
+    function checkQuizAnswer(button, isCorrect, qNum) {
+      const group = button.parentElement.querySelectorAll('.quiz-option');
+      group.forEach(btn => btn.disabled = true);
+      button.classList.add(isCorrect ? 'correct' : 'incorrect');
+      if (isCorrect) document.getElementById(`quiz${qNum}`).classList.remove('hidden');
+    }
+
+    // Expose for inline onclick handlers
+    window.checkAnswer = checkAnswer;
+    window.checkQuizAnswer = checkQuizAnswer;
+
+    // Init
+    updateSlide();
+  </script>
+</body>
+
+</html>
