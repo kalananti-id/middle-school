@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variabel Lokal di AppInventor</title>
+    <script src="/_sdk/element_sdk.js"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            margin: 0.5rem 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .slide-container {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .illustration-svg {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .illustration-svg svg {
+            max-width: 300px;
+            height: auto;
+        }
+
+        .code-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .output-placeholder {
+            background: #e8f5e8;
+            border: 2px dashed #28a745;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .slide h3 {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .slide p,
+        .slide li {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            border-left: 5px solid #f39c12;
+        }
+
+        .analogy-box p {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .code-block {
+            background: #2d3436;
+            color: #00ff88;
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 1rem;
+            margin: 0.8rem 0;
+            background: #e8f4f8;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            font-size: 1.1rem;
+        }
+
+        .feature-list li strong {
+            color: #667eea;
+        }
+
+        .illustration {
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 4rem;
+        }
+
+        .interactive-demo {
+            background: #f0f3ff;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            border: 2px dashed #667eea;
+        }
+
+        .demo-input {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1.1rem;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            box-sizing: border-box;
+        }
+
+        .demo-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .demo-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .demo-button:active {
+            transform: translateY(0);
+        }
+
+        .demo-result {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            min-height: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .nav-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-button:hover {
+            background: #5568d3;
+            transform: translateX(5px);
+        }
+
+        .nav-button.prev:hover {
+            transform: translateX(-5px);
+        }
+
+        .nav-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-indicator {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .conclusion-box {
+            background: linear-gradient(135deg, #a8e6cf 0%, #56ab91 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            color: white;
+        }
+
+        .conclusion-box h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .conclusion-box ul {
+            font-size: 1.15rem;
+            line-height: 2;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .slide-container {
+                padding: 1.5rem;
+            }
+
+            .slide h2 {
+                font-size: 1.5rem;
+            }
+
+            .comparison-table {
+                font-size: 0.9rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.6rem;
+            }
+        }
+    </style>
+    <style>
+        @view-transition {
+            navigation: auto;
+        }
+    </style>
+    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+    <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="main-title">Variabel Lokal di AppInventor</h1>
+            <p id="subtitle">Kapan menggunakan variabel lokal?</p>
+        </div>
+        <div class="slide-container"><!-- Slide 0: Judul Menarik -->
+            <div class="slide active" data-slide="0">
+                <div style="text-align: center; padding: 3rem 0;">
+                    <h1
+                        style="font-size: 3rem; color: #667eea; margin: 2rem 0 1rem 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
+                        Variabel Lokal</h1>
+                    <h2 style="font-size: 1.8rem; color: #764ba2; margin: 1rem 0 2rem 0; font-weight: normal;">Variabel
+                        yang Bisa Menghilang Seperti Sulap - Kenalan dengan Variabel Lokal!</h2>
+                    <div
+                        style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); padding: 2rem; border-radius: 20px; margin: 2rem 0; box-shadow: 0 8px 25px rgba(255, 234, 167, 0.3);">
+                        <p style="font-size: 1.3rem; margin: 0; color: #333; font-weight: 500;">🎯 Siap-siap belajar
+                            trik rahasia programmer sejati!<br>
+                            ✨ Temukan bagaimana variabel bisa "menghilang" seperti ninja!<br>
+                            🎮 Buat aplikasimu lebih keren dan efisien!</p>
+                    </div>
+                    <div style="margin-top: 3rem;">
+                        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;"><span
+                                style="background: #e8f5e8; color: #155724; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">📱
+                                AppInventor</span> <span
+                                style="background: #fff3e0; color: #856404; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">🔧
+                                Variabel Lokal</span> <span
+                                style="background: #f0f3ff; color: #667eea; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">⚡
+                                Efisiensi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 1: Review Variabel -->
+            <div class="slide" data-slide="1">
+                <h2>Review: Apa Itu Variabel?</h2>
+                <p>Variabel adalah <span class="highlight">wadah untuk menyimpan nilai</span> yang bisa berubah-ubah.
+                </p>
+                <p><strong>Di App Inventor, kita menggunakan blok:</strong></p>
+                <div class="code-block">
+                    initialize global nama to nilai → untuk membuat variabel set variabel to nilai_baru → untuk mengubah
+                    isinya get variabel → untuk mengambil nilainya
+                </div>
+                <div class="analogy-box">
+                    <p><strong>Analogi Sederhana:</strong><br>
+                        Bayangkan variabel seperti <strong>kotak penyimpanan</strong>. Kamu bisa memberi nama pada kotak
+                        itu, memasukkan sesuatu ke dalamnya, lalu mengganti isinya kapan pun kamu mau!</p>
+                </div>
+                <div class="interactive-demo">
+                    <h3>Coba Sendiri: Variabel Sederhana</h3>
+                    <p>Masukkan nama dan nilai untuk membuat variabel:</p><input type="text" class="demo-input"
+                        id="varName1" placeholder="Nama variabel (contoh: skor)"> <input type="number"
+                        class="demo-input" id="varValue1" placeholder="Nilai (contoh: 100)"> <button class="demo-button"
+                        onclick="createVariable()">Buat Variabel</button> <button class="demo-button"
+                        onclick="showVariable()">Tampilkan Nilai</button>
+                    <div class="demo-result" id="result1">
+                        Hasil akan muncul di sini
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: Jenis Variabel -->
+            <div class="slide" data-slide="2">
+                <h2>Jenis-Jenis Variabel di AppInventor</h2>
+                <p>Ternyata, tidak semua variabel bisa diakses di seluruh bagian aplikasi! Ada dua jenis variabel
+                    berdasarkan <span class="highlight">jangkauan penggunaannya (scope)</span>:</p>
+                <div class="illustration-svg">
+                    <svg viewbox="0 0 500 200" xmlns="http://www.w3.org/2000/svg"><!-- Global Variable -->
+                        <circle cx="150" cy="100" r="80" fill="#e8f5e8" stroke="#4CAF50" stroke-width="3" /> <text
+                            x="150" y="95" text-anchor="middle" fill="#155724" font-size="14" font-weight="bold">
+                            GLOBAL
+                        </text> <text x="150" y="110" text-anchor="middle" fill="#155724" font-size="12">
+                            Seluruh App
+                        </text> <!-- Local Variable -->
+                        <rect x="300" y="50" width="100" height="100" fill="#fff3e0" stroke="#FF9800" stroke-width="3"
+                            rx="10" /> <text x="350" y="95" text-anchor="middle" fill="#856404" font-size="14"
+                            font-weight="bold">
+                            LOCAL
+                        </text> <text x="350" y="110" text-anchor="middle" fill="#856404" font-size="12">
+                            Satu Blok
+                        </text> <!-- VS --> <text x="250" y="105" text-anchor="middle" fill="#333" font-size="18"
+                            font-weight="bold">
+                            VS
+                        </text>
+                    </svg>
+                </div>
+                <h3>Variabel Global (Yang Sudah Kamu Kenal)</h3>
+                <div
+                    style="background: #e8f5e8; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #4CAF50;">
+                    <p><strong>Variabel Global</strong> seperti <strong>pengeras suara di sekolah</strong></p>
+                    <ul style="margin: 0.5rem 0;">
+                        <li>Bisa didengar di <strong>seluruh sekolah</strong> (semua bagian aplikasi)</li>
+                        <li>Semua orang bisa mendengar pengumumannya</li>
+                        <li>Pengumuman tetap ada sampai diganti dengan pengumuman baru</li>
+                    </ul>
+                    <p><strong>Contoh:</strong> Skor game, nama pemain, jumlah nyawa</p>
+                </div>
+                <h3>Variabel Lokal (Yang Akan Kita Pelajari)</h3>
+                <div
+                    style="background: #fff3e0; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #FF9800;">
+                    <p><strong>Variabel Lokal</strong> seperti <strong>berbisik di dalam kelas</strong></p>
+                    <ul style="margin: 0.5rem 0;">
+                        <li>Hanya bisa didengar di <strong>dalam kelas itu saja</strong></li>
+                        <li>Keluar kelas = tidak bisa dengar lagi</li>
+                        <li>Bisikan hilang begitu pelajaran selesai</li>
+                    </ul>
+                    <p><strong>Contoh:</strong> Hasil perhitungan sementara, data yang sedang diproses</p>
+                </div>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspek</th>
+                            <th>Global Variable</th>
+                            <th>Local Variable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Jangkauan</strong></td>
+                            <td>Seluruh aplikasi</td>
+                            <td>Hanya dalam 1 blok</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Umur</strong></td>
+                            <td>Tetap ada sampai aplikasi ditutup</td>
+                            <td>Hilang setelah blok selesai</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Blok</strong></td>
+                            <td><code>initialize global</code></td>
+                            <td><code>initialize local</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kapan Pakai</strong></td>
+                            <td>Data penting yang perlu diingat terus</td>
+                            <td>Data sementara untuk perhitungan</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Slide 3: Fokus Variabel Lokal -->
+            <div class="slide" data-slide="3">
+                <h2>Variabel Lokal</h2>
+                <h3>Pengertian Lengkap</h3>
+                <div
+                    style="background: #f0f8ff; padding: 2rem; border-radius: 15px; margin: 1.5rem 0; border: 2px solid #667eea;">
+                    <p style="font-size: 1.2rem; margin-top: 0;"><strong>Variabel lokal adalah variabel yang:</strong>
+                    </p>
+                    <ol style="font-size: 1.1rem; line-height: 2;">
+                        <li><span class="highlight">Hanya hidup di dalam satu blok kode</span> (seperti di dalam when
+                            Button.Click)</li>
+                        <li><span class="highlight">Tidak bisa diakses dari blok lain</span> (blok lain tidak tahu
+                            variabel ini ada)</li>
+                        <li><span class="highlight">Otomatis hilang</span> begitu blok selesai dijalankan</li>
+                        <li><span class="highlight">Dibuat dengan blok "initialize local"</span> bukan "initialize
+                            global"</li>
+                    </ol>
+                </div>
+                <h3>Di Mana Variabel Lokal Bisa Digunakan?</h3>
+                <ul class="feature-list">
+                    <li><strong>when Button.Click</strong> - saat tombol diklik (paling sering dipakai)</li>
+                    <li><strong>procedure</strong> - di dalam prosedur/fungsi yang kamu buat</li>
+                    <li><strong>for each item in list</strong> - di dalam perulangan</li>
+                    <li><strong>while loop</strong> - di dalam perulangan while</li>
+                    <li><strong>if-then-else</strong> - di dalam kondisi if</li>
+                </ul>
+                <h3>Siklus Hidup Variabel Lokal</h3>
+                <div class="illustration-svg">
+                    <svg viewbox="0 0 600 150" xmlns="http://www.w3.org/2000/svg"><!-- Step 1 -->
+                        <rect x="20" y="40" width="100" height="70" fill="#e8f5e8" stroke="#4CAF50" stroke-width="2"
+                            rx="10" /> <text x="70" y="65" text-anchor="middle" fill="#155724" font-size="12"
+                            font-weight="bold">
+                            1. MULAI
+                        </text> <text x="70" y="85" text-anchor="middle" fill="#155724" font-size="10">
+                            Blok kode dimulai
+                        </text> <!-- Arrow 1 -->
+                        <path d="M130 75 L150 75" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+                        <!-- Step 2 -->
+                        <rect x="160" y="40" width="100" height="70" fill="#fff3e0" stroke="#FF9800" stroke-width="2"
+                            rx="10" /> <text x="210" y="65" text-anchor="middle" fill="#856404" font-size="12"
+                            font-weight="bold">
+                            2. DIBUAT
+                        </text> <text x="210" y="85" text-anchor="middle" fill="#856404" font-size="10">
+                            Variabel lokal dibuat
+                        </text> <!-- Arrow 2 -->
+                        <path d="M270 75 L290 75" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+                        <!-- Step 3 -->
+                        <rect x="300" y="40" width="100" height="70" fill="#f0f3ff" stroke="#667eea" stroke-width="2"
+                            rx="10" /> <text x="350" y="65" text-anchor="middle" fill="#667eea" font-size="12"
+                            font-weight="bold">
+                            3. DIPAKAI
+                        </text> <text x="350" y="85" text-anchor="middle" fill="#667eea" font-size="10">
+                            Digunakan dalam blok
+                        </text> <!-- Arrow 3 -->
+                        <path d="M410 75 L430 75" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+                        <!-- Step 4 -->
+                        <rect x="440" y="40" width="100" height="70" fill="#ffe6e6" stroke="#dc3545" stroke-width="2"
+                            rx="10" /> <text x="490" y="65" text-anchor="middle" fill="#dc3545" font-size="12"
+                            font-weight="bold">
+                            4. HILANG
+                        </text> <text x="490" y="85" text-anchor="middle" fill="#dc3545" font-size="10">
+                            Blok selesai = hilang
+                        </text>
+                        <defs>
+                            <marker id="arrow" markerwidth="10" markerheight="7" refx="9" refy="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="analogy-box">
+                    <p><strong>Analogi Kertas Kasir yang Diperjelas:</strong><br>
+                        Bayangkan kamu di kasir supermarket:</p>
+                    <ul style="margin: 1rem 0; font-size: 1rem;">
+                        <li>Kamu ambil kertas kecil untuk menghitung total belanja</li>
+                        <li>Kamu tulis: "Roti 15.000 + Susu 8.000 = 23.000"</li>
+                        <li>Kamu bayar 23.000 ke kasir</li>
+                        <li>Kertas itu langsung kamu buang karena sudah tidak perlu</li>
+                    </ul>
+                    <p><strong>Kertas itu = variabel lokal!</strong> Hanya dipakai di kasir, setelah selesai langsung
+                        hilang. Kamu tidak bawa pulang kertas itu kan?</p>
+                </div>
+                <h3>Mengapa Harus Hilang?</h3>
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin: 1rem 0;">
+                    <p style="margin-top: 0;"><strong>Alasan variabel lokal otomatis hilang:</strong></p>
+                    <ul style="font-size: 1rem; line-height: 1.8;">
+                        <li><strong>Menghemat memori</strong> - tidak menyimpan data yang sudah tidak dibutuhkan</li>
+                        <li><strong>Mencegah kesalahan</strong> - blok lain tidak bisa mengubah nilainya secara tidak
+                            sengaja</li>
+                        <li><strong>Aplikasi lebih cepat</strong> - tidak ada data sampah yang menumpuk</li>
+                        <li><strong>Kode lebih rapi</strong> - setiap blok punya variabelnya sendiri</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 4: Mengapa Perlu Variabel Lokal -->
+            <div class="slide" data-slide="4">
+                <h2>Mengapa Kita Membutuhkan Variabel Lokal?</h2>
+                <ul class="feature-list">
+                    <li><strong>Efisien:</strong> Tidak perlu membuat variabel global untuk data sementara</li>
+                    <li><strong>Rapi:</strong> Mencegah tumpang tindih nama variabel antar event</li>
+                    <li><strong>Aman:</strong> Nilainya tidak bisa diubah oleh bagian program lain di luar blok tersebut
+                    </li>
+                </ul>
+                <h3>Contoh Nyata:</h3>
+                <p>Saat menghitung hasil dari dua input (harga &amp; diskon), kamu hanya butuh menyimpan hasil
+                    perhitungan sementara. Nilainya tidak perlu diketahui oleh bagian program lain.</p>
+                <div class="interactive-demo">
+                    <h3>Demo: Perhitungan Sementara</h3>
+                    <p>Hitung total harga setelah diskon:</p><input type="number" class="demo-input" id="price"
+                        placeholder="Harga (contoh: 100000)"> <input type="number" class="demo-input" id="discount"
+                        placeholder="Diskon % (contoh: 20)"> <button class="demo-button"
+                        onclick="calculateDiscount()">Hitung Total</button>
+                    <div class="demo-result" id="result2">
+                        Hasil akan muncul di sini
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.95rem; color: #666;">Variabel untuk menyimpan hasil
+                        perhitungan ini hanya dibutuhkan sementara!</p>
+                </div>
+            </div>
+
+            <!-- Slide 5: Latihan Praktik App Inventor -->
+            <div class="slide" data-slide="5">
+                <h2>Latihan Praktik: Aplikasi Hitung Diskon</h2>
+                <h3>Deskripsi Proyek</h3>
+                <p>Kita akan membuat aplikasi sederhana untuk menghitung harga final setelah diskon menggunakan
+                    <strong>variabel lokal</strong> di MIT App Inventor.
+                </p>
+                <div class="illustration-svg">
+                    <svg viewbox="0 0 500 250" xmlns="http://www.w3.org/2000/svg"><!-- Phone mockup -->
+                        <rect x="150" y="30" width="200" height="350" fill="#333" rx="20" />
+                        <rect x="165" y="50" width="170" height="310" fill="#fff" rx="10" /> <!-- App interface -->
+                        <text x="250" y="80" text-anchor="middle" fill="#667eea" font-size="16" font-weight="bold">
+                            Hitung Diskon
+                        </text> <!-- Input fields -->
+                        <rect x="180" y="100" width="140" height="30" fill="#f8f9fa" stroke="#ddd" stroke-width="1"
+                            rx="5" /> <text x="185" y="120" fill="#666" font-size="12">
+                            Harga Asli
+                        </text>
+                        <rect x="180" y="140" width="140" height="30" fill="#f8f9fa" stroke="#ddd" stroke-width="1"
+                            rx="5" /> <text x="185" y="160" fill="#666" font-size="12">
+                            Diskon %
+                        </text> <!-- Button -->
+                        <rect x="180" y="180" width="140" height="35" fill="#667eea" rx="5" /> <text x="250" y="202"
+                            text-anchor="middle" fill="white" font-size="12" font-weight="bold">
+                            HITUNG
+                        </text> <!-- Result -->
+                        <rect x="180" y="225" width="140" height="40" fill="#e8f5e8" stroke="#4CAF50" stroke-width="1"
+                            rx="5" /> <text x="250" y="245" text-anchor="middle" fill="#155724" font-size="12">
+                            Harga Final:
+                        </text> <text x="250" y="260" text-anchor="middle" fill="#155724" font-size="14"
+                            font-weight="bold">
+                            Rp 80.000
+                        </text>
+                    </svg>
+                </div>
+                <h3>Komponen yang Dibutuhkan</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+                    <div
+                        style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <h4 style="margin-top: 0; color: #667eea;">User Interface</h4>
+                        <ul style="font-size: 0.95rem; margin: 0;">
+                            <li>2 TextBox (input harga &amp; diskon)</li>
+                            <li>1 Button (tombol hitung)</li>
+                            <li>5 Label (judul, label harga barang, label diskon (%), &amp; hasil)</li>
+                        </ul>
+                    </div>
+                    <div
+                        style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #764ba2;">
+                        <h4 style="margin-top: 0; color: #764ba2;">Variabel</h4>
+                        <ul style="font-size: 0.95rem; margin: 0;">
+                            <li><strong>Local:</strong> diskon</li>
+                            <li><strong>Global:</strong> Tidak ada (semua lokal!)</li>
+                        </ul>
+                    </div>
+                </div>
+                <h3>Contoh Output Aplikasi</h3>
+                <div class="output-placeholder">
+                    <p><strong><img
+                                src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/a2d1bc2b-4994-4251-839f-d096d1e6f098.jpg">
+                    </p>
+                    <p>Harga asli: 5.000.000</p>
+                    <p>Diskon: 50%</p>
+                    <p>Harga final: 2.500.000</p>
+                </div>
+            </div>
+
+            <!-- Slide 6: Kode Blok yang Harus Disusun -->
+            <div class="slide" data-slide="6">
+                <h2>Kode Blok yang Harus Disusun</h2>
+                <h3>Langkah-langkah Pembuatan</h3>
+                <p>Susun blok-blok berikut untuk membuat aplikasi hitung diskon:</p>
+                <div class="code-placeholder">
+                    <img
+                        src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/e9b63d91-836e-4342-bbab-93730ffb23a5.png">
+                    <br>
+                    <ul>
+                        <li>• Event <b>when Hitung.Click</b> dijalankan saat tombol "Hitung" ditekan.</li>
+                        <li>• Dibuat variabel lokal <code>diskon</code> dengan nilai awal 0.</li>
+                        <li>• <code>diskon</code> dihitung dari
+                            <code>TextBox_Barang.Text × TextBox_Diskon.Text ÷ 100</code>.</li>
+                        <li>• Hasil perhitungan disimpan di variabel lokal <code>diskon</code>.</li>
+                        <li>• <code>Label_Harga_Final.Text</code> menampilkan hasil akhir menggunakan blok
+                            <code>join</code>.</li>
+                        <li>• Harga akhir = harga barang − diskon.</li>
+                        <li>• Variabel lokal hanya berlaku di dalam event <b>Hitung.Click</b> ini.</li>
+                    </ul>
+
+                </div>
+            </div>
+            
+            <!-- Slide 8: Ciri-ciri -->
+            <div class="slide" data-slide="8">
+                <h2>Ciri-ciri Variabel Lokal</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Ciri</th>
+                            <th>Penjelasan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Hanya dapat digunakan di dalam satu blok</strong></td>
+                            <td>Tidak bisa diakses dari event lain</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hilang setelah blok selesai dijalankan</strong></td>
+                            <td>Nilainya tidak tersimpan permanen</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cocok untuk perhitungan sementara</strong></td>
+                            <td>Misalnya hasil kalkulasi, pengolahan data input</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dideklarasikan dengan blok initialize local</strong></td>
+                            <td>Bukan initialize global</td>
+                        </tr>
+                    </tbody>
+                </table>
+               
+                <div class="analogy-box">
+                    <p><strong>Analogi Aktor di Panggung:</strong><br>
+                        Variabel lokal seperti aktor yang hanya muncul di satu adegan. Setelah adegan selesai, aktor itu
+                        keluar panggung dan tidak muncul lagi di adegan lain!</p>
+                </div>
+            </div>
+            
+            <!-- Slide 9: Panduan Kapan Menggunakan -->
+            <div class="slide" data-slide="9">
+                <h2>Kapan Menggunakan Global vs Lokal?</h2>
+                <h3>Cara Mudah Memilih Jenis Variabel</h3>
+                <p>Tanya diri kamu 3 pertanyaan ini:</p>
+                <div
+                    style="background: #f0f8ff; padding: 2rem; border-radius: 15px; margin: 1.5rem 0; border: 2px solid #667eea;">
+                    <h4 style="color: #667eea; margin-top: 0;">Pertanyaan 1: Apakah data ini perlu diingat terus?</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <p><strong>YA → Gunakan GLOBAL</strong></p>
+                            <p style="font-size: 0.95rem;">Contoh: Skor game, nama pemain, level yang sudah dicapai</p>
+                        </div>
+                        <div style="background: #fff3e0; padding: 1rem; border-radius: 8px;">
+                            <p><strong>TIDAK → Gunakan LOKAL</strong></p>
+                            <p style="font-size: 0.95rem;">Contoh: Hasil perhitungan sementara, data input yang sedang
+                                diproses</p>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    style="background: #f0f8ff; padding: 2rem; border-radius: 15px; margin: 1.5rem 0; border: 2px solid #667eea;">
+                    <h4 style="color: #667eea; margin-top: 0;">Pertanyaan 2: Apakah data ini dibutuhkan di banyak
+                        tempat?</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <p><strong>YA → Gunakan GLOBAL</strong></p>
+                            <p style="font-size: 0.95rem;">Contoh: Nama user (ditampilkan di banyak screen), pengaturan
+                                bahasa</p>
+                        </div>
+                        <div style="background: #fff3e0; padding: 1rem; border-radius: 8px;">
+                            <p><strong>TIDAK → Gunakan LOKAL</strong></p>
+                            <p style="font-size: 0.95rem;">Contoh: Total harga di 1 tombol, hasil konversi suhu</p>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    style="background: #f0f8ff; padding: 2rem; border-radius: 15px; margin: 1.5rem 0; border: 2px solid #667eea;">
+                    <h4 style="color: #667eea; margin-top: 0;">Pertanyaan 3: Apakah data ini berubah-ubah terus?</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <p><strong>YA &amp; perlu diingat → GLOBAL</strong></p>
+                            <p style="font-size: 0.95rem;">Contoh: Skor yang terus bertambah, timer countdown</p>
+                        </div>
+                        <div style="background: #fff3e0; padding: 1rem; border-radius: 8px;">
+                            <p><strong>YA &amp; tidak perlu diingat → LOKAL</strong></p>
+                            <p style="font-size: 0.95rem;">Contoh: Angka random untuk 1 kali pakai, input sementara</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="analogy-box">
+                    <p><strong>Tips Mudah Mengingat:</strong><br><strong>Global</strong> = Seperti KTP (penting,
+                        dibutuhkan di mana-mana, disimpan lama)<br><strong>Lokal</strong> = Seperti struk belanja
+                        (penting sebentar, setelah itu bisa dibuang)</p>
+                </div>
+            </div>
+            
+            <!-- Slide 10: Kesimpulan -->
+            <div class="slide" data-slide="10">
+                <h2>Kesimpulan: Variabel Lokal adalah Sahabatmu!</h2>
+                <ul class="feature-list">
+                    <li><strong>Variabel lokal</strong> hanya hidup di dalam satu blok kode dan hilang setelah blok
+                        selesai dijalankan.</li>
+                    <li>Menggunakan variabel lokal membantu membuat aplikasi lebih <strong>efisien, rapi, dan aman</strong>.
+                    </li>
+                    <li>Gunakan variabel lokal untuk <strong>data sementara</strong> yang tidak perlu diingat lama atau
+                        diakses dari banyak tempat.</li>
+                </ul>
+                <div class="analogy-box">
+                    <p><strong>Ingat Kembali Analogi:</strong><br>
+                        Variabel lokal seperti <strong>berbisik di dalam kelas</strong> atau <strong>kertas kasir
+                            sementara</strong>. Hanya dipakai sebentar, lalu hilang tanpa jejak!</p>
+                </div>
+                <h3>Ayo Praktikkan!</h3>
+                <p>Mulailah menggunakan variabel lokal di proyek App Inventor-mu dan rasakan manfaatnya!</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        const defaultConfig = {
+            main_title: "🚀 Rahasia Variabel Ninja di App Inventor! 🥷",
+            subtitle: "Variabel yang Bisa Menghilang Seperti Sulap - Kenalan dengan Variabel Lokal!",
+            primary_color: "#667eea",
+            secondary_color: "#764ba2",
+            accent_color: "#ffeaa7",
+            text_color: "#333333",
+            background_color: "#ffffff"
+        };
+
+        let currentSlideIndex = 0;
+        const totalSlides = 13;
+        let globalVarValue = "";
+        let demoVar = null;
+
+        function updateSlideDisplay() {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlideIndex) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('currentSlide').textContent = currentSlideIndex + 1;
+            document.getElementById('totalSlides').textContent = totalSlides;
+
+            document.getElementById('prevBtn').disabled = currentSlideIndex === 0;
+            document.getElementById('nextBtn').disabled = currentSlideIndex === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlideIndex += direction;
+            if (currentSlideIndex < 0) currentSlideIndex = 0;
+            if (currentSlideIndex > totalSlides - 1) currentSlideIndex = totalSlides - 1;
+            updateSlideDisplay();
+        }
+
+        function createVariable() {
+            const name = document.getElementById('varName1').value;
+            const value = document.getElementById('varValue1').value;
+
+            if (!name || !value) {
+                document.getElementById('result1').textContent = '⚠️ Isi nama dan nilai variabel!';
+                return;
+            }
+
+            demoVar = { name: name, value: value };
+            document.getElementById('result1').textContent = `✅ Variabel "${name}" dibuat dengan nilai: ${value}`;
+        }
+
+        function showVariable() {
+            if (!demoVar) {
+                document.getElementById('result1').textContent = '❌ Belum ada variabel yang dibuat!';
+                return;
+            }
+
+            document.getElementById('result1').textContent = `${demoVar.name} = ${demoVar.value}`;
+        }
+
+        function calculateDiscount() {
+            const price = parseFloat(document.getElementById('price').value);
+            const discount = parseFloat(document.getElementById('discount').value);
+
+            if (isNaN(price) || isNaN(discount)) {
+                document.getElementById('result2').textContent = '⚠️ Masukkan harga dan diskon yang valid!';
+                return;
+            }
+
+            const discountAmount = price * (discount / 100);
+            const total = price - discountAmount;
+
+            document.getElementById('result2').innerHTML = `
+        💰 Harga: Rp ${price.toLocaleString('id-ID')}<br>
+        🏷️ Diskon ${discount}%: -Rp ${discountAmount.toLocaleString('id-ID')}<br>
+        <strong>✨ Total: Rp ${total.toLocaleString('id-ID')}</strong>
+      `;
+        }
+
+        function setGlobal() {
+            const value = document.getElementById('globalVar').value;
+            if (!value) {
+                document.getElementById('globalResult').textContent = '⚠️ Isi nilai terlebih dahulu!';
+                return;
+            }
+            globalVarValue = value;
+            document.getElementById('globalResult').textContent = `✅ Global disimpan: "${value}"`;
+        }
+
+        function showGlobal() {
+            if (!globalVarValue) {
+                document.getElementById('globalResult').textContent = '❌ Variabel global kosong!';
+                return;
+            }
+            document.getElementById('globalResult').textContent = `🌍 Nilai global: "${globalVarValue}" (masih ada!)`;
+        }
+
+        function setLocal() {
+            const value = document.getElementById('localVar').value;
+            if (!value) {
+                document.getElementById('localResult').textContent = '⚠️ Isi nilai terlebih dahulu!';
+                return;
+            }
+            const localVar = value;
+            document.getElementById('localResult').textContent = `✅ Lokal disimpan: "${localVar}"`;
+        }
+
+        function showLocal() {
+            document.getElementById('localResult').textContent = '💨 Variabel lokal sudah hilang! (hanya hidup sementara)';
+        }
+
+        function checkAnswer(questionNum, answer) {
+            const correctAnswers = {
+                1: 'global', // jumlah_tugas_selesai - ditampilkan di dashboard
+                2: 'local',  // input_tugas_baru - teks yang sedang diketik
+                3: 'global'  // nama_pengguna - muncul di header setiap halaman
+            };
+
+            const explanations = {
+                1: {
+                    correct: '✅ Benar! jumlah_tugas_selesai ditampilkan di dashboard, jadi perlu diakses dari berbagai tempat.',
+                    wrong: '❌ Salah. jumlah_tugas_selesai ditampilkan di dashboard, jadi harus GLOBAL agar bisa diakses dari berbagai tempat.'
+                },
+                2: {
+                    correct: '✅ Benar! input_tugas_baru hanya dibutuhkan sementara saat user mengetik, setelah itu bisa hilang.',
+                    wrong: '❌ Salah. input_tugas_baru hanya dibutuhkan sementara saat mengetik, jadi sebaiknya LOKAL.'
+                },
+                3: {
+                    correct: '✅ Benar! nama_pengguna muncul di header setiap halaman, jadi perlu diakses dari banyak tempat.',
+                    wrong: '❌ Salah. nama_pengguna muncul di header setiap halaman, jadi harus GLOBAL agar bisa diakses dari mana saja.'
+                }
+            };
+
+            const resultDiv = document.getElementById(`answer${questionNum}`);
+            const isCorrect = answer === correctAnswers[questionNum];
+
+            if (isCorrect) {
+                resultDiv.textContent = explanations[questionNum].correct;
+                resultDiv.style.color = '#28a745';
+            } else {
+                resultDiv.textContent = explanations[questionNum].wrong;
+                resultDiv.style.color = '#dc3545';
+            }
+
+            // Disable buttons after answer
+            const buttons = document.querySelectorAll(`#quiz-container div:nth-child(${questionNum}) button`);
+            buttons.forEach(btn => btn.disabled = true);
+        }
+
+        async function onConfigChange(config) {
+            const mainTitle = config.main_title || defaultConfig.main_title;
+            const subtitle = config.subtitle || defaultConfig.subtitle;
+            const primaryColor = config.primary_color || defaultConfig.primary_color;
+            const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+            const accentColor = config.accent_color || defaultConfig.accent_color;
+            const textColor = config.text_color || defaultConfig.text_color;
+            const backgroundColor = config.background_color || defaultConfig.background_color;
+
+            document.getElementById('main-title').textContent = mainTitle;
+            document.getElementById('subtitle').textContent = subtitle;
+
+            document.body.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+
+            const slideH2Elements = document.querySelectorAll('.slide h2');
+            slideH2Elements.forEach(el => {
+                el.style.color = primaryColor;
+            });
+
+            const slideH3Elements = document.querySelectorAll('.slide h3');
+            slideH3Elements.forEach(el => {
+                el.style.color = secondaryColor;
+            });
+
+            const analogyBoxes = document.querySelectorAll('.analogy-box');
+            analogyBoxes.forEach(el => {
+                el.style.background = `linear-gradient(135deg, ${accentColor} 0%, #fdcb6e 100%)`;
+            });
+
+            const navButtons = document.querySelectorAll('.nav-button');
+            navButtons.forEach(btn => {
+                if (!btn.disabled) {
+                    btn.style.background = primaryColor;
+                }
+            });
+
+            const demoButtons = document.querySelectorAll('.demo-button');
+            demoButtons.forEach(btn => {
+                btn.style.background = primaryColor;
+            });
+
+            const tableHeaders = document.querySelectorAll('.comparison-table th');
+            tableHeaders.forEach(th => {
+                th.style.background = primaryColor;
+            });
+
+            const slideContainer = document.querySelector('.slide-container');
+            slideContainer.style.background = backgroundColor;
+
+            const allText = document.querySelectorAll('.slide p, .slide li, .slide td');
+            allText.forEach(el => {
+                el.style.color = textColor;
+            });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function (event) {
+            // Prevent keyboard navigation when user is typing in input fields
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            switch (event.key) {
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                    event.preventDefault();
+                    changeSlide(-1);
+                    break;
+                case 'ArrowRight':
+                case 'ArrowDown':
+                case ' ': // Spacebar
+                    event.preventDefault();
+                    changeSlide(1);
+                    break;
+                case 'Home':
+                    event.preventDefault();
+                    goToSlide(0);
+                    break;
+                case 'End':
+                    event.preventDefault();
+                    goToSlide(totalSlides - 1);
+                    break;
+                case 'Escape':
+                    event.preventDefault();
+                    goToSlide(0);
+                    break;
+            }
+        });
+
+        // Click navigation on slide content (not on interactive elements)
+        document.querySelector('.slide-container').addEventListener('click', function (event) {
+            // Don't navigate if clicking on interactive elements
+            if (event.target.tagName === 'BUTTON' ||
+                event.target.tagName === 'INPUT' ||
+                event.target.closest('.interactive-demo') ||
+                event.target.closest('.navigation')) {
+                return;
+            }
+
+            const rect = this.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const containerWidth = rect.width;
+
+            // Click on left half = previous slide, right half = next slide
+            if (clickX < containerWidth / 2) {
+                changeSlide(-1);
+            } else {
+                changeSlide(1);
+            }
+        });
+
+        // Function to go to specific slide
+        function goToSlide(slideIndex) {
+            currentSlideIndex = slideIndex;
+            if (currentSlideIndex < 0) currentSlideIndex = 0;
+            if (currentSlideIndex > totalSlides - 1) currentSlideIndex = totalSlides - 1;
+            updateSlideDisplay();
+        }
+
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities: (config) => ({
+                    recolorables: [
+                        {
+                            get: () => config.background_color || defaultConfig.background_color,
+                            set: (value) => {
+                                config.background_color = value;
+                                window.elementSdk.setConfig({ background_color: value });
+                            }
+                        },
+                        {
+                            get: () => config.primary_color || defaultConfig.primary_color,
+                            set: (value) => {
+                                config.primary_color = value;
+                                window.elementSdk.setConfig({ primary_color: value });
+                            }
+                        },
+                        {
+                            get: () => config.secondary_color || defaultConfig.secondary_color,
+                            set: (value) => {
+                                config.secondary_color = value;
+                                window.elementSdk.setConfig({ secondary_color: value });
+                            }
+                        },
+                        {
+                            get: () => config.accent_color || defaultConfig.accent_color,
+                            set: (value) => {
+                                config.accent_color = value;
+                                window.elementSdk.setConfig({ accent_color: value });
+                            }
+                        },
+                        {
+                            get: () => config.text_color || defaultConfig.text_color,
+                            set: (value) => {
+                                config.text_color = value;
+                                window.elementSdk.setConfig({ text_color: value });
+                            }
+                        }
+                    ],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (config) => new Map([
+                    ["main_title", config.main_title || defaultConfig.main_title],
+                    ["subtitle", config.subtitle || defaultConfig.subtitle]
+                ])
+            });
+        }
+
+        updateSlideDisplay();
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'999e26c617e4897a',t:'MTc2MjM2NDU4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>
