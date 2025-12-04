@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Tahap 4 - Finalisasi & Presentasi Proyek</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --card-bg: #020617ee;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.18);
+      --accent-strong: #0ea5e9;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.85);
+      --radius-xl: 26px;
+      --transition-fast: 0.25s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #1e293b 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow: auto;
+    }
+
+    .app-shell {
+      position: relative;
+      width: 100%;
+      max-width: 1080px;
+      min-height: 540px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
+      border-radius: 32px;
+      padding: 18px 18px 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .blob-1 {
+      width: 260px;
+      height: 260px;
+      background: #22d3ee;
+      top: -80px;
+      right: -60px;
+    }
+
+    .blob-2 {
+      width: 220px;
+      height: 220px;
+      background: #4f46e5;
+      bottom: -60px;
+      left: -40px;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      border-radius: 26px;
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 18px 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+      padding-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.22);
+      border: 1px solid rgba(45, 212, 191, 0.5);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a5f3fc;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.4);
+    }
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title-main {
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .slide-indicator {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pager-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .pager-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.4);
+      opacity: 0.7;
+      transition: var(--transition-fast);
+    }
+
+    .pager-dot.active {
+      width: 16px;
+      background: var(--accent);
+      opacity: 1;
+    }
+
+    .content-row {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 18px;
+      flex: 1;
+      min-height: 0;
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .content-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .side-panel {
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95));
+      border-radius: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .side-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.08), transparent 55%);
+      pointer-events: none;
+    }
+
+    .side-title {
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #bae6fd;
+      margin-bottom: 4px;
+    }
+
+    .side-main {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .side-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .side-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      margin-top: 4px;
+    }
+
+    .meta-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .side-footer {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .kbd {
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      padding: 2px 6px;
+      font-size: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: rgba(15, 23, 42, 0.96);
+      color: #e5e7eb;
+    }
+
+    .slide-panel {
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.98));
+      border-radius: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 16px 18px 12px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      padding: 16px 18px 12px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.7) transparent;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .slide::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .slide::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .slide::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.6);
+      border-radius: 999px;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      position: relative;
+    }
+
+    .slide h2 {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .slide h3 {
+      font-size: 15px;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .slide p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
+    .slide ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 4px 0 8px;
+    }
+
+    .slide ul li {
+      font-size: 13px;
+      margin-bottom: 4px;
+      display: flex;
+      gap: 6px;
+      color: var(--text-main);
+    }
+
+    .slide ul li::before {
+      content: "•";
+      color: var(--accent-strong);
+      margin-top: -1px;
+    }
+
+    .template-box {
+      border-radius: 14px;
+      border: 1px dashed var(--border-subtle);
+      padding: 10px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      margin-top: 4px;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .template-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .template-grid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .template-grid th,
+    .template-grid td {
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 4px 6px;
+      text-align: left;
+    }
+
+    .template-grid th {
+      background: rgba(15, 23, 42, 0.8);
+      font-weight: 500;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 12px;
+    }
+
+    .nav-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-main);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .btn span {
+      font-size: 14px;
+      line-height: 0;
+    }
+
+    .btn-primary {
+      border-color: var(--accent-strong);
+      background: linear-gradient(135deg, var(--accent-soft), rgba(15, 23, 42, 0.98));
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.7);
+      border-color: var(--accent-strong);
+    }
+
+    .hint-text {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        min-height: 520px;
+        border-radius: 22px;
+        padding: 12px;
+      }
+
+      .card {
+        border-radius: 18px;
+        padding: 12px;
+      }
+
+      .slide {
+        padding: 12px;
+      }
+
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .content-row {
+        gap: 10px;
+      }
+
+      .card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="title-group">
+          <div class="badge">
+            <span class="badge-dot"></span>
+            Tahap 4 · Finalisasi & Presentasi
+          </div>
+          <div class="title-main">
+            Middle School Mid-Semester Coding Project
+          </div>
+          <div class="title-sub">
+            Tema besar: <strong>Aplikasi Pengelola Keuangan Sederhana</strong>
+          </div>
+        </div>
+        <div class="slide-indicator">
+          <span id="slide-counter">Slide 1 / 10</span>
+          <div class="pager-dots" id="pager-dots"></div>
+        </div>
+      </div>
+
+      <div class="content-row">
+        <aside class="side-panel">
+          <div>
+            <div class="side-title">Fokus Tahap Ini</div>
+            <div class="side-main" id="side-main-title">
+              Finalisasi & Presentasi
+            </div>
+            <div class="side-text" id="side-main-text">
+              Menyempurnakan aplikasi, menyiapkan deskripsi proyek, dan bersiap untuk mempresentasikan hasil karyamu.
+            </div>
+          </div>
+          <div>
+            <div class="side-meta">
+              <span class="meta-pill">Tahap 4 dari 4</span>
+              <span class="meta-pill">Middle School (SMP)</span>
+              <span class="meta-pill">MIT App Inventor</span>
+            </div>
+            <div class="side-footer">
+              <span class="hint-text">Gunakan tombol di bawah atau panah ← → pada keyboard untuk berpindah slide.</span>
+              <span class="kbd">← →</span>
+            </div>
+          </div>
+        </aside>
+
+        <section class="slide-panel">
+          <!-- Slide 1: Pengantar Tahap 4 -->
+          <div class="slide active" data-slide="1"
+               data-side-title="Tahap 4"
+               data-side-main="Finalisasi & Presentasi"
+               data-side-text="Tahap terakhir: merapikan aplikasi, mendokumentasikan hasil, dan menyiapkan presentasi proyekmu.">
+            <h2>Tahap 4: Finalisasi, Presentasi, dan Pengumpulan Proyek</h2>
+
+            <p>
+              Pada Tahap 3, kamu sudah menyusun blok kode dan mengimplementasikan logika aplikasi sehingga
+              fitur-fitur dasarnya dapat berjalan.
+            </p>
+            <p>
+              Sekarang di <strong>Tahap 4</strong>, kamu akan:
+            </p>
+            <ul>
+              <li>Melakukan perbaikan akhir pada tampilan dan fitur aplikasi.</li>
+              <li>Menyiapkan deskripsi proyek yang rapi dan mudah dipahami.</li>
+              <li>Mendokumentasikan aplikasi dengan baik.</li>
+              <li>Mempersiapkan diri untuk mempresentasikan aplikasi di depan kelas.</li>
+            </ul>
+            <p>
+              Tahap ini membantu kamu melihat kembali seluruh proses, dari perencanaan hingga aplikasi yang siap digunakan.
+            </p>
+          </div>
+
+          <!-- Slide 2: Tujuan Tahap 4 -->
+          <div class="slide" data-slide="2"
+               data-side-title="Tujuan"
+               data-side-main="Capaian Tahap 4"
+               data-side-text="Di akhir Tahap 4, kamu siap mempresentasikan aplikasi dan mengumpulkan proyek lengkap ke LMS.">
+            <h2>Tujuan Pembelajaran Tahap 4</h2>
+            <p>Setelah menyelesaikan Tahap 4, kamu diharapkan mampu:</p>
+            <ul>
+              <li>Melakukan perbaikan akhir pada tampilan atau fitur aplikasi berdasarkan hasil uji coba.</li>
+              <li>Menyiapkan presentasi ringkas mengenai aplikasi yang dibuat.</li>
+              <li>Mendemokan aplikasi di depan kelas.</li>
+              <li>Memuat file proyek atau link ke Gallery App Inventor.</li>
+              <li>Mengumpulkan link proyek ke LMS dengan deskripsi aplikasi yang singkat dan jelas.</li>
+            </ul>
+          </div>
+
+          <!-- Slide 3: Ringkasan 4 Tahap -->
+          <div class="slide" data-slide="3"
+               data-side-title="Gambaran"
+               data-side-main="Empat Tahap Proyek"
+               data-side-text="Ingat kembali perjalananmu dari Tahap 1 sampai Tahap 4.">
+            <h2>Empat Tahap Proyek – Sekilas Review</h2>
+
+            <h3>Tahap 1: Perencanaan & Flowchart</h3>
+            <ul>
+              <li>Menentukan konsep dan tema aplikasi.</li>
+              <li>Menuliskan tujuan, fungsi utama, dan sasaran pengguna.</li>
+              <li>Menentukan fitur inti dan struktur screen.</li>
+              <li>Menyusun flowchart alur kerja aplikasi.</li>
+            </ul>
+
+            <h3>Tahap 2: Perancangan Tampilan (UI)</h3>
+            <ul>
+              <li>Mendesain tampilan aplikasi sesuai perencanaan.</li>
+              <li>Menambahkan dan mengatur komponen UI.</li>
+              <li>Menata layout agar rapi dan mudah dibaca.</li>
+              <li>Menjaga konsistensi tampilan antar screen.</li>
+            </ul>
+
+            <h3>Tahap 3: Blok Kode & Logika</h3>
+            <ul>
+              <li>Mengimplementasikan logika berdasarkan flowchart.</li>
+              <li>Menggunakan variabel, operasi matematika, dan kondisi.</li>
+              <li>Menguji aplikasi dan memperbaiki error (debugging).</li>
+            </ul>
+
+            <h3>Tahap 4: Finalisasi & Presentasi (sesi ini)</h3>
+            <ul>
+              <li>Merapikan aplikasi dan dokumentasi.</li>
+              <li>Menyiapkan deskripsi proyek.</li>
+              <li>Siap mempresentasikan hasil akhir.</li>
+            </ul>
+          </div>
+
+          <!-- Slide 4: Instruksi LMS & Worksheet -->
+          <div class="slide" data-slide="4"
+               data-side-title="Instruksi"
+               data-side-main="Mulai dari LMS"
+               data-side-text="Pastikan kamu membuka assignment Tahap 4 di LMS sebelum mulai mengisi worksheet.">
+            <h2>Instruksi: LMS & Worksheet Tahap 4</h2>
+            <p>
+              Sebelum mulai mengerjakan, pastikan kamu mengikuti langkah berikut:
+            </p>
+            <div class="template-box">
+              <div class="template-label">Langkah awal</div>
+              <ul>
+                <li>Masuk ke LMS dengan akunmu.</li>
+                <li>Buka kelas coding / informatika.</li>
+                <li>Cari dan buka assignment:
+                  <strong>"Mid-Semester Coding Project – Tahap 4"</strong>.
+                </li>
+                <li>Unduh worksheet Tahap 4 ke perangkatmu.</li>
+                <li>Baca seluruh instruksi dan contoh yang tersedia.</li>
+              </ul>
+            </div>
+            <p>
+              Worksheet akan membantumu menyusun <strong>finalisasi aplikasi</strong> dan
+              <strong>deskripsi proyek</strong> yang rapi untuk presentasi dan pengumpulan.
+            </p>
+          </div>
+
+          <!-- Slide 5: Finalisasi Aplikasi -->
+          <div class="slide" data-slide="5"
+               data-side-title="Langkah 1"
+               data-side-main="Finalisasi Aplikasi"
+               data-side-text="Lakukan perbaikan terakhir pada tampilan dan fitur aplikasi berdasarkan hasil uji coba.">
+            <h2>Finalisasi Aplikasi</h2>
+            <p>
+              Di worksheet, kamu diminta menuliskan perbaikan terakhir yang kamu lakukan.
+              Gunakan bagian ini sebagai panduan:
+            </p>
+            <div class="template-box">
+              <div class="template-label">Contoh hal yang bisa diperbaiki</div>
+              <ul>
+                <li>Memperbaiki teks yang kurang jelas atau salah ejaan.</li>
+                <li>Menata ulang posisi tombol agar lebih mudah ditekan.</li>
+                <li>Menambahkan pesan Notifier ketika saldo tidak cukup.</li>
+                <li>Mengecek kembali perhitungan saldo dan riwayat transaksi.</li>
+              </ul>
+            </div>
+            <p>
+              Di worksheet, tuliskan poin-poin perbaikanmu pada bagian
+              <strong>"Finalisasi Aplikasi"</strong>.
+            </p>
+          </div>
+
+          <!-- Slide 6: Deskripsi Proyek (Judul, Tema, Link) -->
+          <div class="slide" data-slide="6"
+               data-side-title="Langkah 2"
+               data-side-main="Deskripsi Proyek (1)"
+               data-side-text="Mulailah dengan menulis judul, tema, dan link proyek App Inventor milikmu.">
+            <h2>Deskripsi Proyek – Bagian 1</h2>
+            <p>
+              Gunakan template di worksheet untuk merangkum aplikasi yang kamu buat.
+            </p>
+            <div class="template-box">
+              <div class="template-label">Template · Deskripsi Proyek (Bagian 1)</div>
+              <p><strong>a. Judul Proyek</strong><br>
+                Contoh: “Money Buddy App – Aplikasi Pengelola Uang Saku”</p>
+              <p>_______________________________________________</p>
+
+              <p><strong>b. Tema Proyek</strong><br>
+                Contoh: “Aplikasi Keuangan untuk Pencatatan Pemasukan dan Pengeluaran”</p>
+              <p>_______________________________________________</p>
+
+              <p><strong>c. Link Proyek yang Sudah di Publish ke App Inventor Gallery</strong><br>
+                Contoh link Gallery App Inventor.</p>
+              <p>_______________________________________________</p>
+            </div>
+            <p>
+              Pastikan link yang kamu tuliskan dapat diakses dan sesuai dengan aplikasi yang kamu buat.
+            </p>
+          </div>
+
+          <!-- Slide 7: Deskripsi Proyek (Tujuan & Fitur) -->
+          <div class="slide" data-slide="7"
+               data-side-title="Langkah 3"
+               data-side-main="Deskripsi Proyek (2)"
+               data-side-text="Tuliskan tujuan dan fitur utama aplikasi secara singkat dan jelas.">
+            <h2>Deskripsi Proyek – Bagian 2</h2>
+            <p>
+              Di bagian ini, kamu menjelaskan <strong>tujuan aplikasi</strong> dan
+              <strong>fitur utama</strong> yang kamu buat.
+            </p>
+            <div class="template-box">
+              <div class="template-label">Template · Tujuan & Fitur Utama</div>
+              <p><strong>d. Tujuan Aplikasi</strong><br>
+                Contoh: “Aplikasi ini dibuat untuk membantu pengguna mencatat pemasukan dan pengeluaran harian,
+                menghitung saldo otomatis, serta memberi peringatan jika pengeluaran melebihi saldo.”</p>
+              <p>_______________________________________________</p>
+              <p>_______________________________________________</p>
+
+              <p><strong>e. Fitur Utama</strong><br>
+                Contoh:</p>
+              <ul>
+                <li>Input pemasukan harian menggunakan TextBox dan Button.</li>
+                <li>Input pengeluaran dengan pengecekan apakah saldo cukup atau tidak.</li>
+                <li>Menghitung saldo secara otomatis menggunakan variabel global.</li>
+              </ul>
+              <p>_______________________________________________</p>
+              <p>_______________________________________________</p>
+            </div>
+          </div>
+
+          <!-- Slide 8: Deskripsi Proyek (Alur & Hal yang Dipelajari) -->
+          <div class="slide" data-slide="8"
+               data-side-title="Langkah 4"
+               data-side-main="Alur & Pembelajaran"
+               data-side-text="Jelaskan alur kerja aplikasi dan tuliskan hal yang kamu pelajari dari proyek ini.">
+            <h2>Deskripsi Proyek – Bagian 3</h2>
+            <p>
+              Terakhir, kamu diminta menjelaskan <strong>alur kerja program</strong> dan
+              <strong>hal yang kamu pelajari</strong>.
+            </p>
+            <div class="template-box">
+              <div class="template-label">Template · Alur Kerja Program</div>
+              <p><strong>f. Alur Kerja Program</strong><br>
+                Contoh (ringkas):</p>
+              <ul>
+                <li>HomeScreen menampilkan tombol untuk menambah pemasukan, mencatat pengeluaran, dan melihat ringkasan.</li>
+                <li>Pada screen pemasukan, pengguna memasukkan angka lalu saldo diperbarui.</li>
+                <li>Pada screen pengeluaran, aplikasi mengecek apakah saldo cukup sebelum mengurangi saldo.</li>
+              </ul>
+              <p>_______________________________________________</p>
+              <p>_______________________________________________</p>
+
+              <div class="template-label" style="margin-top:6px;">Template · Hal yang Saya Pelajari</div>
+              <p><strong>g. Hal yang Saya Pelajari</strong><br>
+                Contoh: “Saya belajar cara membuat aplikasi sederhana di MIT App Inventor dengan
+                menghubungkan komponen UI ke blok kode, menggunakan variabel saldo, dan membuat kondisi if–then–else.”</p>
+              <p>_______________________________________________</p>
+              <p>_______________________________________________</p>
+            </div>
+          </div>
+
+          <!-- Slide 9: Checklist Tahap 4 -->
+          <div class="slide" data-slide="9"
+               data-side-title="Ringkasan"
+               data-side-main="Checklist Tahap 4"
+               data-side-text="Gunakan checklist ini untuk memastikan semua bagian Tahap 4 sudah kamu selesaikan.">
+            <h2>Checklist Penyelesaian Tahap 4</h2>
+            <p>
+              Beri tanda centang (✔) pada setiap bagian yang sudah kamu selesaikan.
+            </p>
+            <div class="template-box" style="padding:14px 16px; border-radius:14px;">
+              <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" style="transform:scale(1.2); cursor:pointer;">
+                Aplikasi telah diuji dan berjalan tanpa error
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" style="transform:scale(1.2); cursor:pointer;">
+                Tampilan dan tata letak sudah rapi dan konsisten
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" style="transform:scale(1.2); cursor:pointer;">
+                Penjelasan proyek sudah ditulis dengan jelas
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" style="transform:scale(1.2); cursor:pointer;">
+                File aplikasi sudah diunggah ke Gallery App Inventor
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; margin-bottom:4px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" style="transform:scale(1.2); cursor:pointer;">
+                Proyek dan Worksheet Tahap 4 sudah dikirim ke LMS
+              </label>
+            </div>
+          </div>
+
+          <!-- Slide 10: Refleksi & Penutup -->
+          <div class="slide" data-slide="10"
+               data-side-title="Refleksi"
+               data-side-main="Refleksi Akhir"
+               data-side-text="Renungkan perjalananmu dari ide awal hingga aplikasi yang jadi dan bisa kamu presentasikan.">
+            <h2>Refleksi Akhir Proyek</h2>
+            <p>
+              Sebelum menutup proyek ini, luangkan waktu sebentar untuk merefleksikan pengalamanmu.
+            </p>
+            <p>Pertanyaan panduan refleksi:</p>
+            <ul>
+              <li>Apa hal paling berharga yang kamu pelajari dari keempat tahap proyek ini?</li>
+              <li>Bagian mana yang paling menantang bagi kamu?</li>
+              <li>Jika membuat versi 2 dari aplikasimu, apa yang ingin kamu tingkatkan?</li>
+            </ul>
+            <div class="template-box">
+              <div class="template-label">Tempat menulis refleksi (di worksheet)</div>
+              <p>_______________________________________________</p>
+              <p>_______________________________________________</p>
+              <p>_______________________________________________</p>
+            </div>
+            <p>
+              Terima kasih sudah berproses dari Tahap 1 sampai Tahap 4.
+              Aplikasimu adalah hasil kerja keras dan kreativitasmu sendiri — saatnya kamu tunjukkan lewat presentasi.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <div class="card-footer">
+        <div class="nav-group">
+          <button class="btn" id="prev-btn">
+            <span>⟵</span>
+            Sebelumnya
+          </button>
+          <button class="btn btn-primary" id="next-btn">
+            Berikutnya
+            <span>⟶</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const totalSlides = slides.length;
+    const slideCounter = document.getElementById("slide-counter");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const pagerDotsContainer = document.getElementById("pager-dots");
+
+    const sideMainTitle = document.getElementById("side-main-title");
+    const sideMainText = document.getElementById("side-main-text");
+
+    let currentIndex = 0;
+
+    // Build pager dots
+    slides.forEach((slide, idx) => {
+      const dot = document.createElement("div");
+      dot.className = "pager-dot";
+      dot.dataset.index = idx;
+      pagerDotsContainer.appendChild(dot);
+    });
+
+    function updateSidePanel(slide) {
+      const sideMain = slide.dataset.sideMain || "Finalisasi & Presentasi";
+      const sideText = slide.dataset.sideText || "";
+
+      sideMainTitle.textContent = sideMain;
+      sideMainText.textContent = sideText;
+    }
+
+    function showSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === index);
+      });
+
+      const activeSlide = slides[index];
+      updateSidePanel(activeSlide);
+
+      currentIndex = index;
+      slideCounter.textContent = `Slide ${index + 1} / ${totalSlides}`;
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === totalSlides - 1;
+
+      const dots = pagerDotsContainer.querySelectorAll(".pager-dot");
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === index);
+      });
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        showSlide(currentIndex - 1);
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < totalSlides - 1) {
+        showSlide(currentIndex + 1);
+      }
+    });
+
+    pagerDotsContainer.addEventListener("click", (e) => {
+      if (e.target.classList.contains("pager-dot")) {
+        const idx = parseInt(e.target.dataset.index, 10);
+        showSlide(idx);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") {
+        if (currentIndex < totalSlides - 1) showSlide(currentIndex + 1);
+      } else if (e.key === "ArrowLeft") {
+        if (currentIndex > 0) showSlide(currentIndex - 1);
+      }
+    });
+
+    // Initial state
+    showSlide(0);
+  </script>
+</body>
+
+</html>
