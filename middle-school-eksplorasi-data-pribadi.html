@@ -1,0 +1,1375 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Eksplorasi Data Pribadi</title>
+
+    <!-- Tailwind CDN (mudah dipakai, 1 file) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --bg: #0b1020;
+            --card: rgba(255, 255, 255, .08);
+            --card2: rgba(255, 255, 255, .06);
+            --stroke: rgba(255, 255, 255, .12);
+            --text: rgba(255, 255, 255, .92);
+            --muted: rgba(255, 255, 255, .72);
+        }
+
+        body {
+            background:
+                radial-gradient(1200px 600px at 15% 10%, rgba(99, 102, 241, .35), transparent 60%),
+                radial-gradient(900px 500px at 80% 25%, rgba(34, 197, 94, .18), transparent 60%),
+                radial-gradient(900px 500px at 60% 90%, rgba(236, 72, 153, .18), transparent 60%),
+                var(--bg);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .glass {
+            background: var(--card);
+            border: 1px solid var(--stroke);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .glass2 {
+            background: var(--card2);
+            border: 1px solid var(--stroke);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .slide {
+            display: none;
+            height: calc(100vh - 110px);
+            overflow: auto;
+            padding: 26px;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .kbd {
+            border: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(0, 0, 0, .25);
+            padding: .15rem .45rem;
+            border-radius: .5rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: .85rem;
+            color: rgba(255, 255, 255, .85);
+        }
+
+        .chip {
+            cursor: grab;
+            user-select: none;
+        }
+
+        .chip:active {
+            cursor: grabbing;
+        }
+
+        .dropzone {
+            min-height: 120px;
+            border: 2px dashed rgba(255, 255, 255, .25);
+            border-radius: 18px;
+            padding: 12px;
+            transition: .15s ease;
+        }
+
+        .dropzone.hover {
+            border-color: rgba(99, 102, 241, .8);
+            background: rgba(99, 102, 241, .12);
+        }
+
+        .toast {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            max-width: 360px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, .16);
+            background: rgba(0, 0, 0, .35);
+            backdrop-filter: blur(10px);
+            display: none;
+            z-index: 60;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .progressbar {
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .1);
+            overflow: hidden;
+        }
+
+        .progressbar>div {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 1), rgba(34, 197, 94, 1));
+            transition: width .25s ease;
+        }
+
+        .btn {
+            border: 1px solid rgba(255, 255, 255, .16);
+            background: rgba(255, 255, 255, .08);
+            transition: .15s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, .12);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .tag {
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(255, 255, 255, .06);
+        }
+
+        /* simple modal */
+        .modalWrap {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .55);
+            z-index: 70;
+            padding: 18px;
+        }
+
+        .modalWrap.show {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Access Code Overlay (case-insensitive) -->
+    <div id="accessOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);
+            z-index:9999;display:flex;align-items:center;justify-content:center;">
+        <div role="dialog" aria-labelledby="accessTitle" aria-modal="true" style="background:#fff;color:#222;padding:32px 28px;border-radius:22px;
+              box-shadow:0 16px 48px rgba(102,126,234,.25);text-align:center;
+              width:min(95vw,380px);border:1px solid #e0e7ff;">
+            <h2 id="accessTitle" style="margin:0 0 12px;color:#667eea;font-size:1.85rem;
+               text-shadow:0 1px 6px #e0e7ff;">🔒 Kode Akses</h2>
+            <p style="margin:0 0 16px;font-size:1.05rem;color:#5B4494;">
+                Masukkan kode untuk membuka slide
+            </p>
+
+            <input id="accessCodeInput" type="text" placeholder="Kode akses" style="padding:14px 16px;font-size:17px;border-radius:14px;
+                  border:1.5px solid #667eea;width:90%;outline:none;
+                  box-shadow:0 2px 8px #e0e7ff inset;background:#fff;
+                  transition:border-color .2s, box-shadow .2s;" />
+            <button id="accessBtn" style="margin-top:10px;background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);
+                   color:#fff;border:none;padding:12px 0;border-radius:14px;font-weight:700;
+                   cursor:pointer;width:100%;font-size:1.05rem;
+                   box-shadow:0 6px 18px rgba(102,126,234,.25);
+                   transition:transform .08s ease, box-shadow .2s ease;">
+                Buka
+            </button>
+
+            <div id="accessError" style="color:#dc2626;margin-top:12px;display:none;font-size:0.98rem;">
+                Kode salah, coba lagi.
+            </div>
+
+            <div style="margin-top:12px;color:#6b7280;font-size:.9rem">
+                Tekan <span style="font-family:ui-monospace;border:1px solid #e5e7eb;
+                         padding:2px 6px;border-radius:6px">Enter</span> untuk submit
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // === ACCESS CODE (RGMDSMS25, case-insensitive) ===
+        (function () {
+            const overlay = document.getElementById('accessOverlay');
+            const input = document.getElementById('accessCodeInput');
+            const btn = document.getElementById('accessBtn');
+            const errorEl = document.getElementById('accessError');
+            const PASS = 'RGMDSMS25';
+
+            function unlock() { if (overlay) overlay.style.display = 'none'; }
+            function check() {
+                const val = (input?.value || '').trim().toUpperCase();
+                if (val === PASS) { unlock(); }
+                else { if (errorEl) errorEl.style.display = 'block'; }
+            }
+
+            btn?.addEventListener('click', check);
+            input?.addEventListener('keydown', (e) => { if (e.key === 'Enter') check(); });
+
+            // Fokus otomatis ke input
+            setTimeout(() => input?.focus(), 0);
+        })();
+    </script>
+
+    <!-- Top bar -->
+    <header class="h-[110px] px-5 py-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl glass flex items-center justify-center text-xl">🔐</div>
+                    <div>
+                        <div class="font-semibold text-lg leading-tight">4.1 Eksplorasi Data Pribadi</div>
+                        <div class="text-sm" style="color:var(--muted)">Kenali, pahami, dan lindungi datamu di dunia
+                            digital.</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="btnHelp" class="btn rounded-xl px-3 py-2 text-sm">⌨️ Bantuan</button>
+                    <button id="btnResetAll" class="btn rounded-xl px-3 py-2 text-sm">🔄 Reset Aktivitas</button>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-center gap-4">
+                <div class="flex-1">
+                    <div class="progressbar">
+                        <div id="progressFill"></div>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-xs" style="color:var(--muted)">
+                        <span id="slideTitleMini">—</span>
+                        <span><span id="slideNum">1</span>/<span id="slideTotal">—</span></span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-2 text-xs" style="color:var(--muted)">
+                    <span>Nav:</span>
+                    <span class="kbd">←</span><span class="kbd">→</span>
+                    <span class="kbd">Space</span>
+                    <span class="kbd">Home</span><span class="kbd">End</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Slides container -->
+    <main class="max-w-6xl mx-auto px-5">
+        <!-- Slide 1 -->
+        <section class="slide active" data-title="Cover">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass rounded-3xl p-7">
+                    <div class="text-4xl font-bold">Eksplorasi Data Pribadi</div>
+                    <div class="mt-2 text-lg" style="color:var(--muted)">
+                        Kenali, pahami, dan lindungi datamu di dunia digital.
+                    </div>
+
+                    <div class="mt-6 grid gap-3">
+                        <div class="glass2 rounded-2xl p-4">
+                            <div class="font-semibold">Hari ini kamu akan:</div>
+                            <ul class="mt-2 list-disc pl-5" style="color:var(--muted)">
+                                <li>Membedakan data pribadi vs data digital</li>
+                                <li>Mengerti tingkat risiko data (rendah–tinggi)</li>
+                                <li>Mengambil keputusan bijak saat aplikasi minta izin</li>
+                            </ul>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-sm" style="color:var(--muted)">
+                            <span class="tag rounded-full px-3 py-1">⏱️ 60 menit</span>
+                            <span class="tag rounded-full px-3 py-1">🧩 Interaktif</span>
+                        </div>
+
+                        <div class="mt-2 text-sm" style="color:var(--muted)">
+                            Tips: gunakan <span class="kbd">→</span> untuk lanjut, <span class="kbd">←</span> untuk
+                            kembali.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-3xl p-7">
+                    <div class="font-semibold text-xl">Pemantik cepat ⚡</div>
+                    <div class="mt-3 text-lg">
+                        <span class="font-semibold">Pertanyaan:</span>
+                        Apakah kamu meninggalkan “jejak” saat online?
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 gap-3">
+                        <button class="btn rounded-2xl p-4 text-left"
+                            onclick="toast('Betul! Hampir semua aktivitas online meninggalkan jejak data.')">
+                            <div class="text-2xl">✅</div>
+                            <div class="mt-1 font-semibold">Iya</div>
+                            <div class="text-sm" style="color:var(--muted)">Karena ada data yang tercatat</div>
+                        </button>
+                        <button class="btn rounded-2xl p-4 text-left"
+                            onclick="toast('Coba pikir lagi 🙂 Saat nonton/klik/scroll, biasanya tercatat sebagai data digital.')">
+                            <div class="text-2xl">🤔</div>
+                            <div class="mt-1 font-semibold">Tidak yakin</div>
+                            <div class="text-sm" style="color:var(--muted)">Ayo kita buktikan</div>
+                        </button>
+                    </div>
+
+                    <div class="mt-5 glass2 rounded-2xl p-4">
+                        <div class="font-semibold">Agenda slide ini</div>
+                        <ol class="mt-2 list-decimal pl-5" style="color:var(--muted)">
+                            <li>Konsep dasar</li>
+                            <li>Latihan klasifikasi</li>
+                            <li>Studi kasus perizinan aplikasi</li>
+                            <li>Jejak data → algoritma</li>
+                            <li>Refleksi</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2 -->
+        <section class="slide" data-title="Tujuan Pembelajaran">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Tujuan Pembelajaran 🎯</div>
+                <div class="mt-2 text-sm" style="color:var(--muted)">
+                    Setelah selesai, kamu diharapkan bisa melakukan ini (bukan cuma hafal, tapi bisa pakai).
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold text-lg">Kamu bisa…</div>
+                        <ul class="mt-3 space-y-2" style="color:var(--muted)">
+                            <li>🔍 Membedakan <b>data pribadi</b> & <b>data digital</b></li>
+                            <li>🗂️ Mengelompokkan data berdasarkan <b>risiko</b></li>
+                            <li>🔐 Menjelaskan kenapa data harus dilindungi</li>
+                            <li>🤔 Memutuskan izin aplikasi: <b>perlu / tidak</b></li>
+                        </ul>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold text-lg">Cek diri (interaktif)</div>
+                        <div class="mt-3 text-sm" style="color:var(--muted)">Klik yang menurutmu paling menantang:</div>
+
+                        <div class="mt-4 grid gap-3">
+                            <button class="btn rounded-2xl p-4 text-left"
+                                onclick="markChallenge(this,'Membedakan data pribadi vs digital')">
+                                🔍 Membedakan data pribadi vs digital
+                            </button>
+                            <button class="btn rounded-2xl p-4 text-left"
+                                onclick="markChallenge(this,'Mengelompokkan risiko data')">
+                                🗂️ Mengelompokkan risiko data
+                            </button>
+                            <button class="btn rounded-2xl p-4 text-left"
+                                onclick="markChallenge(this,'Menentukan izin aplikasi')">
+                                🤔 Menentukan izin aplikasi
+                            </button>
+                        </div>
+
+                        <div id="challengeMsg" class="mt-4 text-sm" style="color:var(--muted)"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3 -->
+        <section class="slide" data-title="Jejak Digital">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Jejak Digital: Kamu Pasti Punya 👣</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Hampir semua aktivitas online menghasilkan jejak data (meski kamu tidak sadar).
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-4 gap-3">
+                    <div class="glass2 rounded-2xl p-4">
+                        <div class="text-3xl">💬</div>
+                        <div class="font-semibold mt-2">Chat</div>
+                        <div class="text-sm" style="color:var(--muted)">Jam chat, siapa kontaknya (metadata)</div>
+                    </div>
+                    <div class="glass2 rounded-2xl p-4">
+                        <div class="text-3xl">🎬</div>
+                        <div class="font-semibold mt-2">Nonton</div>
+                        <div class="text-sm" style="color:var(--muted)">Video apa, berapa lama, skip di menit berapa
+                        </div>
+                    </div>
+                    <div class="glass2 rounded-2xl p-4">
+                        <div class="text-3xl">🛒</div>
+                        <div class="font-semibold mt-2">Belanja</div>
+                        <div class="text-sm" style="color:var(--muted)">Produk dilihat, wishlist, transaksi</div>
+                    </div>
+                    <div class="glass2 rounded-2xl p-4">
+                        <div class="text-3xl">🎮</div>
+                        <div class="font-semibold mt-2">Main Game</div>
+                        <div class="text-sm" style="color:var(--muted)">Rank, waktu main, item favorit</div>
+                    </div>
+                </div>
+
+                <div class="mt-6 glass2 rounded-2xl p-5">
+                    <div class="font-semibold">Mini tantangan (10 detik)</div>
+                    <div class="mt-2 text-sm" style="color:var(--muted)">
+                        Tulis 1 aktivitas online yang kamu lakukan minggu ini, lalu tebak data apa yang tercatat.
+                    </div>
+
+                    <div class="mt-3 grid md:grid-cols-2 gap-3">
+                        <input id="actInput"
+                            class="w-full rounded-xl px-4 py-3 bg-black/20 border border-white/10 outline-none"
+                            placeholder="Contoh: nonton video musik di YouTube" />
+                        <button class="btn rounded-xl px-4 py-3 font-semibold" onclick="guessTrace()">Tebak data yang
+                            tercatat</button>
+                    </div>
+
+                    <div id="traceOut" class="mt-3 text-sm" style="color:var(--muted)"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4 -->
+        <section class="slide" data-title="Data Pribadi">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Apa itu Data Pribadi? 🧍</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Versi gampangnya: data yang bisa menunjukkan <b>siapa kamu</b> (langsung atau tidak langsung).
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Contoh</div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>Nama lengkap</li>
+                            <li>Foto wajah</li>
+                            <li>Nomor HP</li>
+                            <li>Alamat rumah</li>
+                            <li>Tanggal lahir</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Kenapa ini “pribadi”?</div>
+                        <div class="mt-3 text-sm" style="color:var(--muted)">
+                            Karena kalau orang lain punya data ini, mereka bisa:
+                        </div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>menghubungi kamu tanpa izin</li>
+                            <li>menebak identitas kamu</li>
+                            <li>bahkan menyamar (akun palsu)</li>
+                        </ul>
+
+                        <button class="btn rounded-xl px-4 py-3 mt-4"
+                            onclick="toast('Ingat: “Data pribadi = data yang bisa mengarah ke identitasmu.”')">
+                            ✅ Simpan kalimat kunci
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5 -->
+        <section class="slide" data-title="Data Digital">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Apa itu Data Digital? 💻</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Data dari <b>aktivitas</b> kamu saat pakai teknologi. Tidak selalu “nama/alamat”, tapi bisa
+                    membentuk “profil kebiasaan”.
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Contoh data digital</div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>Riwayat pencarian</li>
+                            <li>Riwayat tontonan</li>
+                            <li>Jam kamu paling aktif online</li>
+                            <li>Klik, scroll, like</li>
+                            <li>Preferensi (genre musik, game, dll.)</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Bagian yang sering bikin bingung</div>
+                        <div class="mt-3 text-sm" style="color:var(--muted)">
+                            ❗ Data digital <b>tidak selalu</b> data pribadi.<br />
+                            Tapi… kalau dikumpulkan banyak, bisa “mengarah” ke identitas/kebiasaanmu.
+                        </div>
+
+                        <div class="mt-4 glass rounded-2xl p-4">
+                            <div class="font-semibold">Contoh</div>
+                            <div class="text-sm mt-2" style="color:var(--muted)">
+                                Kalau sistem tahu kamu sering online jam 9 malam, nonton topik tertentu, dan sering chat
+                                dengan akun tertentu,
+                                sistem bisa menebak <b>pola hidup</b> kamu.
+                            </div>
+                        </div>
+
+                        <button class="btn rounded-xl px-4 py-3 mt-4"
+                            onclick="toast('Data digital = data aktivitas. Banyak data aktivitas → bisa membentuk profil kebiasaan.')">
+                            ✅ Oke, paham
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6 -->
+        <section class="slide" data-title="Aktivitas 1: Klasifikasi Pribadi vs Digital">
+            <div class="glass rounded-3xl p-7">
+                <div class="flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                        <div class="text-2xl font-bold">Aktivitas 1: Data Pribadi atau Data Digital? 🧩</div>
+                        <div class="mt-2" style="color:var(--muted)">
+                            Drag kartu ke kolom yang benar. Kalau sudah, klik <b>Periksa</b>.
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn rounded-xl px-4 py-2 text-sm" onclick="resetActivity1()">Reset</button>
+                        <button class="btn rounded-xl px-4 py-2 text-sm font-semibold"
+                            onclick="checkActivity1()">Periksa</button>
+                    </div>
+                </div>
+
+                <div class="mt-5 grid lg:grid-cols-3 gap-4">
+                    <div class="glass2 rounded-2xl p-4">
+                        <div class="font-semibold">Kartu</div>
+                        <div id="bank1" class="mt-3 flex flex-wrap gap-2 min-h-[120px]">
+                            <!-- chips injected -->
+                        </div>
+                        <div class="mt-3 text-xs" style="color:var(--muted)">Tip: klik kartu lalu drag.</div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-4">
+                        <div class="font-semibold">🧍 Data Pribadi</div>
+                        <div id="zonePersonal" class="dropzone mt-3" data-zone="personal"></div>
+                        <div class="mt-3 text-xs" style="color:var(--muted)">
+                            Data yang mengarah ke identitas kamu.
+                        </div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-4">
+                        <div class="font-semibold">💻 Data Digital</div>
+                        <div id="zoneDigital" class="dropzone mt-3" data-zone="digital"></div>
+                        <div class="mt-3 text-xs" style="color:var(--muted)">
+                            Data dari aktivitas kamu di perangkat/aplikasi.
+                        </div>
+                    </div>
+                </div>
+
+                <div id="result1" class="mt-4 text-sm" style="color:var(--muted)"></div>
+            </div>
+        </section>
+
+        <!-- Slide 7 -->
+        <section class="slide" data-title="Tingkat Sensitivitas">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Tingkat Sensitivitas Data 🔵🟡🔴</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Tidak semua data punya risiko yang sama. Kita pakai 3 level biar gampang.
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-3 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="text-3xl">🔵</div>
+                        <div class="font-bold text-lg mt-2">Rendah</div>
+                        <div class="text-sm mt-2" style="color:var(--muted)">
+                            Umum, risiko kecil jika bocor. Tetap hati-hati ya.
+                        </div>
+                        <div class="mt-3 text-xs" style="color:var(--muted)">Contoh: hobi, nama panggilan.</div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="text-3xl">🟡</div>
+                        <div class="font-bold text-lg mt-2">Sedang</div>
+                        <div class="text-sm mt-2" style="color:var(--muted)">
+                            Bisa dipakai untuk menghubungi/menargetkan kamu. Bisa memicu spam/penipuan ringan.
+                        </div>
+                        <div class="mt-3 text-xs" style="color:var(--muted)">Contoh: email, nomor HP.</div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="text-3xl">🔴</div>
+                        <div class="font-bold text-lg mt-2">Tinggi</div>
+                        <div class="text-sm mt-2" style="color:var(--muted)">
+                            Harus dilindungi maksimal. Berisiko besar kalau bocor.
+                        </div>
+                        <div class="mt-3 text-xs" style="color:var(--muted)">Contoh: OTP/PIN, NIK, biometrik.</div>
+                    </div>
+                </div>
+
+                <div class="mt-6 glass2 rounded-2xl p-5">
+                    <div class="font-semibold">Kalimat kunci</div>
+                    <div class="mt-2 text-sm" style="color:var(--muted)">
+                        “Semakin mudah data dipakai untuk menyamar / merugikan kamu, semakin tinggi sensitivitasnya.”
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8 -->
+        <section class="slide" data-title="Rendah (🔵)">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Data Sensitivitas Rendah 🔵</div>
+                <div class="mt-2" style="color:var(--muted)">Umumnya aman dibagikan, tapi tetap gunakan akal sehat.
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Ciri-ciri</div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>bersifat umum</li>
+                            <li>sering ada di ruang publik</li>
+                            <li>risiko kecil jika bocor</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Contoh</div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>nama panggilan</li>
+                            <li>hobi</li>
+                            <li>foto kegiatan <i>(tanpa lokasi & detail identitas)</i></li>
+                            <li>kota tempat tinggal (umum)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 glass2 rounded-2xl p-5">
+                    <div class="font-semibold">Quick check ✅</div>
+                    <div class="mt-2 text-sm" style="color:var(--muted)">Klik pernyataan yang benar:</div>
+                    <div class="mt-3 grid md:grid-cols-2 gap-3">
+                        <button class="btn rounded-2xl p-4 text-left"
+                            onclick="toast('Benar ✅ Foto tanpa lokasi/detail identitas lebih aman dibanding foto yang menampilkan alamat/seragam jelas.')">
+                            “Foto kegiatan tanpa lokasi/detail identitas lebih aman.”
+                        </button>
+                        <button class="btn rounded-2xl p-4 text-left"
+                            onclick="toast('Kurang tepat ❌ Nama panggilan biasanya risiko rendah, tapi tetap hati-hati jika digabung data lain.')">
+                            “Nama panggilan selalu berbahaya.”
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9 -->
+        <section class="slide" data-title="Sedang (🟡)">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Data Sensitivitas Sedang 🟡</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Data yang bisa dipakai untuk menghubungi/menelusuri kamu. Ini sering diminta aplikasi.
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Ciri-ciri</div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>bisa menargetkan kamu (spam/iklan)</li>
+                            <li>kadang diminta untuk fungsi tertentu</li>
+                            <li>kalau bocor bisa memicu gangguan</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Contoh</div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>nomor telepon</li>
+                            <li>email</li>
+                            <li>tanggal lahir lengkap</li>
+                            <li>alamat rumah</li>
+                            <li>riwayat pencarian</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 glass2 rounded-2xl p-5">
+                    <div class="font-semibold">Tips praktis 🧠</div>
+                    <div class="mt-2 text-sm" style="color:var(--muted)">
+                        Kalau aplikasi minta data sedang, tanya 2 hal:
+                        <b>(1)</b> untuk apa? <b>(2)</b> kalau tidak diberi, apakah fitur utamanya tetap bisa dipakai?
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10 -->
+        <section class="slide" data-title="Tinggi (🔴)">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Data Sensitivitas Tinggi 🔴</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Ini yang paling harus dijaga. Kalau bocor, risikonya bisa besar.
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Ciri-ciri</div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>bisa dipakai untuk menyamar jadi kamu</li>
+                            <li>berisiko finansial / privasi serius</li>
+                            <li>biasanya butuh izin eksplisit</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Contoh</div>
+                        <ul class="mt-3 list-disc pl-5 space-y-1" style="color:var(--muted)">
+                            <li>NIK / paspor / SIM</li>
+                            <li>data biometrik (wajah/sidik jari)</li>
+                            <li>data kesehatan</li>
+                            <li>PIN / nomor kartu / OTP</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 glass2 rounded-2xl p-5">
+                    <div class="font-semibold">Ingat ini 🚨</div>
+                    <div class="mt-2 text-sm" style="color:var(--muted)">
+                        OTP itu <b>rahasia</b>. Kalau ada yang minta OTP lewat chat/telepon, itu tanda bahaya.
+                    </div>
+                    <button class="btn rounded-xl px-4 py-3 mt-4"
+                        onclick="toast('Benar! OTP/PIN = data sensitivitas tinggi. Jangan dibagikan.')">
+                        ✅ Aku paham
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11 -->
+        <section class="slide" data-title="Aktivitas 2: Izin Aplikasi">
+            <div class="glass rounded-3xl p-7">
+                <div class="flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                        <div class="text-2xl font-bold">Aktivitas 2: “Aplikasi Minta Izin” 📲</div>
+                        <div class="mt-2" style="color:var(--muted)">
+                            Kamu akan jadi “detektif izin”. Pilih keputusanmu, lalu lihat alasannya.
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn rounded-xl px-4 py-2 text-sm" onclick="resetActivity2()">Reset</button>
+                    </div>
+                </div>
+
+                <div class="mt-5 grid lg:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold text-lg">Skenario</div>
+                        <div class="mt-2 text-sm" style="color:var(--muted)">
+                            Kamu instal aplikasi game. Saat dibuka, muncul permintaan:
+                        </div>
+
+                        <div class="mt-4 grid gap-2">
+                            <label class="flex items-center gap-3 glass rounded-2xl p-3">
+                                <input type="checkbox" class="w-5 h-5" id="permEmail">
+                                <div>
+                                    <div class="font-semibold">Email</div>
+                                    <div class="text-xs" style="color:var(--muted)">untuk login / pemulihan akun</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-center gap-3 glass rounded-2xl p-3">
+                                <input type="checkbox" class="w-5 h-5" id="permLocation">
+                                <div>
+                                    <div class="font-semibold">Lokasi</div>
+                                    <div class="text-xs" style="color:var(--muted)">untuk “rekomendasi”</div>
+                                </div>
+                            </label>
+
+                            <label class="flex items-center gap-3 glass rounded-2xl p-3">
+                                <input type="checkbox" class="w-5 h-5" id="permCamera">
+                                <div>
+                                    <div class="font-semibold">Kamera</div>
+                                    <div class="text-xs" style="color:var(--muted)">untuk fitur foto profil</div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="mt-4 grid md:grid-cols-2 gap-3">
+                            <button class="btn rounded-xl px-4 py-3 font-semibold" onclick="decidePerms('allowAll')">✅
+                                Izinkan semua</button>
+                            <button class="btn rounded-xl px-4 py-3 font-semibold" onclick="decidePerms('selective')">🧠
+                                Pilih seperlunya</button>
+                        </div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold text-lg">Hasil & Penjelasan</div>
+                        <div id="permOut" class="mt-3 text-sm" style="color:var(--muted)">
+                            Pilih keputusan dulu ya 🙂
+                        </div>
+
+                        <div class="mt-5 glass rounded-2xl p-4">
+                            <div class="font-semibold">Aturan sederhana</div>
+                            <ol class="mt-2 list-decimal pl-5 text-sm" style="color:var(--muted)">
+                                <li>Kalau bukan fitur utama, jangan dipaksa “Allow”.</li>
+                                <li>Izin bisa diubah di pengaturan HP.</li>
+                                <li>Semakin sensitif datanya, semakin ketat kita memilih.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12 -->
+        <section class="slide" data-title="Kenapa Harus Dilindungi?">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Kenapa Data Pribadi Harus Dilindungi? 🛡️</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Ringkasnya: supaya kamu aman, nyaman, dan tidak dirugikan.
+                </div>
+
+                <div class="mt-6 grid md:grid-cols-3 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="text-3xl">🕵️</div>
+                        <div class="font-semibold mt-2">Cegah penyalahgunaan identitas</div>
+                        <div class="text-sm mt-2" style="color:var(--muted)">
+                            Data seperti NIK/tanggal lahir/nomor HP bisa dipakai bikin akun palsu.
+                        </div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="text-3xl">💸</div>
+                        <div class="font-semibold mt-2">Hindari risiko finansial</div>
+                        <div class="text-sm mt-2" style="color:var(--muted)">
+                            PIN/OTP/kartu bisa dipakai untuk transaksi tanpa izin.
+                        </div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="text-3xl">🧠</div>
+                        <div class="font-semibold mt-2">Privasi & kenyamanan</div>
+                        <div class="text-sm mt-2" style="color:var(--muted)">
+                            Data bisa mengungkap kebiasaan, lokasi, kontak sosial, dll.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 glass2 rounded-2xl p-5">
+                    <div class="font-semibold">Kalimat kunci</div>
+                    <div class="mt-2 text-sm" style="color:var(--muted)">
+                        “Sekali data bocor, sulit ditarik kembali.”
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13 -->
+        <section class="slide" data-title="Data → Algoritma (Interaktif)">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Dari Data ke Algoritma 🤖</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Banyak siswa bingung “algoritma itu apa?”. Di sini versi gampangnya: <b>pola → rekomendasi</b>.
+                </div>
+
+                <div class="mt-6 grid lg:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Flow sederhana (klik tahapnya)</div>
+
+                        <div class="mt-4 grid gap-3">
+                            <button class="btn rounded-2xl p-4 text-left" onclick="showFlow(1)">
+                                1️⃣ Pengumpulan Data <span class="text-sm" style="color:var(--muted)">klik, durasi,
+                                    pencarian</span>
+                            </button>
+                            <button class="btn rounded-2xl p-4 text-left" onclick="showFlow(2)">
+                                2️⃣ Data Diproses <span class="text-sm" style="color:var(--muted)">dirapikan &
+                                    disimpan</span>
+                            </button>
+                            <button class="btn rounded-2xl p-4 text-left" onclick="showFlow(3)">
+                                3️⃣ Analisa Pola <span class="text-sm" style="color:var(--muted)">kebiasaan
+                                    terbaca</span>
+                            </button>
+                            <button class="btn rounded-2xl p-4 text-left" onclick="showFlow(4)">
+                                4️⃣ Rekomendasi/Prediksi <span class="text-sm" style="color:var(--muted)">FYP, iklan,
+                                    saran</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Penjelasan tahap</div>
+                        <div id="flowOut" class="mt-3 text-sm" style="color:var(--muted)">
+                            Klik salah satu tahap di kiri.
+                        </div>
+
+                        <div class="mt-5 glass rounded-2xl p-4">
+                            <div class="font-semibold">Contoh cepat</div>
+                            <div class="text-sm mt-2" style="color:var(--muted)">
+                                Kamu nonton video game beberapa kali → sistem “menebak” kamu suka game → muncul video
+                                game lain.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 glass2 rounded-2xl p-5">
+                    <div class="font-semibold">Mini kuis (1 soal)</div>
+                    <div class="mt-2 text-sm" style="color:var(--muted)">
+                        Kalau kamu sering cari “sepatu olahraga”, apa yang mungkin muncul?
+                    </div>
+                    <div class="mt-3 grid md:grid-cols-3 gap-3">
+                        <button class="btn rounded-2xl p-4"
+                            onclick="toast('Benar ✅ rekomendasi/iklan sepatu bisa muncul karena pola pencarianmu.')">Iklan
+                            sepatu</button>
+                        <button class="btn rounded-2xl p-4"
+                            onclick="toast('Kurang tepat ❌ Bisa saja muncul, tapi tidak sekuat pola pencarian sepatu.')">Resep
+                            masakan</button>
+                        <button class="btn rounded-2xl p-4"
+                            onclick="toast('Kurang tepat ❌ Tidak nyambung dengan pola pencarian sepatu.')">Video
+                            kucing</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14 -->
+        <section class="slide" data-title="Refleksi & Ringkasan">
+            <div class="glass rounded-3xl p-7">
+                <div class="text-2xl font-bold">Refleksi & Ringkasan ✅</div>
+                <div class="mt-2" style="color:var(--muted)">
+                    Isi refleksi singkat ini. Tidak perlu data asli, cukup contoh aman ya.
+                </div>
+
+                <div class="mt-6 grid lg:grid-cols-2 gap-4">
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Ringkasan 3 kalimat</div>
+                        <ul class="mt-3 space-y-2" style="color:var(--muted)">
+                            <li>1) Data pribadi = data yang bisa mengarah ke identitas.</li>
+                            <li>2) Data digital = data dari aktivitas (klik, tonton, cari, dll.).</li>
+                            <li>3) Sensitivitas membantu kita menentukan seberapa ketat menjaga data.</li>
+                        </ul>
+
+                        <div class="mt-5 glass rounded-2xl p-4">
+                            <div class="font-semibold">Kalimat kunci</div>
+                            <div class="mt-2 text-sm" style="color:var(--muted)">
+                                “Aku tidak harus takut teknologi, tapi harus cerdas menggunakannya.”
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass2 rounded-2xl p-5">
+                        <div class="font-semibold">Refleksi (isi)</div>
+
+                        <label class="block mt-3 text-sm" style="color:var(--muted)">1 data yang aman dibagikan
+                            (contoh):</label>
+                        <input id="refSafe"
+                            class="mt-2 w-full rounded-xl px-4 py-3 bg-black/20 border border-white/10 outline-none"
+                            placeholder="Contoh: hobi / nama panggilan" />
+
+                        <label class="block mt-4 text-sm" style="color:var(--muted)">1 data yang harus dijaga ketat
+                            (contoh):</label>
+                        <input id="refGuard"
+                            class="mt-2 w-full rounded-xl px-4 py-3 bg-black/20 border border-white/10 outline-none"
+                            placeholder="Contoh: password/OTP/PIN/NIK" />
+
+                        <button class="btn rounded-xl px-4 py-3 mt-4 font-semibold w-full" onclick="submitReflection()">
+                            Kirim refleksi
+                        </button>
+
+                        <div id="refOut" class="mt-3 text-sm" style="color:var(--muted)"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom controls -->
+    <footer class="fixed left-0 right-0 bottom-0 px-5 pb-5">
+        <div class="max-w-6xl mx-auto glass rounded-2xl p-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-sm" style="color:var(--muted)">
+                <span class="hidden sm:inline">Navigasi:</span>
+                <button class="btn rounded-xl px-3 py-2" id="btnPrev">← Prev</button>
+                <button class="btn rounded-xl px-3 py-2 font-semibold" id="btnNext">Next →</button>
+                <button class="btn rounded-xl px-3 py-2" id="btnHome">Home</button>
+                <button class="btn rounded-xl px-3 py-2" id="btnEnd">End</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <span class="tag rounded-full px-3 py-1 text-xs" style="color:var(--muted)" id="hintBox">Tip: gunakan
+                    keyboard untuk lebih cepat</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <div id="toastMsg" class="text-sm"></div>
+    </div>
+
+    <!-- Help modal -->
+    <div id="helpModal" class="modalWrap" role="dialog" aria-modal="true">
+        <div class="glass rounded-3xl p-6 max-w-lg w-full">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <div class="text-xl font-bold">Bantuan Navigasi ⌨️</div>
+                    <div class="text-sm mt-1" style="color:var(--muted)">Bisa dipakai saat presentasi atau belajar
+                        mandiri.</div>
+                </div>
+                <button class="btn rounded-xl px-3 py-2" onclick="toggleHelp(false)">✕</button>
+            </div>
+
+            <div class="mt-5 grid gap-3 text-sm" style="color:var(--muted)">
+                <div class="glass2 rounded-2xl p-4">
+                    <div class="font-semibold text-white">Pindah slide</div>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <span class="kbd">→</span> Next
+                        <span class="kbd">←</span> Prev
+                        <span class="kbd">Space</span> Next
+                    </div>
+                </div>
+                <div class="glass2 rounded-2xl p-4">
+                    <div class="font-semibold text-white">Cepat</div>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <span class="kbd">Home</span> ke awal
+                        <span class="kbd">End</span> ke akhir
+                    </div>
+                </div>
+                <div class="glass2 rounded-2xl p-4">
+                    <div class="font-semibold text-white">Aktivitas drag & drop</div>
+                    <div class="mt-2">
+                        Tarik kartu ke kolom yang sesuai. Klik <b>Periksa</b> untuk melihat hasil.
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn rounded-xl px-4 py-3 mt-5 w-full font-semibold" onclick="toggleHelp(false)">
+                Oke, lanjut belajar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ----------------------------
+        // Slide system
+        // ----------------------------
+        const slides = Array.from(document.querySelectorAll(".slide"));
+        const total = slides.length;
+        const slideNumEl = document.getElementById("slideNum");
+        const slideTotalEl = document.getElementById("slideTotal");
+        const progressFill = document.getElementById("progressFill");
+        const slideTitleMini = document.getElementById("slideTitleMini");
+
+        slideTotalEl.textContent = total;
+
+        let idx = 0;
+
+        function showSlide(i) {
+            idx = Math.max(0, Math.min(total - 1, i));
+            slides.forEach((s, k) => s.classList.toggle("active", k === idx));
+            slideNumEl.textContent = idx + 1;
+            const title = slides[idx].dataset.title || "Slide";
+            slideTitleMini.textContent = title;
+
+            const pct = ((idx) / (total - 1)) * 100;
+            progressFill.style.width = `${pct}%`;
+            // keep scroll top
+            slides[idx].scrollTop = 0;
+        }
+
+        function next() { showSlide(idx + 1); }
+        function prev() { showSlide(idx - 1); }
+
+        document.getElementById("btnNext").addEventListener("click", next);
+        document.getElementById("btnPrev").addEventListener("click", prev);
+        document.getElementById("btnHome").addEventListener("click", () => showSlide(0));
+        document.getElementById("btnEnd").addEventListener("click", () => showSlide(total - 1));
+
+        window.addEventListener("keydown", (e) => {
+            const tag = (document.activeElement?.tagName || "").toLowerCase();
+            const typing = tag === "input" || tag === "textarea";
+            if (typing) return;
+
+            if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); next(); }
+            if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
+            if (e.key === "Home") { e.preventDefault(); showSlide(0); }
+            if (e.key === "End") { e.preventDefault(); showSlide(total - 1); }
+            if (e.key.toLowerCase() === "h") { toggleHelp(true); }
+            if (e.key.toLowerCase() === "r") { resetAll(); }
+        });
+
+        // ----------------------------
+        // Toast
+        // ----------------------------
+        const toastEl = document.getElementById("toast");
+        const toastMsgEl = document.getElementById("toastMsg");
+        let toastTimer = null;
+        function toast(msg) {
+            toastMsgEl.textContent = msg;
+            toastEl.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3500);
+        }
+
+        // ----------------------------
+        // Help Modal
+        // ----------------------------
+        const helpModal = document.getElementById("helpModal");
+        document.getElementById("btnHelp").addEventListener("click", () => toggleHelp(true));
+        function toggleHelp(open) {
+            helpModal.classList.toggle("show", !!open);
+        }
+
+        // ----------------------------
+        // Slide 2: challenge marker
+        // ----------------------------
+        function markChallenge(btn, text) {
+            document.querySelectorAll("#challengeMsg").forEach(() => { });
+            const msg = document.getElementById("challengeMsg");
+            msg.innerHTML = `Oke! Kamu memilih: <b>${escapeHtml(text)}</b>.<br/>Tenang, di slide berikutnya kamu akan latihan sampai paham 🙂`;
+            // tiny highlight
+            btn.style.outline = "2px solid rgba(34,197,94,.9)";
+            setTimeout(() => btn.style.outline = "none", 900);
+        }
+
+        // ----------------------------
+        // Slide 3: guess trace
+        // ----------------------------
+        function guessTrace() {
+            const v = (document.getElementById("actInput").value || "").trim();
+            const out = document.getElementById("traceOut");
+            if (!v) {
+                out.textContent = "Tulis dulu aktivitasnya ya 🙂";
+                return;
+            }
+            out.innerHTML = `
+        Aktivitas: <b>${escapeHtml(v)}</b><br/>
+        Data yang mungkin tercatat: <span class="tag rounded-full px-3 py-1 inline-block mt-2 text-xs">waktu</span>
+        <span class="tag rounded-full px-3 py-1 inline-block mt-2 text-xs">durasi</span>
+        <span class="tag rounded-full px-3 py-1 inline-block mt-2 text-xs">klik/scroll</span>
+        <span class="tag rounded-full px-3 py-1 inline-block mt-2 text-xs">topik/minat</span>
+        <span class="tag rounded-full px-3 py-1 inline-block mt-2 text-xs">perangkat/lokasi perkiraan</span>
+        <div class="mt-3 text-sm" style="color:rgba(255,255,255,.72)">
+          Catatan: ini contoh umum. Tidak semua platform mencatat hal yang sama, tapi idenya: ada jejak data.
+        </div>
+      `;
+        }
+
+        // ----------------------------
+        // Slide 6: Activity 1 drag drop (Pribadi vs Digital)
+        // ----------------------------
+        const activity1Data = [
+            { id: "c1", text: "Nama lengkap", ans: "personal" },
+            { id: "c2", text: "Email", ans: "personal" },
+            { id: "c3", text: "Nomor HP", ans: "personal" },
+            { id: "c4", text: "Alamat rumah", ans: "personal" },
+            { id: "c5", text: "Riwayat pencarian", ans: "digital" },
+            { id: "c6", text: "Riwayat tontonan", ans: "digital" },
+            { id: "c7", text: "Jam online favorit", ans: "digital" },
+            { id: "c8", text: "Klik/like/scroll", ans: "digital" }
+        ];
+
+        const bank1 = document.getElementById("bank1");
+        const zonePersonal = document.getElementById("zonePersonal");
+        const zoneDigital = document.getElementById("zoneDigital");
+        const result1 = document.getElementById("result1");
+
+        function chipEl(item) {
+            const el = document.createElement("div");
+            el.className = "chip px-3 py-2 rounded-xl glass2 text-sm";
+            el.textContent = item.text;
+            el.draggable = true;
+            el.dataset.id = item.id;
+            el.dataset.ans = item.ans;
+            el.addEventListener("dragstart", (e) => {
+                e.dataTransfer.setData("text/plain", item.id);
+                e.dataTransfer.effectAllowed = "move";
+            });
+            return el;
+        }
+
+        function allowDrop(zone) {
+            zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("hover"); });
+            zone.addEventListener("dragleave", () => zone.classList.remove("hover"));
+            zone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                zone.classList.remove("hover");
+                const id = e.dataTransfer.getData("text/plain");
+                const el = document.querySelector(`[data-id="${CSS.escape(id)}"]`);
+                if (el) zone.appendChild(el);
+            });
+        }
+
+        allowDrop(bank1);
+        allowDrop(zonePersonal);
+        allowDrop(zoneDigital);
+
+        function mountActivity1() {
+            bank1.innerHTML = "";
+            zonePersonal.innerHTML = "";
+            zoneDigital.innerHTML = "";
+            result1.textContent = "";
+            // shuffle
+            const shuffled = [...activity1Data].sort(() => Math.random() - 0.5);
+            shuffled.forEach(it => bank1.appendChild(chipEl(it)));
+            // make bank droppable
+            bank1.classList.add("dropzone");
+            bank1.dataset.zone = "bank";
+        }
+
+        function checkActivity1() {
+            const personalIds = Array.from(zonePersonal.querySelectorAll(".chip")).map(x => x.dataset.id);
+            const digitalIds = Array.from(zoneDigital.querySelectorAll(".chip")).map(x => x.dataset.id);
+            const allPlaced = personalIds.length + digitalIds.length;
+
+            if (allPlaced < activity1Data.length) {
+                toast("Masih ada kartu di bank. Coba selesaikan dulu ya 🙂");
+                return;
+            }
+
+            let correct = 0;
+            zonePersonal.querySelectorAll(".chip").forEach(el => {
+                const ok = el.dataset.ans === "personal";
+                correct += ok ? 1 : 0;
+                el.style.outline = ok ? "2px solid rgba(34,197,94,.9)" : "2px solid rgba(239,68,68,.9)";
+            });
+            zoneDigital.querySelectorAll(".chip").forEach(el => {
+                const ok = el.dataset.ans === "digital";
+                correct += ok ? 1 : 0;
+                el.style.outline = ok ? "2px solid rgba(34,197,94,.9)" : "2px solid rgba(239,68,68,.9)";
+            });
+
+            const totalQ = activity1Data.length;
+            const scorePct = Math.round((correct / totalQ) * 100);
+            result1.innerHTML = `Skor kamu: <b>${correct}/${totalQ}</b> (${scorePct}%). ${correct === totalQ
+                    ? "Keren! Kamu sudah paham bedanya ✅"
+                    : "Bagus! Lihat kartu yang merah—itu yang perlu dibahas lagi."
+                }`;
+            toast(`Aktivitas 1 selesai. Skor: ${correct}/${totalQ}`);
+        }
+
+        function resetActivity1() { mountActivity1(); toast("Aktivitas 1 di-reset."); }
+
+        // ----------------------------
+        // Slide 11: Activity 2 permissions decision
+        // ----------------------------
+        const permOut = document.getElementById("permOut");
+        function resetActivity2() {
+            document.getElementById("permEmail").checked = false;
+            document.getElementById("permLocation").checked = false;
+            document.getElementById("permCamera").checked = false;
+            permOut.textContent = "Pilih keputusan dulu ya 🙂";
+        }
+
+        function decidePerms(mode) {
+            const email = document.getElementById("permEmail").checked;
+            const loc = document.getElementById("permLocation").checked;
+            const cam = document.getElementById("permCamera").checked;
+
+            if (!email && !loc && !cam) {
+                toast("Kamu belum memilih izin apa pun. Pilih dulu ya 🙂");
+                return;
+            }
+
+            const list = [];
+            if (email) list.push({ name: "Email", level: "🟡 sedang", why: "bisa dipakai untuk menghubungi / pemulihan akun" });
+            if (loc) list.push({ name: "Lokasi", level: "🟡 sedang", why: "bisa mengungkap kebiasaan & tempat" });
+            if (cam) list.push({ name: "Kamera", level: "🟡 sedang", why: "bisa menampilkan wajah/ruangan (privasi)" });
+
+            let advice = "";
+            if (mode === "allowAll") {
+                advice = `Kamu memilih <b>izinkan semua</b>. Ini cepat, tapi risikonya lebih besar.`;
+            } else {
+                advice = `Kamu memilih <b>pilih seperlunya</b>. Ini biasanya pilihan paling aman.`;
+            }
+
+            // heuristic advice
+            const needEmail = "Email biasanya wajar untuk login/pemulihan akun.";
+            const needLoc = "Lokasi sering tidak wajib untuk game. Kalau bukan fitur utama, lebih baik tolak.";
+            const needCam = "Kamera biasanya hanya perlu kalau kamu benar-benar mau pakai fitur foto/AR. Bisa ditolak dulu.";
+
+            const tips = [];
+            if (email) tips.push("✅ " + needEmail);
+            if (loc) tips.push("⚠️ " + needLoc);
+            if (cam) tips.push("⚠️ " + needCam);
+
+            permOut.innerHTML = `
+        ${advice}<br/><br/>
+        <div class="glass rounded-2xl p-4">
+          <div class="font-semibold">Izin yang kamu pilih:</div>
+          <ul class="mt-2 list-disc pl-5 text-sm" style="color:rgba(255,255,255,.72)">
+            ${list.map(x => `<li><b>${escapeHtml(x.name)}</b> — ${x.level} (${escapeHtml(x.why)})</li>`).join("")}
+          </ul>
+        </div>
+        <div class="mt-4">
+          <div class="font-semibold">Saran singkat</div>
+          <ul class="mt-2 list-disc pl-5 text-sm" style="color:rgba(255,255,255,.72)">
+            ${tips.map(t => `<li>${t}</li>`).join("")}
+          </ul>
+        </div>
+      `;
+            toast("Keputusan izin dianalisis ✅");
+        }
+
+        // ----------------------------
+        // Slide 13: flow explanation
+        // ----------------------------
+        const flowOut = document.getElementById("flowOut");
+        function showFlow(step) {
+            const map = {
+                1: {
+                    title: "1) Pengumpulan Data",
+                    desc: "Platform mencatat aktivitas: klik, durasi nonton, pencarian, like, dll. Ini jadi bahan analisis."
+                },
+                2: {
+                    title: "2) Data Diproses",
+                    desc: "Data dirapikan & disimpan agar mudah dipakai (misalnya di server/database)."
+                },
+                3: {
+                    title: "3) Analisa Pola",
+                    desc: "Sistem mencari pola: kamu sering nonton apa, jam aktif kapan, konten apa yang kamu suka."
+                },
+                4: {
+                    title: "4) Rekomendasi/Prediksi",
+                    desc: "Dari pola tadi, sistem menebak konten/produk yang kamu mungkin suka → muncullah FYP/iklan/rekomendasi."
+                }
+            };
+            flowOut.innerHTML = `
+        <div class="glass rounded-2xl p-4">
+          <div class="font-semibold">${map[step].title}</div>
+          <div class="text-sm mt-2" style="color:rgba(255,255,255,.72)">${map[step].desc}</div>
+        </div>
+      `;
+        }
+
+        // ----------------------------
+        // Slide 14: reflection
+        // ----------------------------
+        const refOut = document.getElementById("refOut");
+        function submitReflection() {
+            const safe = (document.getElementById("refSafe").value || "").trim();
+            const guard = (document.getElementById("refGuard").value || "").trim();
+            if (!safe || !guard) {
+                toast("Isi dua-duanya ya 🙂 (cukup contoh, bukan data asli)");
+                return;
+            }
+            refOut.innerHTML = `
+        Mantap ✅<br/>
+        Aman dibagikan: <b>${escapeHtml(safe)}</b><br/>
+        Harus dijaga ketat: <b>${escapeHtml(guard)}</b><br/>
+        <div class="mt-2" style="color:rgba(255,255,255,.72)">
+          Kamu sudah membuat keputusan yang lebih bijak tentang data.
+        </div>
+      `;
+            toast("Refleksi tersimpan (di halaman ini).");
+        }
+
+        // ----------------------------
+        // Reset all
+        // ----------------------------
+        document.getElementById("btnResetAll").addEventListener("click", resetAll);
+        function resetAll() {
+            resetActivity1();
+            resetActivity2();
+            document.getElementById("actInput").value = "";
+            document.getElementById("traceOut").textContent = "";
+            document.getElementById("refSafe").value = "";
+            document.getElementById("refGuard").value = "";
+            refOut.textContent = "";
+            flowOut.textContent = "Klik salah satu tahap di kiri.";
+            toast("Semua aktivitas di-reset.");
+        }
+
+        // ----------------------------
+        // Helpers
+        // ----------------------------
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, (m) => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+            }[m]));
+        }
+
+        // initial mount
+        mountActivity1();
+        showSlide(0);
+    </script>
+</body>
+
+</html>
