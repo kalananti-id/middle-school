@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Etika & Tanggung Jawab Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .slide {
+            display: none;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .kbd {
+            border: 1px solid #e5e7eb;
+            padding: .1rem .35rem;
+            border-radius: .4rem;
+            background: #f9fafb;
+            font-family: monospace;
+        }
+
+        /* Interactive Card Styles */
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Access Code Overlay -->
+    <div id="accessOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border border-indigo-100">
+            <h2 class="text-2xl font-bold text-indigo-600 mb-2">🔒 Kode Akses</h2>
+            <p class="text-slate-600 mb-4">Masukkan kode kelas untuk memulai</p>
+            <input id="accessCodeInput" type="text" placeholder="Kode..."
+                class="w-full p-3 rounded-xl border border-slate-300 focus:border-indigo-500 outline-none text-center font-mono text-lg uppercase mb-3">
+            <button id="accessBtn"
+                class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition">Buka
+                Materi</button>
+            <p id="accessError" class="text-red-500 text-sm mt-3 hidden">Kode salah!</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white grid place-items-center font-bold">26</div>
+                <div>
+                    <div class="font-semibold leading-tight">Etika Digital</div>
+                    <div class="text-xs text-slate-600">Privacy • Responsibility • Security</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="btnPrev" class="px-3 py-2 rounded-lg border hover:bg-slate-50 disabled:opacity-40 text-sm">←
+                    Prev</button>
+                <button id="btnNext"
+                    class="px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-sm">Next →</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-6 mb-20">
+        <!-- Progress -->
+        <div class="mb-6">
+            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                <span>Slide <span id="counter">1</span> / <span id="total">15</span></span>
+                <span>Press <span class="kbd">→</span></span>
+            </div>
+            <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div id="bar" class="h-full bg-indigo-600 transition-all duration-300" style="width: 6%"></div>
+            </div>
+        </div>
+
+        <!-- 1. Intro Slide -->
+        <section class="slide active">
+            <div class="max-w-3xl mx-auto text-center py-12">
+                <div class="text-8xl mb-6">🛡️</div>
+                <h1 class="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Etika & Tanggung Jawab Digital</h1>
+                <p class="text-xl text-slate-600 mb-8 leading-relaxed">
+                    Dunia digital sama nyatanya dengan dunia fisik. Bagaimana kita menjaga diri dan orang lain di
+                    internet?
+                </p>
+                <div
+                    class="grid grid-cols-2 gap-4 text-left bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-start gap-3">
+                        <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600">🕵️</div>
+                        <div>
+                            <span class="font-bold block">Analisis Masalah</span>
+                            <span class="text-sm text-slate-500">Menganalisis penyalahgunaan data.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="bg-green-100 p-2 rounded-lg text-green-600">🔐</div>
+                        <div>
+                            <span class="font-bold block">Privasi & Keamanan</span>
+                            <span class="text-sm text-slate-500">Merancang perlindungan diri.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. The Concept -->
+        <section class="slide">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold">Dunia Maya vs Dunia Nyata</h2>
+                    <p class="text-lg text-slate-600">
+                        Seringkali kita merasa "bebas" di internet karena tidak bertatap muka langsung. Tapi ingat:
+                    </p>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                        <p class="font-bold text-blue-800">"Jejak Digital itu Abadi"</p>
+                        <p class="text-sm text-blue-700 mt-1">Apa yang kamu posting hari ini, mungkin bisa dilihat orang
+                            lain 10 tahun lagi.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 text-center">
+                    <div class="text-9xl mb-4">👣</div>
+                    <p class="font-bold text-slate-500">Digital Footprint</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 2B. Definisi: Etika vs Tanggung Jawab -->
+        <section class="slide">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl font-bold mb-2 text-center">Etika Digital vs Tanggung Jawab Digital</h2>
+                <p class="text-slate-600 text-center mb-8">
+                    Dua-duanya penting. Etika adalah <b>cara bersikap</b>, tanggung jawab adalah <b>kesadaran
+                        dampak</b>.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 grid place-items-center text-xl">
+                                🗣️</div>
+                            <h3 class="text-xl font-bold">Etika Digital</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">
+                            Aturan, norma, dan sikap saat menggunakan internet agar kita bisa berkomunikasi dengan aman
+                            dan saling menghormati.
+                        </p>
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                            <div class="font-semibold mb-2">Contoh:</div>
+                            <ul class="list-disc ml-5 text-sm text-emerald-900 space-y-1">
+                                <li>Menulis komentar yang sopan (tidak menghina atau mengejek).</li>
+                                <li>Tidak menyebarkan screenshot chat pribadi tanpa izin.</li>
+                                <li>Minta izin sebelum memposting foto teman yang terlihat jelas wajahnya.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 grid place-items-center text-xl">
+                                🧠</div>
+                            <h3 class="text-xl font-bold">Tanggung Jawab Digital</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">
+                            Sikap sadar dan bijaksana: kita paham bahwa setiap klik, komentar, dan unggahan punya dampak
+                            untuk diri sendiri dan orang lain.
+                        </p>
+                        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                            <div class="font-semibold mb-2">Contoh:</div>
+                            <ul class="list-disc ml-5 text-sm text-indigo-900 space-y-1">
+                                <li>Berhenti sebelum share berita viral: cek sumber dulu.</li>
+                                <li>Mengatur akun jadi private dan memilih siapa yang boleh melihat.</li>
+                                <li>Kalau melihat bullying di grup, berani mengingatkan atau melapor.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-slate-900 text-white p-5 rounded-2xl">
+                    <div class="font-bold mb-1">Kalimat kunci:</div>
+                    <div class="text-slate-200">Etika = <b>cara kita bersikap</b>. <br>Tanggung jawab = <b>kita siap
+                            dengan dampaknya</b>.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2C. Aspek-Aspek Penting -->
+        <section class="slide">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl font-bold mb-2 text-center">7 Aspek yang Wajib Kamu Kuasai</h2>
+                <p class="text-slate-600 text-center mb-8">Klik satu kartu untuk melihat contoh singkat.</p>
+
+                <div class="grid md:grid-cols-3 gap-5">
+                    <button
+                        class="aspect-card bg-white p-5 rounded-2xl border border-slate-200 text-left card-hover transition-all"
+                        data-title="Sopan Santun Digital"
+                        data-body="Contoh: beda antara bercanda dan menghina. Hindari kata-kata kasar, ejekan fisik, atau komentar yang memalukan teman.">
+                        <div class="text-3xl mb-2">💬</div>
+                        <div class="font-bold">Sopan Santun Digital</div>
+                        <div class="text-sm text-slate-500">Cara bicara & komentar</div>
+                    </button>
+
+                    <button
+                        class="aspect-card bg-white p-5 rounded-2xl border border-slate-200 text-left card-hover transition-all"
+                        data-title="Jejak Digital"
+                        data-body="Contoh: story boleh hilang, tapi screenshot bisa disimpan. Postingan bisa muncul lagi di masa depan (misal saat daftar beasiswa/OSIS).">
+                        <div class="text-3xl mb-2">👣</div>
+                        <div class="font-bold">Jejak Digital</div>
+                        <div class="text-sm text-slate-500">Apa yang tertinggal online</div>
+                    </button>
+
+                    <button
+                        class="aspect-card bg-white p-5 rounded-2xl border border-slate-200 text-left card-hover transition-all"
+                        data-title="Data Pribadi"
+                        data-body="Contoh: nama lengkap + sekolah + lokasi live = berisiko. Jangan pernah bagi password/OTP, alamat rumah, atau lokasi real-time.">
+                        <div class="text-3xl mb-2">🧾</div>
+                        <div class="font-bold">Data Pribadi</div>
+                        <div class="text-sm text-slate-500">Yang harus dijaga</div>
+                    </button>
+
+                    <button
+                        class="aspect-card bg-white p-5 rounded-2xl border border-slate-200 text-left card-hover transition-all"
+                        data-title="Menghargai Karya"
+                        data-body="Contoh: pakai gambar/musik orang lain? tulis sumber. Jangan upload film/lagu bajakan. Itu merugikan pembuatnya.">
+                        <div class="text-3xl mb-2">©️</div>
+                        <div class="font-bold">Menghargai Karya</div>
+                        <div class="text-sm text-slate-500">Hak cipta & sumber</div>
+                    </button>
+
+                    <button
+                        class="aspect-card bg-white p-5 rounded-2xl border border-slate-200 text-left card-hover transition-all"
+                        data-title="Anti Hoaks"
+                        data-body="Contoh: pesan 'sebarkan atau kena sial' itu ciri hoaks. Tahan share, cek sumber resmi, tanya guru/orang dewasa kalau ragu.">
+                        <div class="text-3xl mb-2">📰</div>
+                        <div class="font-bold">Informasi & Hoaks</div>
+                        <div class="text-sm text-slate-500">Cek sebelum share</div>
+                    </button>
+
+                    <button
+                        class="aspect-card bg-white p-5 rounded-2xl border border-slate-200 text-left card-hover transition-all"
+                        data-title="Keamanan & Screen Time"
+                        data-body="Contoh: jangan klik link mencurigakan, aktifkan 2FA. Atur waktu layar supaya tidur & belajar tidak terganggu.">
+                        <div class="text-3xl mb-2">🛡️</div>
+                        <div class="font-bold">Keamanan & Screen Time</div>
+                        <div class="text-sm text-slate-500">Aman & seimbang</div>
+                    </button>
+                </div>
+
+                <div class="mt-6 bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
+                    <div class="font-bold text-indigo-900 mb-1" id="aspectTitle">Klik salah satu kartu di atas</div>
+                    <div class="text-indigo-900/80" id="aspectBody">Nanti contoh singkatnya muncul di sini.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Definisi Data Pribadi (INTERAKTIF) -->
+        <section class="slide" id="slide-data-pribadi">
+            <h2 class="text-3xl font-bold mb-3 text-center">Apa itu Data Pribadi?</h2>
+            <p class="text-center text-slate-600 mb-8">
+                Klik tiap kartu untuk lihat contoh nyata + cara aman. Lalu coba mini-quiz di bawahnya.
+            </p>
+
+            <!-- Progress -->
+            <div class="max-w-4xl mx-auto mb-5 flex items-center justify-between gap-3">
+                <div class="text-sm text-slate-600">
+                    📌 Kartu sudah dibuka: <span id="dpOpenedCount" class="font-bold">0</span>/3
+                </div>
+                <button class="text-sm px-4 py-2 rounded-full bg-slate-900 text-white hover:opacity-90 transition"
+                    onclick="dpReset()" type="button" aria-label="Reset interaksi data pribadi">
+                    Reset
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+
+                <!-- Card 1 -->
+                <button type="button"
+                    class="dpCard text-left bg-white p-6 rounded-2xl border border-red-100 shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-4 focus:ring-red-100"
+                    data-key="id" aria-expanded="false">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-2xl mb-4">🆔
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Identitas Utama</h3>
+                    <p class="text-sm text-slate-500">Nama Lengkap, Foto Wajah, Tanggal Lahir (PII).</p>
+
+                    <!-- Reveal -->
+                    <div class="dpReveal hidden mt-4 text-sm">
+                        <div class="rounded-xl bg-red-50 p-3 border border-red-100">
+                            <p class="font-bold text-red-900 mb-2">Contoh yang sering kejadian:</p>
+                            <ul class="list-disc pl-5 text-red-900/90 space-y-1">
+                                <li>Upload kartu pelajar dengan nama lengkap terlihat.</li>
+                                <li>Story ulang tahun + tanggal lahir ditulis lengkap.</li>
+                                <li>Foto selfie + nama lengkap di bio akun publik.</li>
+                            </ul>
+                        </div>
+
+                        <div class="rounded-xl bg-emerald-50 p-3 border border-emerald-100 mt-3">
+                            <p class="font-bold text-emerald-900 mb-2">Cara aman:</p>
+                            <ul class="list-disc pl-5 text-emerald-900/90 space-y-1">
+                                <li>Sensor/buramkan nama & tanggal lahir pada foto dokumen.</li>
+                                <li>Gunakan nama panggilan (bukan nama lengkap) untuk akun publik.</li>
+                                <li>Atur akun private jika sering upload foto wajah.</li>
+                            </ul>
+                        </div>
+
+                        <p class="mt-3 text-slate-600">
+                            <span class="font-bold">Kenapa penting?</span> Identitas bisa dipakai untuk menipu atau
+                            “menyamar” jadi kamu.
+                        </p>
+                    </div>
+                </button>
+
+                <!-- Card 2 -->
+                <button type="button"
+                    class="dpCard text-left bg-white p-6 rounded-2xl border border-orange-100 shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-4 focus:ring-orange-100"
+                    data-key="loc" aria-expanded="false">
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-2xl mb-4">🏠
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Lokasi</h3>
+                    <p class="text-sm text-slate-500">Alamat Rumah, Nama Sekolah, Lokasi Live (Check-in).</p>
+
+                    <!-- Reveal -->
+                    <div class="dpReveal hidden mt-4 text-sm">
+                        <div class="rounded-xl bg-orange-50 p-3 border border-orange-100">
+                            <p class="font-bold text-orange-900 mb-2">Contoh yang sering kejadian:</p>
+                            <ul class="list-disc pl-5 text-orange-900/90 space-y-1">
+                                <li>Story “lagi sendiri di rumah” + lokasi menyala.</li>
+                                <li>Upload foto depan sekolah dengan nama sekolah terlihat jelas.</li>
+                                <li>Live/Check-in di tempat yang sama tiap hari.</li>
+                            </ul>
+                        </div>
+
+                        <div class="rounded-xl bg-emerald-50 p-3 border border-emerald-100 mt-3">
+                            <p class="font-bold text-emerald-900 mb-2">Cara aman:</p>
+                            <ul class="list-disc pl-5 text-emerald-900/90 space-y-1">
+                                <li>Matikan “share location” saat posting.</li>
+                                <li>Jangan sebut jadwal rutin (mis. “tiap jam 3 pulang sendiri”).</li>
+                                <li>Hindari foto yang menunjukkan alamat/plat rumah.</li>
+                            </ul>
+                        </div>
+
+                        <p class="mt-3 text-slate-600">
+                            <span class="font-bold">Kenapa penting?</span> Lokasi bisa dipakai orang asing untuk melacak
+                            kebiasaan kamu.
+                        </p>
+                    </div>
+                </button>
+
+                <!-- Card 3 -->
+                <button type="button"
+                    class="dpCard text-left bg-white p-6 rounded-2xl border border-yellow-100 shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-4 focus:ring-yellow-100"
+                    data-key="contact" aria-expanded="false">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-2xl mb-4">📞
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Kontak</h3>
+                    <p class="text-sm text-slate-500">Nomor HP, Email Pribadi, Akun Orang Tua.</p>
+
+                    <!-- Reveal -->
+                    <div class="dpReveal hidden mt-4 text-sm">
+                        <div class="rounded-xl bg-yellow-50 p-3 border border-yellow-100">
+                            <p class="font-bold text-yellow-900 mb-2">Contoh yang sering kejadian:</p>
+                            <ul class="list-disc pl-5 text-yellow-900/90 space-y-1">
+                                <li>Menulis nomor HP di bio akun publik.</li>
+                                <li>Isi email asli di kolom komentar “giveaway”.</li>
+                                <li>Bagikan akun orang tua ke teman game online.</li>
+                            </ul>
+                        </div>
+
+                        <div class="rounded-xl bg-emerald-50 p-3 border border-emerald-100 mt-3">
+                            <p class="font-bold text-emerald-900 mb-2">Cara aman:</p>
+                            <ul class="list-disc pl-5 text-emerald-900/90 space-y-1">
+                                <li>Gunakan fitur DM/Chat resmi, bukan nomor pribadi.</li>
+                                <li>Pakai email khusus untuk daftar aplikasi (bukan email utama).</li>
+                                <li>Kalau diminta kontak oleh orang asing: skip + lapor orang dewasa.</li>
+                            </ul>
+                        </div>
+
+                        <p class="mt-3 text-slate-600">
+                            <span class="font-bold">Kenapa penting?</span> Kontak bisa dipakai untuk spam, penipuan,
+                            atau “phishing”.
+                        </p>
+                    </div>
+                </button>
+
+            </div>
+
+            <!-- Mini Quiz -->
+            <div class="max-w-4xl mx-auto mt-8">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
+                    <div class="flex items-start justify-between gap-4 flex-wrap">
+                        <div>
+                            <p class="font-bold text-indigo-900 text-lg">Mini-Quiz Cepat 🎯</p>
+                            <p class="text-indigo-900/80 text-sm mt-1">
+                                “Boleh nggak membagikan <span class="font-bold">nama sekolah + foto kartu pelajar</span>
+                                di akun publik?”
+                            </p>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button type="button"
+                                class="px-4 py-2 rounded-full bg-white border border-indigo-200 hover:bg-indigo-100 transition text-indigo-900 font-semibold"
+                                onclick="dpAnswer('yes')">Boleh</button>
+                            <button type="button"
+                                class="px-4 py-2 rounded-full bg-slate-900 hover:opacity-90 transition text-white font-semibold"
+                                onclick="dpAnswer('no')">Tidak</button>
+                        </div>
+                    </div>
+
+                    <div id="dpFeedback" class="hidden mt-4 rounded-xl p-4 text-sm"></div>
+
+                    <div
+                        class="mt-5 text-center bg-indigo-100 inline-block px-6 py-3 rounded-full mx-auto block w-fit text-indigo-900 font-bold">
+                        ⚠️ Ingat: “Data pribadi = sesuatu yang bisa mengarah ke identitas kamu.”
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            // ===== Interaksi kartu =====
+            const dpState = { opened: new Set() };
+
+            function dpUpdateCounter() {
+                const el = document.getElementById("dpOpenedCount");
+                if (el) el.textContent = dpState.opened.size;
+            }
+
+            function dpInit() {
+                const cards = document.querySelectorAll("#slide-data-pribadi .dpCard");
+                cards.forEach(card => {
+                    card.addEventListener("click", () => {
+                        const reveal = card.querySelector(".dpReveal");
+                        const key = card.getAttribute("data-key");
+                        const expanded = card.getAttribute("aria-expanded") === "true";
+
+                        // Toggle
+                        if (reveal) reveal.classList.toggle("hidden");
+                        card.setAttribute("aria-expanded", (!expanded).toString());
+
+                        // Mark opened
+                        if (key) dpState.opened.add(key);
+                        dpUpdateCounter();
+                    });
+                });
+                dpUpdateCounter();
+            }
+
+            function dpReset() {
+                // close all reveals + reset state + reset feedback
+                dpState.opened = new Set();
+                document.querySelectorAll("#slide-data-pribadi .dpReveal").forEach(r => r.classList.add("hidden"));
+                document.querySelectorAll("#slide-data-pribadi .dpCard").forEach(c => c.setAttribute("aria-expanded", "false"));
+                dpUpdateCounter();
+
+                const fb = document.getElementById("dpFeedback");
+                if (fb) {
+                    fb.className = "hidden mt-4 rounded-xl p-4 text-sm";
+                    fb.innerHTML = "";
+                }
+            }
+
+            // ===== Mini-quiz =====
+            function dpAnswer(choice) {
+                const fb = document.getElementById("dpFeedback");
+                if (!fb) return;
+
+                fb.classList.remove("hidden");
+
+                if (choice === "no") {
+                    fb.className = "mt-4 rounded-xl p-4 text-sm bg-emerald-50 border border-emerald-100 text-emerald-900";
+                    fb.innerHTML = `
+        <p class="font-bold mb-1">✅ Benar!</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Nama sekolah + kartu pelajar bisa mengarah ke identitas kamu.</li>
+          <li>Solusi aman: sensor info penting, pakai akun private, atau share hanya ke orang terpercaya.</li>
+        </ul>
+      `;
+                } else {
+                    fb.className = "mt-4 rounded-xl p-4 text-sm bg-rose-50 border border-rose-100 text-rose-900";
+                    fb.innerHTML = `
+        <p class="font-bold mb-1">⚠️ Belum tepat.</p>
+        <p class="mb-2">Itu termasuk data pribadi karena bisa mengarah ke identitas & lokasi kamu.</p>
+        <p class="font-semibold">Tips cepat:</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Jangan unggah dokumen yang menampilkan nama lengkap/tanggal lahir/alamat.</li>
+          <li>Kalau perlu share: blur/sensor + batasi audiens.</li>
+        </ul>
+      `;
+                }
+            }
+
+            // init once DOM ready
+            document.addEventListener("DOMContentLoaded", dpInit);
+        </script>
+
+
+        <!-- 4. Activity: Scenario Analysis 1 -->
+        <section class="slide">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
+                    <div class="bg-slate-900 p-6 text-white flex justify-between items-center">
+                        <h2 class="text-xl font-bold">📂 Studi Kasus: "Si Over-Sharing"</h2>
+                        <span class="bg-red-500 text-xs font-bold px-2 py-1 rounded">ALERT</span>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex gap-6 mb-8">
+                            <div class="text-5xl">📱</div>
+                            <div
+                                class="bg-slate-50 p-4 rounded-xl border border-slate-200 w-full italic text-slate-600">
+                                "Sinta baru saja menang lomba lari. Saking senangnya, dia memfoto medali lengkap dengan
+                                sertifikat yang memuat <b>Nama Lengkap</b>, <b>Sekolah</b>, dan <b>Tanggal Lahir</b>,
+                                lalu mempostingnya di Instagram Story (Public) dengan caption: 'Alhamdulillah juara!
+                                Siap-siap pulang ke Jl. Mawar No 5!'"
+                            </div>
+                        </div>
+
+                        <h3 class="font-bold text-lg mb-4">Analisis Risiko:</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">1. Apa bahaya dari postingan
+                                    Sinta?</label>
+                                <textarea
+                                    class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none h-24 text-sm"
+                                    placeholder="Tulis pendapatmu di sini..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">2. Apa yang bisa dilakukan orang jahat
+                                    dengan data itu?</label>
+                                <textarea
+                                    class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none h-24 text-sm"
+                                    placeholder="Contoh: Penculikan, penipuan..."></textarea>
+                            </div>
+                            <button onclick="saveAnswer(this)"
+                                class="px-6 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition">Simpan
+                                Jawaban</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Dampak Penyalahgunaan (INTERAKTIF) -->
+        <section class="slide" id="slide-dampak">
+            <h2 class="text-3xl font-bold mb-2 text-center">Dampak Penyalahgunaan Data</h2>
+            <p class="text-center text-slate-600 mb-6">
+                Klik tiap dampak untuk lihat contoh nyata + cara mencegah. Lalu beri nilai “seberapa serius” menurutmu.
+            </p>
+
+            <!-- Progress + Reset -->
+            <div class="max-w-5xl mx-auto mb-5 flex items-center justify-between gap-3 flex-wrap">
+                <div class="text-sm text-slate-600">
+                    🔎 Dampak yang sudah dibuka: <span id="impactOpenedCount" class="font-bold">0</span>/6
+                </div>
+                <button type="button"
+                    class="text-sm px-4 py-2 rounded-full bg-slate-900 text-white hover:opacity-90 transition"
+                    onclick="impactReset()" aria-label="Reset interaksi dampak penyalahgunaan data">
+                    Reset
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <!-- Individu -->
+                <div class="bg-red-50 p-8 rounded-3xl border border-red-100">
+                    <div class="font-bold text-red-600 mb-4 tracking-widest text-sm uppercase">Bagi Individu</div>
+
+                    <div class="space-y-4">
+                        <!-- Identity Theft -->
+                        <button type="button"
+                            class="impactItem w-full text-left flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition focus:outline-none focus:ring-4 focus:ring-red-100"
+                            data-key="idtheft" aria-expanded="false">
+                            <span class="text-2xl mt-0.5">☠️</span>
+                            <div class="flex-1">
+                                <div class="font-semibold"><b>Identity Theft</b></div>
+                                <div class="text-sm text-slate-600">Penjahat menyamar jadi kamu untuk menipu orang lain.
+                                </div>
+
+                                <div class="impactReveal hidden mt-3 text-sm">
+                                    <div class="rounded-xl bg-red-50 border border-red-100 p-3">
+                                        <p class="font-bold text-red-900 mb-1">Contoh:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-red-900/90">
+                                            <li>Akun kamu dipakai kirim DM “pinjam pulsa/uang” ke teman sekelas.</li>
+                                            <li>Nama+foto kamu dipakai bikin akun palsu untuk komentar jahat.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mt-2">
+                                        <p class="font-bold text-emerald-900 mb-1">Cara mencegah:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-emerald-900/90">
+                                            <li>Pakai password kuat + beda untuk tiap akun.</li>
+                                            <li>Aktifkan verifikasi 2 langkah (2FA).</li>
+                                            <li>Jangan pernah bagikan OTP/kode verifikasi.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Stalking -->
+                        <button type="button"
+                            class="impactItem w-full text-left flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition focus:outline-none focus:ring-4 focus:ring-red-100"
+                            data-key="stalking" aria-expanded="false">
+                            <span class="text-2xl mt-0.5">😨</span>
+                            <div class="flex-1">
+                                <div class="font-semibold"><b>Stalking</b></div>
+                                <div class="text-sm text-slate-600">Orang asing tahu lokasi rumah dan sekolahmu.</div>
+
+                                <div class="impactReveal hidden mt-3 text-sm">
+                                    <div class="rounded-xl bg-red-50 border border-red-100 p-3">
+                                        <p class="font-bold text-red-900 mb-1">Contoh:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-red-900/90">
+                                            <li>Story “lagi sendiri” + lokasi menyala, lalu ada DM aneh.</li>
+                                            <li>Foto depan rumah/sekolah menunjukkan alamat/plang.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mt-2">
+                                        <p class="font-bold text-emerald-900 mb-1">Cara mencegah:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-emerald-900/90">
+                                            <li>Matikan share lokasi saat posting.</li>
+                                            <li>Batasi akun jadi private + pilih followers.</li>
+                                            <li>Kalau ada DM mencurigakan: blokir + lapor orang dewasa.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Kerugian Finansial -->
+                        <button type="button"
+                            class="impactItem w-full text-left flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition focus:outline-none focus:ring-4 focus:ring-red-100"
+                            data-key="finance" aria-expanded="false">
+                            <span class="text-2xl mt-0.5">💸</span>
+                            <div class="flex-1">
+                                <div class="font-semibold"><b>Kerugian Finansial</b></div>
+                                <div class="text-sm text-slate-600">Akun game/sosmed di-hack dan dijual.</div>
+
+                                <div class="impactReveal hidden mt-3 text-sm">
+                                    <div class="rounded-xl bg-red-50 border border-red-100 p-3">
+                                        <p class="font-bold text-red-900 mb-1">Contoh:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-red-900/90">
+                                            <li>Akun game diambil alih karena password mudah ditebak.</li>
+                                            <li>Klik link “diamond gratis” ternyata phishing.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mt-2">
+                                        <p class="font-bold text-emerald-900 mb-1">Cara mencegah:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-emerald-900/90">
+                                            <li>Jangan login di website/link tidak resmi.</li>
+                                            <li>Gunakan email/nomor yang aman + 2FA.</li>
+                                            <li>Kalau ragu, tanya orang dewasa sebelum klik.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Masyarakat -->
+                <div class="bg-indigo-50 p-8 rounded-3xl border border-indigo-100">
+                    <div class="font-bold text-indigo-600 mb-4 tracking-widest text-sm uppercase">Bagi Masyarakat</div>
+
+                    <div class="space-y-4">
+                        <!-- Hoax -->
+                        <button type="button"
+                            class="impactItem w-full text-left flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                            data-key="hoax" aria-expanded="false">
+                            <span class="text-2xl mt-0.5">🦠</span>
+                            <div class="flex-1">
+                                <div class="font-semibold"><b>Penyebaran Hoaks</b></div>
+                                <div class="text-sm text-slate-600">Akun palsu digunakan untuk menyebar fitnah.</div>
+
+                                <div class="impactReveal hidden mt-3 text-sm">
+                                    <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-3">
+                                        <p class="font-bold text-indigo-900 mb-1">Contoh:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-indigo-900/90">
+                                            <li>Berita “sekolah diliburkan mendadak” menyebar tanpa sumber.</li>
+                                            <li>Screenshot chat dipotong-potong untuk memfitnah.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mt-2">
+                                        <p class="font-bold text-emerald-900 mb-1">Cara mencegah:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-emerald-900/90">
+                                            <li>Cek sumber: siapa yang mengirim? ada bukti resmi?</li>
+                                            <li>Jangan share kalau belum jelas benar.</li>
+                                            <li>Kalau ragu: tanya guru/orang tua.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Trust -->
+                        <button type="button"
+                            class="impactItem w-full text-left flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                            data-key="trust" aria-expanded="false">
+                            <span class="text-2xl mt-0.5">📉</span>
+                            <div class="flex-1">
+                                <div class="font-semibold"><b>Hilang Kepercayaan</b></div>
+                                <div class="text-sm text-slate-600">Orang jadi takut bertransaksi digital.</div>
+
+                                <div class="impactReveal hidden mt-3 text-sm">
+                                    <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-3">
+                                        <p class="font-bold text-indigo-900 mb-1">Contoh:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-indigo-900/90">
+                                            <li>Banyak akun palsu → orang jadi ragu percaya info.</li>
+                                            <li>Penipuan online → teman/keluarga jadi takut beli online.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mt-2">
+                                        <p class="font-bold text-emerald-900 mb-1">Cara mencegah:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-emerald-900/90">
+                                            <li>Jaga akun: password kuat + 2FA.</li>
+                                            <li>Jangan ikut menyebarkan info tanpa sumber.</li>
+                                            <li>Laporkan akun mencurigakan.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Cybercrime -->
+                        <button type="button"
+                            class="impactItem w-full text-left flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                            data-key="cybercrime" aria-expanded="false">
+                            <span class="text-2xl mt-0.5">⚖️</span>
+                            <div class="flex-1">
+                                <div class="font-semibold"><b>Cybercrime Meningkat</b></div>
+                                <div class="text-sm text-slate-600">Lingkungan internet jadi tidak aman.</div>
+
+                                <div class="impactReveal hidden mt-3 text-sm">
+                                    <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-3">
+                                        <p class="font-bold text-indigo-900 mb-1">Contoh:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-indigo-900/90">
+                                            <li>Semakin banyak phishing, scam, dan akun palsu.</li>
+                                            <li>Cyberbullying makin mudah terjadi karena anonim.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mt-2">
+                                        <p class="font-bold text-emerald-900 mb-1">Cara mencegah:</p>
+                                        <ul class="list-disc pl-5 space-y-1 text-emerald-900/90">
+                                            <li>Laporkan konten/akun yang merugikan.</li>
+                                            <li>Jangan membalas provokasi—simpan bukti & minta bantuan.</li>
+                                            <li>Biasakan “pikir dulu sebelum klik”.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Severity / Skala Dampak -->
+            <div class="max-w-5xl mx-auto mt-8">
+                <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6">
+                    <div class="flex items-start justify-between gap-4 flex-wrap">
+                        <div>
+                            <p class="font-bold text-slate-900 text-lg">Seberapa serius menurutmu? 📊</p>
+                            <p class="text-slate-600 text-sm mt-1">
+                                Geser skala dari 1 (ringan) sampai 5 (sangat serius), lalu lihat feedback.
+                            </p>
+                        </div>
+                        <div class="text-sm text-slate-600">
+                            Nilai kamu: <span id="impactScore" class="font-bold">3</span>/5
+                        </div>
+                    </div>
+
+                    <input id="impactRange" type="range" min="1" max="5" value="3" class="w-full mt-4 accent-slate-900"
+                        oninput="impactOnRange(this.value)"
+                        aria-label="Skala seberapa serius dampak penyalahgunaan data" />
+
+                    <div id="impactRangeFeedback"
+                        class="mt-4 rounded-2xl p-4 text-sm bg-white border border-slate-200 text-slate-800">
+                        Pilih nilai dulu ya 🙂 (Coba geser)
+                    </div>
+
+                    <div
+                        class="mt-5 text-center bg-indigo-100 inline-block px-6 py-3 rounded-full mx-auto block w-fit text-indigo-900 font-bold">
+                        ⚠️ Kesimpulan: Data pribadi itu “kunci” yang bisa membuka banyak hal tentang kamu.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            // ===== Interaksi Dampak =====
+            const impactState = { opened: new Set() };
+
+            function impactUpdateCounter() {
+                const el = document.getElementById("impactOpenedCount");
+                if (el) el.textContent = impactState.opened.size;
+            }
+
+            function impactInit() {
+                const items = document.querySelectorAll("#slide-dampak .impactItem");
+                items.forEach(item => {
+                    item.addEventListener("click", () => {
+                        const reveal = item.querySelector(".impactReveal");
+                        const key = item.getAttribute("data-key");
+                        const expanded = item.getAttribute("aria-expanded") === "true";
+
+                        if (reveal) reveal.classList.toggle("hidden");
+                        item.setAttribute("aria-expanded", (!expanded).toString());
+
+                        if (key) impactState.opened.add(key);
+                        impactUpdateCounter();
+                    });
+                });
+
+                // init range feedback
+                impactOnRange(document.getElementById("impactRange")?.value || 3);
+                impactUpdateCounter();
+            }
+
+            function impactReset() {
+                impactState.opened = new Set();
+                document.querySelectorAll("#slide-dampak .impactReveal").forEach(r => r.classList.add("hidden"));
+                document.querySelectorAll("#slide-dampak .impactItem").forEach(i => i.setAttribute("aria-expanded", "false"));
+                impactUpdateCounter();
+
+                const range = document.getElementById("impactRange");
+                if (range) range.value = 3;
+                impactOnRange(3);
+            }
+
+            function impactOnRange(val) {
+                const scoreEl = document.getElementById("impactScore");
+                const fbEl = document.getElementById("impactRangeFeedback");
+                if (scoreEl) scoreEl.textContent = val;
+
+                if (!fbEl) return;
+
+                const v = Number(val);
+
+                if (v <= 2) {
+                    fbEl.className = "mt-4 rounded-2xl p-4 text-sm bg-amber-50 border border-amber-100 text-amber-900";
+                    fbEl.innerHTML = `
+        <p class="font-bold mb-1">🟡 Kamu menilai ini cukup ringan.</p>
+        <p>Coba pikir lagi: kalau akun kamu dipakai menipu teman, siapa yang dirugikan?</p>
+      `;
+                } else if (v === 3) {
+                    fbEl.className = "mt-4 rounded-2xl p-4 text-sm bg-white border border-slate-200 text-slate-800";
+                    fbEl.innerHTML = `
+        <p class="font-bold mb-1">⚪ Nilai tengah (cukup serius).</p>
+        <p>Bagus. Dampaknya bisa merugikan diri sendiri <b>dan</b> orang lain.</p>
+      `;
+                } else {
+                    fbEl.className = "mt-4 rounded-2xl p-4 text-sm bg-emerald-50 border border-emerald-100 text-emerald-900";
+                    fbEl.innerHTML = `
+        <p class="font-bold mb-1">🟢 Kamu menilai ini sangat serius.</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Data pribadi bisa dipakai untuk penipuan & peretasan.</li>
+          <li>Jejak digital bisa berdampak jangka panjang.</li>
+          <li>Langkah aman: password kuat + 2FA + cek sebelum klik.</li>
+        </ul>
+      `;
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", impactInit);
+        </script>
+
+
+        <!-- 6. Interactive: Share or Keep? -->
+        <section class="slide">
+            <div class="max-w-2xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-4">Game: Share or Keep? 🚦</h2>
+                <p class="text-slate-600 mb-8">Klik tombol yang sesuai. Apakah data ini AMAN dibagikan ke publik?</p>
+
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 relative overflow-hidden">
+                    <div id="gameScenario" class="text-2xl font-bold mb-8 transition-all">Nama Panggilan Hewan
+                        Peliharaan</div>
+
+                    <div class="flex justify-center gap-4">
+                        <button onclick="playGame(true)"
+                            class="flex-1 py-4 bg-green-100 text-green-700 rounded-xl font-bold hover:bg-green-200 transition text-lg border-b-4 border-green-700 active:border-b-0 active:translate-y-1">📢
+                            SHARE</button>
+                        <button onclick="playGame(false)"
+                            class="flex-1 py-4 bg-red-100 text-red-700 rounded-xl font-bold hover:bg-red-200 transition text-lg border-b-4 border-red-700 active:border-b-0 active:translate-y-1">🔒
+                            KEEP</button>
+                    </div>
+
+                    <div id="gameFeedback" class="mt-6 font-bold text-lg min-h-[2rem]"></div>
+                </div>
+
+                <div class="mt-8 flex justify-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-slate-300 game-dot active-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-slate-300 game-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-slate-300 game-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-slate-300 game-dot"></span>
+                    <span class="w-3 h-3 rounded-full bg-slate-300 game-dot"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Pencegahan: Strong Passwords -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold mb-6 text-center">Langkah 1: Kunci Ganda</h2>
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-center">
+                <div>
+                    <p class="text-lg text-slate-600 mb-4">Password ibarat kunci rumahmu di dunia maya. Jangan pakai
+                        kunci gembok mainan!</p>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-red-500 text-white rounded-xl">
+                            ❌ <b>Lemah:</b> "123456", "password", "nama sendiri", tanggal lahir.
+                        </div>
+                        <div class="p-4 bg-green-600 text-white rounded-xl shadow-lg transform translate-x-4">
+                            ✅ <b>Kuat:</b> "K4l4n4nt!_Jaya", "Suk4_M4k4n_Baks0!", kombinasi Huruf, Angka, Simbol.
+                        </div>
+                    </div>
+                    <div class="mt-6 bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-yellow-800 text-sm">
+                        💡 <b>Tips:</b> Aktifkan <b>2FA (Two-Factor Authentication)</b>. Jadi selain password, butuh
+                        kode OTP dari HP kamu.
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-8 rounded-3xl text-white">
+                    <h3 class="font-bold mb-4">Password Strength Checker (Simulasi)</h3>
+                    <input type="text" id="passInput" placeholder="Coba ketik password..."
+                        class="w-full p-3 bg-slate-800 rounded-lg text-white outline-none mb-4 font-mono">
+                    <div class="h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
+                        <div id="strengthBar" class="h-full bg-red-500 w-0 transition-all duration-500"></div>
+                    </div>
+                    <p id="strengthText" class="text-sm text-slate-400">Strength: -</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Interactive: Check Password -->
+        <script>
+            // Password Checker Logic placed directly here for simplicity in reading flow, usually at bottom
+            document.getElementById('passInput')?.addEventListener('input', function (e) {
+                const val = e.target.value;
+                const bar = document.getElementById('strengthBar');
+                const text = document.getElementById('strengthText');
+
+                let score = 0;
+                if (val.length > 5) score++;
+                if (val.length > 8) score++;
+                if (/[A-Z]/.test(val)) score++;
+                if (/[0-9]/.test(val)) score++;
+                if (/[^A-Za-z0-9]/.test(val)) score++;
+
+                let color = 'bg-red-500';
+                let label = 'Weak';
+
+                if (score > 4) { color = 'bg-green-500'; label = 'Strong'; }
+                else if (score > 2) { color = 'bg-yellow-500'; label = 'Medium'; }
+
+                bar.className = `h-full ${color} transition-all duration-500`;
+                bar.style.width = (score * 20) + '%';
+                text.innerText = `Strength: ${label}`;
+            });
+        </script>
+
+        <!-- 9. Pencegahan: Privacy Settings -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold mb-6 text-center">Langkah 2: Perisai Privasi</h2>
+            <div class="max-w-4xl mx-auto bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <img src="https://ui-avatars.com/api/?name=Privacy+Settings&background=6366f1&color=fff&size=256"
+                        alt="Settings" class="rounded-2xl mx-auto w-48 shadow-lg">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Atur Akunmu Sekarang!</h3>
+                        <ul class="space-y-4 text-slate-600">
+                            <li class="flex items-center gap-3">
+                                <input type="checkbox" checked disabled class="w-5 h-5 text-indigo-600 rounded">
+                                <span>Gembok akun ("Private Account") di Instagram/TikTok.</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <input type="checkbox" checked disabled class="w-5 h-5 text-indigo-600 rounded">
+                                <span>Matikan "Location Services" untuk aplikasi yang tidak perlu.</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <input type="checkbox" checked disabled class="w-5 h-5 text-indigo-600 rounded">
+                                <span>Cek "Tagged Photos" agar tidak sembarang muncul di profilmu.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. Phishing & Scams -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold mb-6 text-center">Waspada Penipuan Digital</h2>
+            <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="col-span-1 bg-white p-6 rounded-2xl border border-slate-200 text-center">
+                    <div class="text-6xl mb-4">🎣</div>
+                    <h3 class="font-bold text-xl mb-2">Phishing</h3>
+                    <p class="text-sm text-slate-500">Pancingan berupa link palsu yang mirip website asli untuk mencuri
+                        password.</p>
+                </div>
+                <div class="col-span-2 bg-slate-100 p-6 rounded-2xl border border-slate-200">
+                    <h3 class="font-bold text-slate-600 mb-4">Contoh Link Palsu:</h3>
+                    <div class="space-y-3 font-mono text-sm">
+                        <div
+                            class="p-3 bg-red-100 text-red-700 rounded border border-red-200 flex justify-between items-center group cursor-pointer hover:bg-red-200 transition">
+                            <span>xns.instagram-verified.com/login</span>
+                            <span
+                                class="opacity-0 group-hover:opacity-100 font-bold px-2 py-1 bg-red-600 text-white text-xs rounded">❌
+                                PALSU</span>
+                        </div>
+                        <div
+                            class="p-3 bg-green-100 text-green-700 rounded border border-green-200 flex justify-between items-center">
+                            <span>instagram.com</span>
+                            <span class="font-bold px-2 py-1 bg-green-600 text-white text-xs rounded">✅ ASLI</span>
+                        </div>
+                        <div
+                            class="p-3 bg-red-100 text-red-700 rounded border border-red-200 flex justify-between items-center group cursor-pointer hover:bg-red-200 transition">
+                            <span>bank-bca-promo-hadiah.blogspot.com</span>
+                            <span
+                                class="opacity-0 group-hover:opacity-100 font-bold px-2 py-1 bg-red-600 text-white text-xs rounded">❌
+                                PALSU</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. Activity: Spot the Scam -->
+        <section class="slide">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="text-2xl font-bold mb-4">Quiz: Asli atau Palsu?</h2>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                    <div class="bg-slate-100 p-4 rounded-xl mb-6">
+                        <div class="flex items-center gap-3 mb-3 border-b border-slate-200 pb-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-500"></div>
+                            <div>
+                                <div class="font-bold text-sm">Admin Game <span class="text-blue-500">✔</span></div>
+                                <div class="text-xs text-slate-500">admin@gim-gratisan.xyz</div>
+                            </div>
+                        </div>
+                        <p class="text-sm mb-3">Selamat! Akun Anda terpilih mendapatkan 1000 Diamond GRATIS.</p>
+                        <p class="text-sm mb-3">Login sekarang untuk klaim sebelum hangus: <a href="#"
+                                class="text-blue-600 underline">bit.ly/klaim-diamond-gratis</a></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="checkScam(this, true)"
+                            class="p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 font-bold transition">Ini
+                            SCAM! 🚨</button>
+                        <button onclick="checkScam(this, false)"
+                            class="p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 font-bold transition">Ini
+                            ASLI 👍</button>
+                    </div>
+                    <div class="scam-feedback hidden mt-4 p-4 rounded-xl bg-slate-800 text-white text-sm"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 11B. Menghargai Karya Orang Lain -->
+        <section class="slide">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl font-bold mb-2 text-center">Menghargai Karya Orang Lain (Hak Cipta)</h2>
+                <p class="text-slate-600 text-center mb-8">
+                    Internet memudahkan copy-paste, tapi karya orang lain tetap punya pemilik.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="font-bold mb-3 flex items-center gap-2"><span class="text-2xl">✅</span> Yang boleh
+                            kamu lakukan</div>
+                        <ul class="list-disc ml-5 text-slate-700 space-y-2">
+                            <li>Mencantumkan <b>sumber</b> saat memakai gambar/infografik untuk tugas.</li>
+                            <li>Memakai musik/asset yang <b>free-to-use</b> atau berlisensi.</li>
+                            <li>Minta izin kalau mau repost karya teman (gambar, tulisan, video).</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="font-bold mb-3 flex items-center gap-2"><span class="text-2xl">⛔</span> Yang
+                            sebaiknya dihindari</div>
+                        <ul class="list-disc ml-5 text-slate-700 space-y-2">
+                            <li>Mengaku karya orang lain sebagai karya sendiri.</li>
+                            <li>Upload/menyebarkan film, musik, atau buku <b>bajakan</b>.</li>
+                            <li>Copy-paste tugas dari internet tanpa memahami & tanpa sumber.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-2xl p-5 text-yellow-900">
+                    <div class="font-bold mb-1">Contoh sederhana mencantumkan sumber:</div>
+                    <div class="text-sm">
+                        “Gambar diambil dari: Nama Website/Creator (tanggal).”
+                        <span class="text-slate-600">— ini sudah jauh lebih etis daripada tidak menulis apa pun.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11C. Jangan Sebar Hoaks -->
+        <section class="slide">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl font-bold mb-2 text-center">Jangan Sebarkan Hoaks</h2>
+                <p class="text-slate-600 text-center mb-8">
+                    Sebelum share, lakukan “<b>STOP - CEK - TANYA</b>”.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-4xl mb-3">🛑</div>
+                        <div class="font-bold text-lg mb-2">STOP</div>
+                        <p class="text-sm text-slate-600">
+                            Jangan terburu-buru ikut viral. Tarik napas dulu sebelum menekan tombol <b>share</b>.
+                        </p>
+                        <div class="mt-4 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <b>Contoh:</b> “Sebarkan ke 10 orang atau akunmu diblokir” → ini tanda bahaya.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-4xl mb-3">🔎</div>
+                        <div class="font-bold text-lg mb-2">CEK</div>
+                        <ul class="text-sm text-slate-600 list-disc ml-5 space-y-1">
+                            <li>Siapa sumbernya?</li>
+                            <li>Ada tanggal/penulis?</li>
+                            <li>Judulnya terlalu heboh?</li>
+                        </ul>
+                        <div class="mt-4 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <b>Contoh:</b> “Katanya…” tanpa sumber jelas → jangan share dulu.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-4xl mb-3">🙋‍♀️</div>
+                        <div class="font-bold text-lg mb-2">TANYA</div>
+                        <p class="text-sm text-slate-600">
+                            Kalau ragu, tanyakan ke guru/orang tua atau cek ke sumber resmi.
+                        </p>
+                        <div class="mt-4 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <b>Contoh:</b> Informasi sekolah → cek dari guru/wali kelas, bukan grup random.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
+                    <div class="font-bold text-indigo-900 mb-2">Latihan cepat:</div>
+                    <p class="text-indigo-900/80 mb-4">Pilih reaksi terbaik saat menerima pesan: “Video ini bikin
+                        pingsan! Sebarkan sekarang!”</p>
+                    <div class="grid md:grid-cols-3 gap-3">
+                        <button
+                            class="hoax-btn p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-left"
+                            data-ans="wrong">
+                            A. Langsung share ke grup kelas biar teman-teman tahu.
+                        </button>
+                        <button
+                            class="hoax-btn p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-left"
+                            data-ans="right">
+                            B. STOP, cek sumbernya, dan tanya guru/orang dewasa jika ragu.
+                        </button>
+                        <button
+                            class="hoax-btn p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-left"
+                            data-ans="wrong">
+                            C. Share tapi kasih caption “katanya sih bener”.
+                        </button>
+                    </div>
+                    <div id="hoaxFeedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11D. Screen Time Seimbang -->
+        <section class="slide">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl font-bold mb-2 text-center">Screen Time yang Seimbang</h2>
+                <p class="text-slate-600 text-center mb-8">
+                    Gadget itu alat. Kalau berlebihan, bisa mengganggu kesehatan, belajar, tidur, dan hubungan sosial.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-6 items-start">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="font-bold mb-3">Tanda-tanda perlu diatur</div>
+                        <ul class="list-disc ml-5 text-slate-700 space-y-2">
+                            <li>Sering tidur larut karena “scroll bentar” jadi lama.</li>
+                            <li>Susah fokus belajar karena ingin cek notifikasi terus.</li>
+                            <li>Sering emosi kalau HP diminta berhenti.</li>
+                            <li>Jarang olahraga/berinteraksi karena terlalu lama main game/sosmed.</li>
+                        </ul>
+
+                        <div
+                            class="mt-5 bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-emerald-900 text-sm">
+                            <b>Ide cepat:</b> pakai aturan “<b>20-20-20</b>” (setiap 20 menit, lihat jauh 20 detik)
+                            untuk mata.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="font-bold mb-3">Rencana kecil 7 hari (pilih 2)</div>
+                        <div class="space-y-3 text-slate-700">
+                            <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                <input type="checkbox" class="w-5 h-5 mt-1">
+                                <span><b>Matikan notifikasi</b> untuk aplikasi yang bikin terdistraksi saat
+                                    belajar.</span>
+                            </label>
+                            <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                <input type="checkbox" class="w-5 h-5 mt-1">
+                                <span>Pakai fitur <b>Screen Time / Digital Wellbeing</b> untuk batas harian.</span>
+                            </label>
+                            <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                <input type="checkbox" class="w-5 h-5 mt-1">
+                                <span><b>HP di luar kamar</b> 30 menit sebelum tidur (biar tidur lebih cepat).</span>
+                            </label>
+                            <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                <input type="checkbox" class="w-5 h-5 mt-1">
+                                <span>Ganti 15 menit gadget dengan <b>aktivitas fisik</b> (jalan, stretching, main
+                                    bola).</span>
+                            </label>
+                        </div>
+
+                        <div class="mt-4 text-xs text-slate-500">
+                            Tips: pilih yang realistis. Yang penting konsisten, bukan sempurna.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-slate-900 text-white rounded-2xl p-5">
+                    <b>Ingat:</b> Seimbang itu berarti kamu tetap bisa menikmati gadget, tanpa mengorbankan hal penting
+                    lainnya.
+                </div>
+            </div>
+        </section>
+
+        <!-- 12. Netiquette -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold mb-6 text-center">Etika Berinternet (Netiquette)</h2>
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <img src="https://img.freepik.com/free-vector/cyber-bullying-concept-illustration_114360-4372.jpg?w=800"
+                    class="rounded-2xl shadow-lg" alt="Kindness">
+                <div class="flex flex-col justify-center space-y-6">
+                    <div class="bg-white p-6 rounded-xl border-l-8 border-indigo-600 shadow-sm">
+                        <h3 class="font-bold text-lg mb-2">Think Before You Post</h3>
+                        <p class="text-slate-600 text-sm">Apakah ini Benar? Apakah ini Meyakinkan? Apakah ini Perlu?
+                            Apakah ini Sopan?</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border-l-8 border-emerald-600 shadow-sm">
+                        <h3 class="font-bold text-lg mb-2">Hargai Privasi Orang Lain</h3>
+                        <p class="text-slate-600 text-sm">Jangan posting foto teman tanpa izin. Jangan menyebar
+                            screenshot chat pribadi.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border-l-8 border-rose-600 shadow-sm">
+                        <h3 class="font-bold text-lg mb-2">Stop Cyberbullying</h3>
+                        <p class="text-slate-600 text-sm">Tidak ikut-ikutan berkomentar jahat. Report akun bully. Dukung
+                            korban.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 13. Case Study: Group Chat -->
+        <section class="slide">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold mb-4">Kasus: Grup Chat Kelas</h2>
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden p-6 mb-6">
+                    <div class="space-y-4 mb-6">
+                        <div class="flex gap-2">
+                            <div class="bg-gray-200 p-3 rounded-2xl rounded-tl-none text-sm max-w-md">Eh liat deh si
+                                Dani, sepatunya jebol wkwk 🤣</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="bg-gray-200 p-3 rounded-2xl rounded-tl-none text-sm max-w-md">Iya miskin banget
+                                gayanya sok asik</div>
+                        </div>
+                        <div class="flex gap-2 justify-end">
+                            <div
+                                class="bg-indigo-100 p-3 rounded-2xl rounded-tr-none text-sm max-w-md italic text-slate-500">
+                                Apa yang harus kamu lakukan?</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <button onclick="checkResponse(this, 'bad')"
+                            class="w-full text-left p-4 rounded-xl border border-slate-200 hover:bg-slate-50 transition">A.
+                            Ikut ketawa pakai emoji 🤣</button>
+                        <button onclick="checkResponse(this, 'med')"
+                            class="w-full text-left p-4 rounded-xl border border-slate-200 hover:bg-slate-50 transition">B.
+                            Diam saja (Silent Reader)</button>
+                        <button onclick="checkResponse(this, 'good')"
+                            class="w-full text-left p-4 rounded-xl border border-slate-200 hover:bg-slate-50 transition">C.
+                            Mengingatkan teman: "Guys, jangan gitu lah, kasian Dani."</button>
+                    </div>
+                    <p id="chatFeedback" class="mt-4 font-bold hidden text-center"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 14. Pledge -->
+        <section class="slide">
+            <div class="max-w-2xl mx-auto text-center py-10">
+                <div class="text-6xl mb-6">🤝</div>
+                <h1 class="text-3xl font-bold text-slate-900 mb-6">Janji Digital Saya</h1>
+                <div class="bg-indigo-50 p-8 rounded-3xl border border-indigo-100 shadow-inner mb-8">
+                    <p class="text-lg italic font-serif text-slate-700 leading-relaxed">
+                        "Saya berjanji untuk menggunakan internet dengan bijak. Saya akan menjaga privasi diri sendiri
+                        dan menghargai privasi orang lain. Saya tidak akan menyebarkan kebencian dan akan selalu
+                        berpikir sebelum memposting."
+                    </p>
+                </div>
+                <div class="flex justify-center gap-4">
+                    <input type="text" placeholder="Ketik Nama Kamu..."
+                        class="p-3 rounded-xl border border-slate-300 outline-none w-64 text-center">
+                    <button onclick="this.innerText='✅ Tertanda!'"
+                        class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition">Saya
+                        Berjanji</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 15. Closing -->
+        <section class="slide">
+            <div class="max-w-2xl mx-auto text-center py-10">
+                <div class="text-6xl mb-4">🌟</div>
+                <h1 class="text-3xl font-bold text-slate-900 mb-4">Sesi Selesai!</h1>
+                <p class="text-lg text-slate-600 mb-8">
+                    Kamu sekarang adalah <b>Digital Guardian</b>! Jaga terus etikamu di dunia nyata maupun maya.
+                </p>
+                <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+                    <h3 class="font-bold mb-2">Ingat Selalu:</h3>
+                    <ul class="text-left space-y-2 text-slate-600 inline-block mx-auto">
+                        <li>✅ Jaga Data Pribadi (Nama, Alamat, HP).</li>
+                        <li>✅ Buat Password Kuat & Aktifkan 2FA.</li>
+                        <li>✅ Think Before You Post.</li>
+                        <li>✅ Jangan Cyberbully.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- App Script -->
+    <script>
+        // Access Code
+        const CODE = 'RGMDSMS25'; // Placeholder Access Code
+        const overlay = document.getElementById('accessOverlay');
+        const input = document.getElementById('accessCodeInput');
+        const btn = document.getElementById('accessBtn');
+        const error = document.getElementById('accessError');
+
+        function checkCode() {
+            // For Teacher ease, simple check. Or we can match Highschool code if preferred.
+            // Using generic checker
+            if (input.value.toUpperCase().trim().length > 3) {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 300);
+            } else {
+                error.innerText = "Masukkan kode yang valid (min 4 karakter)";
+                error.classList.remove('hidden');
+            }
+        }
+        btn.addEventListener('click', checkCode);
+        input.addEventListener('keypress', (e) => e.key === 'Enter' && checkCode());
+
+        // Slide Navigation
+        const slides = document.querySelectorAll('.slide');
+        const total = document.getElementById('total');
+        if (total) total.innerText = slides.length;
+        const bar = document.getElementById('bar');
+        const counter = document.getElementById('counter');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+            slides[currentSlide].classList.remove('active');
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+
+            // UI Updates
+            document.getElementById('btnPrev').disabled = currentSlide === 0;
+            document.getElementById('btnPrev').style.opacity = currentSlide === 0 ? '0.4' : '1';
+
+            document.getElementById('btnNext').disabled = currentSlide === slides.length - 1;
+            document.getElementById('btnNext').style.opacity = currentSlide === slides.length - 1 ? '0.4' : '1';
+
+            counter.innerText = currentSlide + 1;
+            bar.style.width = ((currentSlide + 1) / slides.length * 100) + '%';
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById('btnNext').addEventListener('click', () => showSlide(currentSlide + 1));
+        document.getElementById('btnPrev').addEventListener('click', () => showSlide(currentSlide - 1));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') showSlide(currentSlide + 1);
+            if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
+        });
+
+
+        // Interactive Functions
+
+        // 0. Aspect cards (klik untuk tampilkan contoh)
+        const aspectTitle = document.getElementById('aspectTitle');
+        const aspectBody = document.getElementById('aspectBody');
+        document.querySelectorAll('.aspect-card').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const t = btn.getAttribute('data-title');
+                const b = btn.getAttribute('data-body');
+                if (aspectTitle) aspectTitle.innerText = t || "Aspek";
+                if (aspectBody) aspectBody.innerText = b || "";
+                // small highlight
+                document.querySelectorAll('.aspect-card').forEach(x => x.classList.remove('ring-2', 'ring-indigo-400'));
+                btn.classList.add('ring-2', 'ring-indigo-400');
+            });
+        });
+
+        // 0B. Hoaks quick check
+        const hoaxFb = document.getElementById('hoaxFeedback');
+        document.querySelectorAll('.hoax-btn').forEach(b => {
+            b.addEventListener('click', () => {
+                const ans = b.getAttribute('data-ans');
+                if (ans === 'right') {
+                    hoaxFb.innerText = "✅ Tepat! STOP - CEK - TANYA dulu sebelum share.";
+                    hoaxFb.className = "mt-4 font-bold text-center text-green-600 block";
+                } else {
+                    hoaxFb.innerText = "❌ Kurang tepat. Kalau kita ikut menyebar, dampaknya bisa merugikan banyak orang.";
+                    hoaxFb.className = "mt-4 font-bold text-center text-red-600 block";
+                }
+            });
+        });
+
+        // Interactive Functions
+
+        // 1. Save Answer Button
+        function saveAnswer(btn) {
+            btn.innerText = "✅ Tersimpan!";
+            btn.className = "px-6 py-2 bg-green-600 text-white rounded-lg font-bold transition cursor-default";
+            setTimeout(() => {
+                // Optional: Reset after 3s or keep it
+            }, 3000);
+        }
+
+        // 2. Share or Keep Game
+        const gameData = [
+            { text: "Nama Panggilan Hewan", safe: true },
+            { text: "Alamat Rumah", safe: false },
+            { text: "Foto Tiket Pesawat (Barcode)", safe: false },
+            { text: "Hobi / Makanan Favorit", safe: true },
+            { text: "Password Email", safe: false }
+        ];
+        let gameIdx = 0;
+        const gameScenario = document.getElementById('gameScenario');
+        const gameFeedback = document.getElementById('gameFeedback');
+        const dots = document.querySelectorAll('.game-dot');
+
+        function playGame(choiceShare) {
+            const currentItem = gameData[gameIdx];
+            const isCorrect = choiceShare === currentItem.safe;
+
+            if (isCorrect) {
+                gameFeedback.innerText = "✅ Tepat! " + (currentItem.safe ? "Ini aman dibagikan." : "Ini data rahasia!");
+                gameFeedback.className = "mt-6 font-bold text-lg text-green-600";
+            } else {
+                gameFeedback.innerText = "❌ Ups! " + (currentItem.safe ? "Sebenarnya ini boleh aja kok." : "BAHAYA! Jangan dibagikan.");
+                gameFeedback.className = "mt-6 font-bold text-lg text-red-600";
+            }
+
+            // Highlight dot
+            dots[gameIdx].classList.remove('active-dot', 'bg-slate-300');
+            dots[gameIdx].classList.add(isCorrect ? 'bg-green-500' : 'bg-red-500');
+
+            // Next
+            gameIdx++;
+            if (gameIdx < gameData.length) {
+                setTimeout(() => {
+                    gameScenario.innerText = gameData[gameIdx].text;
+                    gameFeedback.innerText = "";
+                    dots[gameIdx].classList.add('active-dot');
+                }, 1500);
+            } else {
+                setTimeout(() => {
+                    gameScenario.innerText = "Game Selesai! 🎉";
+                    gameFeedback.innerText = "Kamu hebat memilah data!";
+                }, 1500);
+            }
+        }
+
+        // 3. Scam Checker
+        function checkScam(btn, isCorrectAnswer) {
+            const parent = btn.parentElement;
+            const fb = parent.nextElementSibling;
+
+            // Reset buttons
+            Array.from(parent.children).forEach(b => b.classList.add('opacity-50'));
+            btn.classList.remove('opacity-50');
+
+            if (isCorrectAnswer) {
+                fb.innerHTML = "<b>✅ BENAR!</b> Ini adalah PHISHING. Lihat email pengirimnya aneh (@gim-gratisan.xyz) dan linknya bukan official.";
+                fb.classList.remove('bg-red-900');
+                fb.classList.add('bg-green-800');
+            } else {
+                fb.innerHTML = "<b>❌ SALAH!</b> Hati-hati, ini penipuan. Jangan asal klik link Iming-iming hadiah!";
+                fb.classList.remove('bg-green-800');
+                fb.classList.add('bg-red-900');
+            }
+            fb.classList.remove('hidden');
+        }
+
+        // 4. Chat Response
+        function checkResponse(btn, type) {
+            const fb = document.getElementById('chatFeedback');
+            if (type === 'bad') {
+                fb.innerText = "❌ Yah, kamu malah mendukung bullying. Jangan ditiru ya.";
+                fb.className = "mt-4 font-bold text-center text-red-600 block";
+            } else if (type === 'med') {
+                fb.innerText = "😐 Silent Reader lebih baik daripada ikut-ikutan, tapi kamu bisa melakukan hal yang lebih baik.";
+                fb.className = "mt-4 font-bold text-center text-yellow-600 block";
+            } else {
+                fb.innerText = "✅ Keren! Kamu berani membela kebenaran (Upstander).";
+                fb.className = "mt-4 font-bold text-center text-green-600 block";
+            }
+        }
+
+    </script>
+</body>
+
+</html>
