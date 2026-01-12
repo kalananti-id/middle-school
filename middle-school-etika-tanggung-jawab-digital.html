@@ -123,6 +123,267 @@
             </div>
         </section>
 
+        <!-- ICE BREAKING: Klik atau Skip -->
+        <section class="slide" id="slide-klik-skip">
+            <h2 class="text-3xl font-bold text-center mb-2">Ice Breaking: “Klik atau Skip”</h2>
+            <p class="text-center text-slate-600 mb-6">Kita latihan ambil keputusan cepat saat online. Tidak ada
+                “menghakimi”, yang penting alasannya 🙂</p>
+
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
+                <!-- Kiri: Situasi + tombol -->
+                <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+                        <div class="text-sm text-slate-600">
+                            Situasi <span id="ksIndex" class="font-bold">0</span>/<span id="ksTotal"
+                                class="font-bold">0</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button"
+                                class="px-4 py-2 rounded-full bg-slate-900 text-white hover:opacity-90 transition"
+                                onclick="ksStart()">
+                                Mulai
+                            </button>
+                            <button type="button"
+                                class="px-4 py-2 rounded-full bg-white border border-slate-200 hover:bg-slate-50 transition"
+                                onclick="ksReset()">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl bg-indigo-50 border border-indigo-100 p-5">
+                        <div class="text-xs font-bold tracking-widest uppercase text-indigo-700 mb-2">SITUASI</div>
+                        <p id="ksPrompt" class="text-lg font-semibold text-indigo-900">
+                            Klik “Mulai” untuk membaca situasi pertama.
+                        </p>
+                        <p id="ksHint" class="text-sm text-indigo-900/80 mt-2 hidden"></p>
+                    </div>
+
+                    <div class="mt-5 grid grid-cols-2 gap-3">
+                        <button type="button" id="ksClickBtn"
+                            class="px-4 py-3 rounded-2xl bg-emerald-600 text-white font-bold hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            onclick="ksAnswer('klik')" disabled>
+                            ✅ KLIK (Aman / Boleh)
+                        </button>
+                        <button type="button" id="ksSkipBtn"
+                            class="px-4 py-3 rounded-2xl bg-rose-600 text-white font-bold hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            onclick="ksAnswer('skip')" disabled>
+                            ⛔ SKIP (Tahan dulu)
+                        </button>
+                    </div>
+
+                    <!-- Feedback -->
+                    <div id="ksFeedback" class="hidden mt-5 rounded-2xl p-4 border text-sm"></div>
+
+                    <!-- Next -->
+                    <div class="mt-4 flex items-center justify-between">
+                        <div class="text-xs text-slate-500">Tip: Setelah memilih, baca pertanyaan pemantik untuk diskusi
+                            kelas.</div>
+                        <button type="button" id="ksNextBtn"
+                            class="px-4 py-2 rounded-full bg-white border border-slate-200 hover:bg-slate-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            onclick="ksNext()" disabled>
+                            Lanjut →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kanan: Aturan main + ringkasan -->
+                <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6">
+                    <div class="rounded-2xl bg-white border border-slate-200 p-5">
+                        <div class="text-xs font-bold tracking-widest uppercase text-slate-600 mb-2">ATURAN MAIN “Klik
+                            atau Skip”</div>
+                        <ul class="list-disc pl-5 text-slate-700 space-y-2">
+                            <li>Baca situasi aktivitas digital sehari-hari.</li>
+                            <li>Pilih <b>KLIK</b> jika dianggap aman / boleh, <b>SKIP</b> jika perlu
+                                dipikirkan kembali.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4 rounded-2xl bg-white border border-slate-200 p-5">
+                        <div class="text-xs font-bold tracking-widest uppercase text-slate-600 mb-2">RINGKASAN KELAS
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-4">
+                                <div class="text-sm text-emerald-900/80">Total KLIK</div>
+                                <div id="ksKlikCount" class="text-3xl font-extrabold text-emerald-900">0</div>
+                            </div>
+                            <div class="rounded-2xl bg-rose-50 border border-rose-100 p-4">
+                                <div class="text-sm text-rose-900/80">Total SKIP</div>
+                                <div id="ksSkipCount" class="text-3xl font-extrabold text-rose-900">0</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 rounded-2xl bg-indigo-50 border border-indigo-100 p-4">
+                            <p class="font-bold text-indigo-900 mb-1">Pesan kunci</p>
+                            <p class="text-indigo-900/80 text-sm">
+                                Hal kecil di HP (klik, komentar, share) bisa berdampak ke diri sendiri dan orang lain.
+                                Karena itu kita perlu <b>etika</b> dan <b>tanggung jawab</b> digital.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // ===== Data situasi (boleh kamu edit/ tambah) =====
+                const ksSituations = [
+                    {
+                        text: "Kamu menerima DM dari orang yang tidak kamu kenal, lalu dia meminta nama lengkap dan alamat rumah.",
+                        hint: "Clue: data pribadi + orang asing.",
+                        prompt: "Pertanyaan pemantik: Kalau ini terjadi, apa risiko terburuknya? Siapa yang bisa kamu minta bantuan?"
+                    },
+                    {
+                        text: "Kamu mau upload foto bareng teman, tapi belum minta izin temanmu.",
+                        hint: "Clue: privasi + menghargai orang lain.",
+                        prompt: "Pertanyaan pemantik: Kenapa izin itu penting? Bagaimana kalau kamu yang tidak mau fotomu diposting?"
+                    },
+                    {
+                        text: "Temanmu mengirim berita yang 'viral dan menakutkan' lalu menyuruh kamu langsung share ke grup kelas.",
+                        hint: "Clue: hoaks + tanggung jawab membagikan informasi.",
+                        prompt: "Pertanyaan pemantik: Apa langkah cepat untuk cek kebenaran sebelum share?"
+                    },
+                    {
+                        text: "Ada link 'diamond gratis / hadiah game' dan kamu diminta login pakai akun game kamu.",
+                        hint: "Clue: phishing/scam.",
+                        prompt: "Pertanyaan pemantik: Tanda-tanda link berbahaya itu apa saja?"
+                    },
+                    {
+                        text: "Kamu mau komentar bercanda di postingan teman, tapi candaan itu bisa bikin dia malu.",
+                        hint: "Clue: sopan santun digital + dampak ke orang lain.",
+                        prompt: "Pertanyaan pemantik: Bercanda yang aman itu seperti apa? Apa bedanya bercanda vs mengejek?"
+                    }
+                ];
+
+                // ===== State =====
+                let ksStarted = false;
+                let ksIdx = -1;
+                let ksCountKlik = 0;
+                let ksCountSkip = 0;
+                let ksLocked = false;
+
+                function el(id) { return document.getElementById(id); }
+
+                function ksRenderMeta() {
+                    el("ksTotal").textContent = ksSituations.length;
+                    el("ksIndex").textContent = Math.max(0, ksIdx + 1);
+                    el("ksKlikCount").textContent = ksCountKlik;
+                    el("ksSkipCount").textContent = ksCountSkip;
+                }
+
+                function ksSetButtons(enabled) {
+                    el("ksClickBtn").disabled = !enabled;
+                    el("ksSkipBtn").disabled = !enabled;
+                }
+
+                function ksShowFeedback(type, situation) {
+                    const fb = el("ksFeedback");
+                    fb.classList.remove("hidden");
+
+                    if (type === "klik") {
+                        fb.className = "mt-5 rounded-2xl p-4 border text-sm bg-emerald-50 border-emerald-100 text-emerald-900";
+                        fb.innerHTML = `
+          <p class="font-bold mb-1">Kamu memilih: ✅ KLIK</p>
+          <p class="mb-2">Oke! Sekarang diskusikan alasannya.</p>
+          <p class="font-semibold">🧠 ${situation.prompt}</p>
+        `;
+                    } else {
+                        fb.className = "mt-5 rounded-2xl p-4 border text-sm bg-rose-50 border-rose-100 text-rose-900";
+                        fb.innerHTML = `
+          <p class="font-bold mb-1">Kamu memilih: ⛔ SKIP</p>
+          <p class="mb-2">Bagus! “Tahan dulu” sering jadi pilihan paling aman.</p>
+          <p class="font-semibold">🧠 ${situation.prompt}</p>
+        `;
+                    }
+
+                    el("ksNextBtn").disabled = false;
+                }
+
+                function ksLoad(i) {
+                    const s = ksSituations[i];
+                    el("ksPrompt").textContent = s.text;
+                    el("ksHint").textContent = "💡 " + s.hint;
+                    el("ksHint").classList.remove("hidden");
+
+                    // reset feedback state
+                    el("ksFeedback").classList.add("hidden");
+                    el("ksFeedback").innerHTML = "";
+                    el("ksNextBtn").disabled = true;
+
+                    ksLocked = false;
+                    ksSetButtons(true);
+                    ksRenderMeta();
+                }
+
+                function ksStart() {
+                    if (!ksStarted) {
+                        ksStarted = true;
+                        ksIdx = 0;
+                        ksLoad(ksIdx);
+                    } else {
+                        // kalau sudah mulai, lanjutkan dari state saat ini
+                        if (ksIdx < 0) { ksIdx = 0; ksLoad(ksIdx); }
+                    }
+                }
+
+                function ksAnswer(choice) {
+                    if (!ksStarted || ksLocked) return;
+                    ksLocked = true;
+                    ksSetButtons(false);
+
+                    const s = ksSituations[ksIdx];
+                    if (choice === "klik") ksCountKlik++;
+                    else ksCountSkip++;
+
+                    ksRenderMeta();
+                    ksShowFeedback(choice, s);
+                }
+
+                function ksNext() {
+                    if (!ksStarted) return;
+                    if (ksIdx >= ksSituations.length - 1) {
+                        // selesai
+                        el("ksPrompt").textContent = "Selesai! Dari jawaban kelas, kita bisa lihat: keputusan digital itu butuh dipikirkan.";
+                        el("ksHint").classList.add("hidden");
+                        el("ksFeedback").className = "mt-5 rounded-2xl p-4 border text-sm bg-indigo-50 border-indigo-100 text-indigo-900";
+                        el("ksFeedback").innerHTML = `
+          <p class="font-bold mb-1">Penutup Ice Breaking</p>
+          <p>Pengajar menegaskan: hal kecil (klik, komentar, share) punya dampak nyata. Setelah ini kita masuk ke materi etika & tanggung jawab digital.</p>
+        `;
+                        el("ksFeedback").classList.remove("hidden");
+                        el("ksNextBtn").disabled = true;
+                        ksSetButtons(false);
+                        ksRenderMeta();
+                        return;
+                    }
+                    ksIdx++;
+                    ksLoad(ksIdx);
+                }
+
+                function ksReset() {
+                    ksStarted = false;
+                    ksIdx = -1;
+                    ksCountKlik = 0;
+                    ksCountSkip = 0;
+                    ksLocked = false;
+
+                    el("ksPrompt").textContent = "Klik “Mulai” untuk membaca situasi pertama.";
+                    el("ksHint").classList.add("hidden");
+                    el("ksFeedback").classList.add("hidden");
+                    el("ksFeedback").innerHTML = "";
+                    el("ksNextBtn").disabled = true;
+                    ksSetButtons(false);
+                    ksRenderMeta();
+                }
+
+                // init
+                document.addEventListener("DOMContentLoaded", () => {
+                    ksReset();
+                    el("ksTotal").textContent = ksSituations.length;
+                });
+            </script>
+        </section>
+
+
         <!-- 2. The Concept -->
         <section class="slide">
             <div class="grid md:grid-cols-2 gap-10 items-center">
