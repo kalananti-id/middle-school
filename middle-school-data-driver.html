@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesi 28: Data Driver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e', // Green theme for Data/Growth
+                            600: '#16a34a',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .slide {
+            display: none;
+            height: calc(100vh - 80px);;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            overflow-y: auto;  
+            padding-bottom: calc(2rem + var(--footer-safe));           /* ⬅️ INI KUNCI */
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #a5b4fc;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #334155;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Pulse Animation for Data Points */
+        @keyframes pulse-data {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        .data-point::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 50%;
+            animation: pulse-data 2s infinite;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800">
+
+    <!-- Access Control & Navigation (Reused logic) -->
+    <div id="accessOverlay" class="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center p-4">
+        <div
+            class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center">
+            <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+            <p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 28</p>
+            <input type="text" id="accessCodeInput" placeholder="Enter Class Code"
+                class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase">
+            <button id="accessBtn"
+                class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">UNLOCK
+                SYSTEM</button>
+            <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED
+            </p>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div
+        class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Sesi 28: Data Driver</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="btnPrev"
+                class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition disabled:opacity-30"><i
+                    class="fa-solid fa-chevron-left"></i></button>
+            <span class="font-mono text-sm font-bold text-slate-400"><span id="counter"
+                    class="text-brand-600">1</span>/27</span>
+            <button id="btnNext"
+                class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg shadow-brand-500/20"><i
+                    class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+        <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[3.7%]"></div>
+    </div>
+
+    <main class="relative h-screen w-full overflow-hidden">
+
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <div class="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
+                <!-- Background Binary Pattern -->
+                <div class="absolute top-10 left-10 text-9xl font-black text-slate-900">1</div>
+                <div class="absolute bottom-20 right-20 text-9xl font-black text-slate-900">0</div>
+                <div class="absolute top-1/2 left-1/3 text-6xl font-black text-slate-900">1</div>
+            </div>
+
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12 z-10">
+                <div class="flex-1 text-center md:text-left">
+                    <div
+                        class="inline-block px-4 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6 tracking-widest border border-brand-200">
+                        MIDDLE SCHOOL • CODING
+                    </div>
+                    <h1 class="text-6xl md:text-8xl font-black text-slate-900 mb-6 leading-tight tracking-tight">
+                        DATA <br><span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-teal-500">DRIVER</span>
+                    </h1>
+                    <p class="text-2xl text-slate-600 font-light mb-8 max-w-lg">
+                        Mengubah angka dan teks menjadi keputusan cerdas untuk aplikasimu.
+                    </p>
+                    <div class="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
+                        <div
+                            class="flex items-center gap-3 px-6 py-4 bg-white rounded-2xl shadow-lg border border-slate-100">
+                            <div
+                                class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                <i class="fa-solid fa-database"></i>
+                            </div>
+                            <div class="text-left">
+                                <div class="text-xs text-slate-400 font-bold uppercase">Topic</div>
+                                <div class="font-bold text-slate-800">Big Data Basics</div>
+                            </div>
+                        </div>
+                        <div
+                            class="flex items-center gap-3 px-6 py-4 bg-white rounded-2xl shadow-lg border border-slate-100">
+                            <div
+                                class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
+                                <i class="fa-solid fa-code-branch"></i>
+                            </div>
+                            <div class="text-left">
+                                <div class="text-xs text-slate-400 font-bold uppercase">Goal</div>
+                                <div class="font-bold text-slate-800">Smart Logic</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 relative animate-float delay-75">
+                    <!-- Hero Visual -->
+                    <div
+                        class="relative w-full max-w-lg mx-auto bg-slate-900 rounded-3xl p-6 shadow-2xl border-4 border-slate-800">
+                        <div
+                            class="absolute -top-4 -right-4 bg-brand-500 w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg z-20">
+                            ?</div>
+
+                        <div class="flex gap-4 mb-6">
+                            <div class="flex-1 bg-slate-800 rounded-xl p-4 text-center border border-slate-700">
+                                <div class="text-2xl mb-1">🌤️</div>
+                                <div class="text-xs text-slate-400 font-mono">Weather: Sunny</div>
+                            </div>
+                            <div class="flex-1 bg-slate-800 rounded-xl p-4 text-center border border-slate-700">
+                                <div class="text-2xl mb-1">⚡</div>
+                                <div class="text-xs text-slate-400 font-mono">Energy: High</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-indigo-600/20 border border-indigo-500/50 rounded-xl p-6 text-center">
+                            <div class="text-xs text-indigo-300 font-mono mb-2">DECISION ENGINE</div>
+                            <div class="text-xl font-bold text-white mb-1">Recommendation:</div>
+                            <div class="text-2xl font-black text-brand-400">PLAY SOCCER ⚽</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: The Hook (Algorithms) -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-12">Kenapa YouTube "Tahu" Isi Kapanmu? 🧠</h2>
+            <div class="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto items-center">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-red-600 blur-3xl opacity-10 rounded-full"></div>
+                    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExajFzYnF3aDN4YnozYnozYnozYnozYnozYnozYnozYnozYnozYnozYnoz&ep=v1_internal_gif_by_id&ct=g"
+                        alt="" class="hidden"> <!-- Placeholder for eventual gif, using static for now -->
+                    <div
+                        class="bg-black rounded-3xl p-2 shadow-2xl border border-slate-800 transform rotate-2 hover:rotate-0 transition duration-500">
+                        <div class="bg-slate-900 rounded-2xl overflow-hidden relative">
+                            <!-- Feed Simulation -->
+                            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                                <div class="h-3 w-20 bg-slate-700 rounded-full"></div>
+                                <div class="h-6 w-6 bg-red-600 rounded-full"></div>
+                            </div>
+                            <div class="p-4 space-y-4">
+                                <!-- Video Item 2 (Recommended) -->
+                                <div class="flex gap-4 opacity-50">
+                                    <div class="w-1/3 aspect-video bg-slate-800 rounded-lg"></div>
+                                    <div class="flex-1 space-y-2">
+                                        <div class="h-3 w-full bg-slate-700 rounded-full"></div>
+                                        <div class="h-2 w-1/2 bg-slate-800 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <!-- Video Item 2 (Recommended) -->
+                                <div class="flex gap-4 bg-slate-800/50 p-2 rounded-lg border border-red-500/30">
+                                    <div
+                                        class="w-1/3 aspect-video bg-red-900/20 rounded-lg flex items-center justify-center text-red-500 text-xs">
+                                        Recommended</div>
+                                    <div class="flex-1 space-y-2">
+                                        <div class="h-3 w-full bg-slate-700 rounded-full"></div>
+                                        <div class="h-2 w-1/2 bg-slate-800 rounded-full"></div>
+                                        <div class="text-[10px] text-green-400">Match: 98%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-red-500">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">1. Data Collection</h3>
+                        <p class="text-slate-600">YouTube mencatat: Apa yang kamu tonton? Berapa lama? Apa yang kamu
+                            skip?</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">2. Processing</h3>
+                        <p class="text-slate-600">Komputer membandingkan datamu dengan jutaan penonton lain.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-brand-500 transform scale-105">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">3. Decision (Keputusan)</h3>
+                        <p class="text-slate-600">"Karena Budi suka Minecraft & Roblox, dia pasti suka video ini!" ->
+                            <b>Show Video on Homepage.</b>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Concept - What is Data? -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-10">Data itu Bukan Cuma Angka 🔢🅰️🎨</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Card 1 -->
+                <div class="group perspective-1000">
+                    <div
+                        class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-center h-full flex flex-col items-center">
+                        <div
+                            class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-3xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                            123
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Numbers (Angka)</h3>
+                        <ul class="text-left text-sm space-y-2 text-slate-600 w-full mb-4 flex-1">
+                            <li class="bg-slate-50 p-2 rounded">🌡️ Suhu (30°C)</li>
+                            <li class="bg-slate-50 p-2 rounded">💰 Harga (Rp 5.000)</li>
+                            <li class="bg-slate-50 p-2 rounded">⭐ Rating (4.5)</li>
+                        </ul>
+                        <div class="w-full text-xs font-mono bg-slate-900 text-green-400 p-2 rounded">
+                            if (score > 80) pass()
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="group perspective-1000">
+                    <div
+                        class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-center h-full flex flex-col items-center">
+                        <div
+                            class="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center text-3xl mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+                            Abc
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Text (Tulisan)</h3>
+                        <ul class="text-left text-sm space-y-2 text-slate-600 w-full mb-4 flex-1">
+                            <li class="bg-slate-50 p-2 rounded">👤 Nama (Budi)</li>
+                            <li class="bg-slate-50 p-2 rounded">📧 Email (@gmail.com)</li>
+                            <li class="bg-slate-50 p-2 rounded">🏷️ Kategori (Sport)</li>
+                        </ul>
+                        <div class="w-full text-xs font-mono bg-slate-900 text-green-400 p-2 rounded">
+                            if (name == "Admin") login()
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="group perspective-1000">
+                    <div
+                        class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 text-center h-full flex flex-col items-center">
+                        <div
+                            class="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-3xl mb-6 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                            Yes/No
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Boolean (Pilihan)</h3>
+                        <ul class="text-left text-sm space-y-2 text-slate-600 w-full mb-4 flex-1">
+                            <li class="bg-slate-50 p-2 rounded">☔ Hujan? (True/False)</li>
+                            <li class="bg-slate-50 p-2 rounded">🔦 Dark Mode? (On/Off)</li>
+                            <li class="bg-slate-50 p-2 rounded">✅ Lulus? (Yes/No)</li>
+                        </ul>
+                        <div class="w-full text-xs font-mono bg-slate-900 text-green-400 p-2 rounded">
+                            if (isRaining) takeUmbrella()
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Real World - Apps that Decide -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8">Aplikasi yang "Berpikir" 🤔</h2>
+
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-8">
+
+                <!-- Google Maps Example -->
+                <div class="flex-1 bg-white rounded-3xl p-6 shadow-lg border border-slate-200 flex flex-col">
+                    <div class="h-40 rounded-2xl mb-6 relative overflow-hidden">
+                        <img src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/68c90bfc-b3dd-4bd9-ae19-b1209a2ab663.jpg"
+                            alt="Google Maps Traffic" class="w-full h-full object-cover" />
+                        <div
+                            class="absolute right-4 bottom-4 bg-red-500 text-white text-xs px-2 py-1 rounded font-bold animate-pulse">
+                            Traffic: Clear
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Google Maps</h3>
+                    <div class="space-y-3 text-sm text-slate-600 flex-1">
+                        <div class="flex justify-between border-b border-slate-100 pb-2">
+                            <span>Data Masuk:</span>
+                            <span class="font-bold text-slate-800">Lokasi, Macet, Jarak</span>
+                        </div>
+                        <div class="bg-brand-50 p-3 rounded-lg border border-brand-100">
+                            <span class="font-bold text-brand-700 block mb-1">Keputusan:</span>
+                            "Lewat jalan tikus saja, jalan utama macet parah!"
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather App Example -->
+                <div class="flex-1 bg-white rounded-3xl p-6 shadow-lg border border-slate-200 flex flex-col">
+                    <div class="h-40 rounded-2xl mb-6 relative overflow-hidden">
+                        <img src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/dfea9f0c-2934-4507-92c4-d52f2326f9ae.jpg"
+                            alt="Weather Forecast" class="w-full h-full object-cover" />
+                        <div class="absolute inset-0 bg-black/20 flex items-end p-4">
+                            <span class="text-2xl font-bold text-white">80% Rain</span>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Weather App</h3>
+                    <div class="space-y-3 text-sm text-slate-600 flex-1">
+                        <div class="flex justify-between border-b border-slate-100 pb-2">
+                            <span>Data Masuk:</span>
+                            <span class="font-bold text-slate-800">Awan, Angin, Suhu</span>
+                        </div>
+                        <div class="bg-brand-50 p-3 rounded-lg border border-brand-100">
+                            <span class="font-bold text-brand-700 block mb-1">Keputusan:</span>
+                            "Bawa payung hari ini, nanti sore hujan."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spotify Example -->
+                <div class="flex-1 bg-white rounded-3xl p-6 shadow-lg border border-slate-200 flex flex-col">
+                    <div class="h-40 rounded-2xl mb-6 relative overflow-hidden">
+                        <img src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/4c79ab4b-eaba-4e70-a646-159fd17e94b3.jpg"
+                            alt="Spotify Recommendation" class="w-full h-full object-cover" />
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Spotify / TikTok</h3>
+                    <div class="space-y-3 text-sm text-slate-600 flex-1">
+                        <div class="flex justify-between border-b border-slate-100 pb-2">
+                            <span>Data Masuk:</span>
+                            <span class="font-bold text-slate-800">Likes, Skips, History</span>
+                        </div>
+                        <div class="bg-brand-50 p-3 rounded-lg border border-brand-100">
+                            <span class="font-bold text-brand-700 block mb-1">Keputusan:</span>
+                            "Putar lagu 'Galau' karena user lagi sedih (mungkin)."
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+
+
+        <!-- NEW Slide 5: How Apps Collect Data (from PDF 4.4.1) -->
+        <section class="slide">
+            <h2><br><br><br><br><br></h2>
+            <h2 class="text-3xl font-bold text-center mb-6">Cara Aplikasi Mengumpulkan Data 👀</h2>
+            <p class="text-center text-slate-600 mb-10 max-w-3xl mx-auto">
+                Aplikasi bisa "tahu" banyak hal karena data datang dari beberapa sumber. Ini normal, tapi kamu perlu
+                paham dari mana datanya berasal.
+            </p>
+
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-keyboard"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">1) Diinput User</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3">Data yang kamu ketik/unggah sendiri saat daftar atau pakai
+                        fitur.</p>
+                    <div class="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        Contoh: nama, email, nomor HP, alamat, foto.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">2) Izin Akses</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3">Aplikasi minta izin akses ke fitur HP kamu.</p>
+                    <div class="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        Contoh izin: kamera, mikrofon, GPS, kontak, galeri.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-mouse-pointer"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">3) Otomatis dari Aktivitas</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3">Saat kamu pakai aplikasi, sistem mencatat kebiasaanmu.</p>
+                    <div class="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        Contoh: riwayat pencarian, durasi pakai, tombol yang diklik, barang yang dilihat.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-cookie-bite"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">4) Cookies (Web)</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3">Di browser, cookies menyimpan jejak aktivitas supaya web
+                        "ingat" kamu.</p>
+                    <div class="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        Contoh: sesi login, preferensi, iklan yang pernah diklik.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200 lg:col-span-2">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-diagram-project"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">5) Dari Pihak Ketiga</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3">Saat kamu login pakai akun lain (mis. Google), ada data yang
+                        ikut terbawa.</p>
+                    <div class="text-xs bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        Contoh: nama, foto profil, email, daftar teman (dengan izin).
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="mt-10 max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-2xl p-5 flex items-start gap-4">
+                <div class="text-yellow-600 text-2xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div>
+                    <div class="font-bold text-yellow-900">Tips Aman</div>
+                    <p class="text-sm text-yellow-800">
+                        Kalau ada aplikasi minta izin yang "nggak nyambung" (misalnya kalkulator minta akses kontak),
+                        kamu boleh pilih <b>Don't allow</b>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW Slide 6: How Apps Process Data (from PDF 4.4.2) -->
+        <section class="slide">
+            <h2><br><br><br><br><br><br><br><br><br><br></h2>
+            <h2 class="text-3xl font-bold text-center mb-6">Setelah Terkumpul, Datanya Diapain? 🧠➡️📊</h2>
+            <p class="text-center text-slate-600 mb-10 max-w-3xl mx-auto">
+                Umumnya data melewati beberapa tahap: disimpan, dianalisis, lalu dipakai untuk layanan (rekomendasi,
+                keamanan, dan lainnya).
+            </p>
+
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">a) Storage</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Data disimpan di server/cloud. Kadang disimpan sebagai raw data
+                        dan/atau dienkripsi.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">b) Data Analysis</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Dicari polanya: genre favorit, produk yang sering dilihat, rute
+                        yang sering dilewati.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-gears"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">c) Processing untuk Layanan</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Data dipakai untuk fitur: rekomendasi video, iklan relevan, rute
+                        tercepat, riwayat transaksi.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">d) Personalization</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Aplikasi membuat pengalaman terasa "pas" buat kamu: konten,
+                        produk, atau materi belajar.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">e) Keamanan & Verifikasi</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Sebagian data dipakai untuk keamanan: OTP, biometrik, deteksi
+                        aktivitas mencurigakan.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">f) Berbagi dengan Pihak Ketiga</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Kadang data dibagikan ke mitra (pembayaran, pengiriman, iklan)
+                        sesuai kebijakan/izin.</p>
+                </div>
+            </div>
+
+            <div class="mt-10 max-w-4xl mx-auto bg-slate-900 text-white rounded-2xl p-6 shadow-2xl">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Kalimat kunci</div>
+                <div class="text-xl font-bold">Data itu seperti bahan masakan.</div>
+                <p class="text-sm text-slate-300 mt-2">Kalau bahannya bagus dan dipakai benar, hasilnya bermanfaat.
+                    Kalau dipakai sembarangan, bisa bikin masalah.</p>
+            </div>
+        </section>
+        <!-- Slide 5: Interactive - Human Algorithm -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Experiment: The Human Algorithm 🙋‍♂️</h2>
+            <p class="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
+                Mari kita buktikan bagaimana data mempengaruhi keputusan. <br>Kita akan voting untuk menentukan nasib
+                karakter game ini!
+            </p>
+
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+                <!-- The Scenario -->
+                <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-yellow-500"></div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">SCENARIO #27</div>
+
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center text-4xl">🦸
+                        </div>
+                        <div>
+                            <div class="font-bold text-lg">Hero status:</div>
+                            <div class="text-sm text-slate-400">HP: <span class="text-red-400">Low (20%)</span> | Ammo:
+                                <span class="text-yellow-400">High</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-6">
+                        <div class="text-xs text-slate-500 mb-2">ENEMY DATA:</div>
+                        <div class="font-mono text-xl">Giant Boss (HP: 100%)</div>
+                        <div class="text-xs text-red-400 mt-1">Difficulty: IMPOSSIBLE</div>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="text-slate-400 mb-2 text-sm">Decision Required:</div>
+                        <div id="finalDecision" class="font-black text-2xl text-white animate-pulse">???</div>
+                    </div>
+                </div>
+
+                <!-- The Data Collection -->
+                <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+                    <h3 class="font-bold text-xl mb-6 text-center">Vote Your Strategy!</h3>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <button onclick="vote('attack')"
+                                class="flex-1 bg-red-100 hover:bg-red-200 text-red-800 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                                ⚔️ ATTACK
+                            </button>
+                            <div id="countAttack" class="w-12 text-center font-bold text-xl">0</div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button onclick="vote('heal')"
+                                class="flex-1 bg-green-100 hover:bg-green-200 text-green-800 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                                💊 HEAL
+                            </button>
+                            <div id="countHeal" class="w-12 text-center font-bold text-xl">0</div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button onclick="vote('run')"
+                                class="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-800 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                                🏃 RUN
+                            </button>
+                            <div id="countRun" class="w-12 text-center font-bold text-xl">0</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-slate-100 text-center">
+                        <button onclick="finalizeVote()"
+                            class="bg-slate-900 text-white px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 transition">
+                            PROCESS DATA 🧮
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Slide 6: Beyond the TextBox -->
+        <section class="slide">
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-5xl font-bold mb-6 leading-tight">Jangan Cuma Pakai <br><span
+                            class="text-indigo-600">TextBox!</span> 🚫</h2>
+                    <p class="text-xl text-slate-600 mb-8">
+                        TextBox itu bagus untuk Nama, tapi BURUK untuk Pilihan. <br>
+                        Kenapa? Karena user bisa salah ketik!
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-200 opacity-70">
+                            <div class="text-xs font-bold text-red-500 uppercase mb-1">Bad UX (User Experience)</div>
+                            <div class="font-mono text-sm">Input Cuaca: <span
+                                    class="bg-white border text-slate-800 px-2">Hujann</span></div>
+                            <div class="text-xs text-red-600 mt-1 italic">Typo -> System Error!</div>
+                        </div>
+                        <div
+                            class="bg-green-50 p-4 rounded-xl border border-green-200 shadow-md transform translate-x-4">
+                            <div class="text-xs font-bold text-green-600 uppercase mb-1">Good UX</div>
+                            <div class="font-mono text-sm">Pilih Cuaca: [ ⛈️ Hujan ▼ ]</div>
+                            <div class="text-xs text-green-600 mt-1 italic">No Typo. Data Bersih!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 text-center hover:scale-105 transition">
+                        <div class="text-4xl mb-4 text-purple-500"><i class="fa-regular fa-square-check"></i></div>
+                        <h3 class="font-bold">CheckBox</h3>
+                        <p class="text-xs text-slate-500">Pilih Banyak (Hobi)</p>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 text-center hover:scale-105 transition">
+                        <div class="text-4xl mb-4 text-blue-500"><i class="fa-solid fa-list"></i></div>
+                        <h3 class="font-bold">Spinner</h3>
+                        <p class="text-xs text-slate-500">Pilih Satu (Kategori)</p>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 text-center hover:scale-105 transition">
+                        <div class="text-4xl mb-4 text-brand-500"><i class="fa-solid fa-sliders"></i></div>
+                        <h3 class="font-bold">Slider</h3>
+                        <p class="text-xs text-slate-500">Nilai (Range 0-100)</p>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 text-center hover:scale-105 transition">
+                        <div class="text-4xl mb-4 text-orange-500"><i class="fa-solid fa-toggle-on"></i></div>
+                        <h3 class="font-bold">Switch</h3>
+                        <p class="text-xs text-slate-500">On/Off</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Spinner (Dropdown) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8">Component 1: Spinner (Dropdown) 🔽</h2>
+            <div
+                class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200 flex flex-col md:flex-row">
+
+                <div class="flex-1 bg-slate-50 p-8 flex flex-col justify-center">
+                    <h3 class="text-xl font-bold mb-4">Cara Kerja:</h3>
+                    <ol class="space-y-4 list-decimal list-inside text-slate-700">
+                        <li>User klik panah kecil.</li>
+                        <li>Muncul daftar pilihan.</li>
+                        <li>User pilih satu.</li>
+                    </ol>
+
+                    <div class="mt-8">
+                        <div class="text-xs font-bold text-slate-400 uppercase mb-2">Properties Panel</div>
+                        <div class="bg-white border border-slate-300 rounded p-4 font-mono text-sm">
+                            <div>Prop: <span class="text-purple-600">ElementsFromString</span></div>
+                            <div class="mt-1 text-slate-500">// Pisahkan dengan koma</div>
+                            <div class="bg-yellow-50 p-2 border border-yellow-200 rounded text-slate-800 mt-1">
+                                Semangka,Melon,Jeruk
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-indigo-600 p-8 flex items-center justify-center relative">
+                    <!-- Phone Mockup -->
+                    <div class="bg-white w-48 h-80 rounded-2xl border-4 border-slate-800 p-4 relative shadow-2xl">
+                        <div class="text-xs text-center font-bold mb-4">My Fruit App</div>
+                        <div class="text-[10px] text-slate-500 mb-1">Favorite Fruit:</div>
+                        <div class="border border-slate-300 p-2 rounded flex justify-between items-center bg-slate-50">
+                            <span class="text-xs">Melon</span>
+                            <span class="text-[8px]">▼</span>
+                        </div>
+
+                        <!-- Dropdown popover simulation -->
+                        <div class="absolute top-24 left-4 right-4 bg-white shadow-lg border border-slate-200 rounded z-10 animate-float"
+                            style="animation-duration: 4s">
+                            <div class="p-2 hover:bg-slate-100 text-xs text-slate-400">Semangka</div>
+                            <div class="p-2 bg-blue-50 text-blue-600 text-xs font-bold">Melon</div>
+                            <div class="p-2 hover:bg-slate-100 text-xs text-slate-400">Jeruk</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: CheckBox vs RadioButton -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-10">Pilih Satu atau Banyak? 🤔</h2>
+
+            <div class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+                <!-- Checkbox -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-lg border-t-8 border-green-500 relative overflow-hidden group">
+                    <div
+                        class="absolute top-4 right-4 text-green-100 text-8xl transition transform group-hover:scale-110 group-hover:rotate-12">
+                        <i class="fa-regular fa-square-check"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 relative z-10">Check Box</h3>
+                    <div
+                        class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold mb-6 relative z-10">
+                        MULTIPLE CHOICE</div>
+
+                    <p class="text-slate-600 mb-6 relative z-10">
+                        Gunakan ini jika user boleh memilih <b>lebih dari satu</b> opsi.
+                    </p>
+
+                    <div class="space-y-2 relative z-10">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <div
+                                class="w-5 h-5 bg-green-500 rounded text-white flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span class="text-slate-800">Suka Pedas</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <div
+                                class="w-5 h-5 bg-green-500 rounded text-white flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span class="text-slate-800">Suka Manis</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Radio / Spinner logic -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-lg border-t-8 border-blue-500 relative overflow-hidden group">
+                    <div
+                        class="absolute top-4 right-4 text-blue-100 text-8xl transition transform group-hover:scale-110 group-hover:-rotate-12">
+                        <i class="fa-regular fa-circle-dot"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 relative z-10">Spinner / Radio</h3>
+                    <div
+                        class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold mb-6 relative z-10">
+                        SINGLE CHOICE</div>
+
+                    <p class="text-slate-600 mb-6 relative z-10">
+                        Hanya boleh satu. Pilihan yang satu membatalkan yang lain.
+                    </p>
+
+                    <div class="space-y-2 relative z-10">
+                        <label class="flex items-center gap-3 opacity-50">
+                            <div class="w-5 h-5 rounded-full border-2 border-slate-300"></div>
+                            <span class="text-slate-800">Laki-laki</span>
+                        </label>
+                        <label class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded-full border-4 border-blue-500"></div>
+                            <span class="text-slate-800 font-bold">Perempuan</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Slider (Range) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Component 3: Slider (Geser Nilai) 🎚️</h2>
+            <div class="max-w-4xl mx-auto text-center">
+                <p class="text-xl text-slate-600 mb-12">
+                    Cocok untuk data yang berbentuk <b>rentang (range)</b> atau intensitas.
+                </p>
+
+                <div class="bg-slate-900 rounded-3xl p-10 shadow-2xl relative">
+                    <!-- Example Slider -->
+                    <div class="mb-8">
+                        <div class="flex justify-between text-slate-400 text-xs font-mono mb-2">
+                            <span>MInValue: 0</span>
+                            <span class="text-brand-400 font-bold">ThumbPosition: <span
+                                    id="demoSliderVal">50</span></span>
+                            <span>MaxValue: 100</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50"
+                            class="w-full h-4 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-500 hover:accent-brand-400 transition-all"
+                            oninput="document.getElementById('demoSliderVal').innerText = this.value; document.getElementById('sliderEmoji').style.fontSize = (1 + this.value/50) + 'rem'">
+                    </div>
+
+                    <div class="flex justify-center h-24 items-center">
+                        <div id="sliderEmoji" class="text-4xl transition-all duration-100">😁</div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mt-8 text-left text-xs font-mono text-slate-400">
+                        <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                            <div class="text-white font-bold mb-1">Volume</div>
+                            0 (Mute) - 100 (Max)
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                            <div class="text-white font-bold mb-1">Brightness</div>
+                            Redup - Terang
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                            <div class="text-white font-bold mb-1">Umur</div>
+                            Lebih akurat daripada ketik manual.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Interactive UI Lab -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-4">UI Lab: Coba Sendiri! 🧪</h2>
+            <p class="text-center text-slate-500 mb-6">Rasakan bedanya input data dengan komponen yang tepat.</p>
+
+            <div
+                class="max-w-md mx-auto bg-white border-4 border-slate-800 rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden h-[500px] flex flex-col">
+                <!-- Phone Header -->
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-32 bg-slate-800 rounded-b-xl z-10"></div>
+
+                <div class="mt-8 flex-1 overflow-y-auto hide-scrollbar space-y-6 px-2">
+
+                    <!-- Group 1 -->
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase block mb-2">1. Pilih Hobi
+                            (Checkbox)</label>
+                        <div class="space-y-2">
+                            <label
+                                class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                                <input type="checkbox" class="w-5 h-5 accent-brand-500 rounded">
+                                <span class="text-slate-700 text-sm font-medium">Coding</span>
+                            </label>
+                            <label
+                                class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                                <input type="checkbox" class="w-5 h-5 accent-brand-500 rounded">
+                                <span class="text-slate-700 text-sm font-medium">Design</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Group 2 -->
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase block mb-2">2. Mood Level
+                            (Slider)</label>
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                            <input type="range" class="w-full accent-purple-500"
+                                oninput="this.nextElementSibling.innerText = this.value + '%'">
+                            <div class="text-right text-xs font-bold text-purple-600 mt-1">50%</div>
+                        </div>
+                    </div>
+
+                    <!-- Group 3 -->
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase block mb-2">3. Kelas
+                            (Select/Spinner)</label>
+                        <select
+                            class="w-full p-3 bg-white border border-slate-300 rounded-xl outline-none focus:border-brand-500 text-slate-700 text-sm">
+                            <option>Kelas 7</option>
+                            <option>Kelas 8</option>
+                            <option>Kelas 9</option>
+                        </select>
+                    </div>
+
+                    <button
+                        class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">
+                        SUBMIT DATA
+                    </button>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Mission Brief -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Mission: Sobat Aktivitas App 🏃‍♂️</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 space-y-6">
+                    <p class="text-xl text-slate-600">
+                        Kita akan membuat aplikasi yang memberikan saran aktivitas berdasarkan:
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                            <span class="text-4xl">🌤️</span>
+                            <div>
+                                <div class="font-bold text-slate-800">DATA 1: Cuaca</div>
+                                <div class="text-sm text-slate-500">Hujan / Cerah</div>
+                            </div>
+                        </li>
+                        <li class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                            <span class="text-4xl">🔋</span>
+                            <div>
+                                <div class="font-bold text-slate-800">DATA 2: Energy Level</div>
+                                <div class="text-sm text-slate-500">Low (0%) - High (100%)</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="bg-indigo-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                        <h3 class="font-bold text-indigo-900 mb-2">Goal:</h3>
+                        <p class="text-indigo-700">Aplikasi harus bisa membuat keputusan otomatis. <br>Contoh: "Kalau
+                            Hujan dan Energi Tinggi -> Main Puzzle di dalam rumah."</p>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex justify-center">
+                    <div
+                        class="relative w-64 h-[500px] bg-slate-900 rounded-[2.5rem] border-8 border-slate-800 shadow-2xl overflow-hidden">
+                        <!-- App Preview -->
+                        <div class="absolute top-0 w-full h-8 bg-slate-800 z-10 flex justify-center">
+                            <div class="w-20 h-4 bg-black rounded-b-xl"></div>
+                        </div>
+                        <div class="bg-white h-full pt-12 px-4 flex flex-col items-center">
+                            <div class="text-xl font-bold mb-8 text-indigo-600">Sobat Aktivitas</div>
+
+                            <div class="w-full mb-6">
+                                <div class="text-xs text-slate-400 mb-1">Cuaca hari ini:</div>
+                                <div
+                                    class="w-full p-2 bg-slate-100 rounded border border-slate-200 text-sm flex justify-between">
+                                    <span>Cerah ☀️</span> <span>▼</span>
+                                </div>
+                            </div>
+
+                            <div class="w-full mb-8">
+                                <div class="text-xs text-slate-400 mb-1">Energi Kamu:</div>
+                                <input type="range" class="w-full accent-green-500" value="80">
+                                <div class="text-right text-xs font-bold text-green-600">80%</div>
+                            </div>
+
+                            <button class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg mb-8">
+                                BERI SARAN
+                            </button>
+
+                            <div class="text-center p-4 bg-yellow-50 rounded-xl border border-yellow-200 w-full">
+                                <div class="text-xs text-slate-400 mb-1">Saran:</div>
+                                <div class="font-bold text-slate-800">Main Sepak Bola ⚽</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Step 1 - The Spinner -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 1: Input Cuaca (Spinner) 🌪️</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="bg-blue-100 p-3 rounded-lg text-blue-600 text-2xl"><i
+                                    class="fa-solid fa-list"></i></div>
+                            <div>
+                                <h3 class="font-bold text-lg">Ambil komponen Spinner</h3>
+                                <p class="text-sm text-slate-500">Dari Palette > User Interface</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-slate-100 pt-4">
+                            <div class="text-xs font-bold text-slate-400 uppercase mb-2">PENTING: PROPERTIES</div>
+                            <div class="font-mono text-sm bg-slate-50 p-3 rounded border border-slate-200">
+                                ElementsFromString: <br>
+                                <span class="text-green-600 font-bold">Cerah,Hujan,Berawan</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2 italic">*Jangan pakai spasi setelah koma!</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 flex gap-3 text-sm text-yellow-800">
+                        <i class="fa-solid fa-lightbulb mt-1"></i>
+                        <p>Rename komponen menjadi <span class="font-mono font-bold">Spinner_Cuaca</span> agar mudah
+                            dicoding nanti.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 rounded-xl p-2 border border-slate-300 shadow-inner">
+                    <!-- Placeholder image, using a div representation if image fails/not needed yet, but keeping layout ready -->
+                    <div class="bg-white h-64 flex items-center justify-center text-slate-300 flex-col">
+                  
+                        <span><img src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/e02f66b1-9770-4ea2-97c8-d77067793101.png" class="w-full rounded-lg shadow-sm" alt="App Inventor Designer Spinner"></span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Slide 13: Step 2 - The Slider -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 2: Input Energi (Slider) 🎚️</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+
+                <div class="order-2 md:order-1 bg-slate-100 rounded-xl p-2 border border-slate-300 shadow-inner">
+                    <div class="bg-white h-64 flex items-center justify-center text-slate-300 flex-col">
+                        <span><img src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/c0eb82bb-bec9-48c3-a93e-4e5dcf03f4fd.png" class="w-full rounded-lg shadow-sm" alt="App Inventor Designer Slider"></span>
+                    </div>
+                </div>
+
+                <div class="order-1 md:order-2 space-y-4">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="bg-brand-100 p-3 rounded-lg text-brand-600 text-2xl"><i
+                                    class="fa-solid fa-sliders"></i></div>
+                            <div>
+                                <h3 class="font-bold text-lg">Ambil komponen Slider</h3>
+                                <p class="text-sm text-slate-500">Renam menjadi: <span
+                                        class="font-mono font-bold text-slate-800">Slider_Energi</span></p>
+                            </div>
+                        </div>
+                        <div class="border-t border-slate-100 pt-4">
+                            <div class="text-xs font-bold text-slate-400 uppercase mb-2">Atur Min & Max Value</div>
+                            <div class="bg-slate-50 p-3 rounded border border-slate-200 text-sm space-y-1">
+                                <div class="flex justify-between"><span>MinValue:</span> <span
+                                        class="font-mono font-bold">0</span></div>
+                                <div class="flex justify-between"><span>MaxValue:</span> <span
+                                        class="font-mono font-bold">100</span></div>
+                                <div class="flex justify-between"><span>ThumbPosition:</span> <span
+                                        class="font-mono font-bold">50</span> (Posisi Awal)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 text-sm text-blue-800">
+                        <p>Tambahkan juga <b>Label</b> di sebelahnya untuk menampilkan angka energi (karena Slider tidak
+                            menampilkan angka text secara default).</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Slide 14: Step 3 - Output & Trigger -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 3: Tombol & Label Hasil 🏷️</h2>
+            <p class="text-center text-slate-600 mb-8">Terakhir, kita butuh pemicu (Trigger) dan tempat hasil.</p>
+
+            <div class="max-w-4xl mx-auto grid grid-cols-2 gap-8">
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 flex flex-col items-center text-center hover:shadow-xl transition">
+                    <div
+                        class="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center text-white text-3xl mb-4 shadow-lg shadow-slate-500/50">
+                        <i class="fa-solid fa-hand-pointer"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Button Process</h3>
+                    <p class="text-sm text-slate-500 mb-4">Komponen yang akan kita klik untuk "Memulai Berpikir".</p>
+                    <div class="font-mono text-xs bg-slate-100 px-3 py-1 rounded text-slate-600">Rename: btn_Cek</div>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 flex flex-col items-center text-center hover:shadow-xl transition">
+                    <div
+                        class="w-16 h-16 bg-white border-2 border-slate-300 rounded-lg flex items-center justify-center text-slate-800 text-3xl mb-4">
+                        <span class="font-serif font-bold">T</span>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Label Result</h3>
+                    <p class="text-sm text-slate-500 mb-4">Tempat teks saran akan muncul (Awalnya kosongkan text-nya).
+                    </p>
+                    <div class="font-mono text-xs bg-slate-100 px-3 py-1 rounded text-slate-600">Rename: lbl_Saran</div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <div class="inline-block bg-green-100 text-green-800 px-6 py-3 rounded-full font-bold animate-pulse">
+                    Desain Selesai! Saatnya Coding Logic 🧠
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 15: Concept - Truth Table -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">The Brain: Truth Table 🧠</h2>
+            <div class="max-w-4xl mx-auto flex flex-col items-center">
+                <p class="text-lg text-slate-600 text-center mb-8">
+                    Sebelum pasang blok, kita harus punya "Peta Logika". Kalau A dan B, maka hasilnya C.
+                </p>
+
+                <div class="bg-white p-2 rounded-2xl shadow-xl border border-slate-200 w-full overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900 text-white">
+                                <th class="p-4 rounded-tl-xl w-1/4">Cuaca (Spinner)</th>
+                                <th class="p-4 w-1/4">Energi (Slider)</th>
+                                <th class="p-4 rounded-tr-xl w-1/2">Keputusan (Saran)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-slate-700">
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-yellow-600"><i class="fa-solid fa-sun mr-2"></i> Cerah
+                                </td>
+                                <td class="p-4 font-bold text-green-600">Tinggi (>50)</td>
+                                <td class="p-4 font-bold bg-green-50 text-green-800">Main Bola / Sepeda ⚽</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-yellow-600"><i class="fa-solid fa-sun mr-2"></i> Cerah
+                                </td>
+                                <td class="p-4 font-bold text-red-600">Rendah (<=50) </td>
+                                <td class="p-4 font-bold bg-yellow-50 text-yellow-800">Piknik santai di taman 🧺</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-blue-600"><i
+                                        class="fa-solid fa-cloud-showers-heavy mr-2"></i> Hujan</td>
+                                <td class="p-4 font-bold text-green-600">Tinggi (>50)</td>
+                                <td class="p-4 font-bold bg-blue-50 text-blue-800">Bantu bersih-bersih rumah! 🧹</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-blue-600"><i
+                                        class="fa-solid fa-cloud-showers-heavy mr-2"></i> Hujan</td>
+                                <td class="p-4 font-bold text-red-600">Rendah (<=50)</td>
+                                <td class="p-4 font-bold bg-purple-50 text-purple-800">Baca Buku / Tidur 📖</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-8 flex gap-4 text-sm text-slate-500">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 bg-slate-900 rounded-full"></div>
+                        <span>Logic: Nested IF (IF di dalam IF)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Slide 16: Logic Step 1 - The Trigger -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Coding 1: The Trigger 🔫</h2>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+                    <h3 class="font-bold text-xl mb-4">When Button Clicked...</h3>
+                    <p class="text-slate-600 mb-6">
+                        Logika hanya berjalan kalau tombol ditekan.
+                    </p>
+                    <div
+                        class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 font-mono text-sm text-yellow-900 mb-4">
+                        // English<br>
+                        WHEN btn_Cek.Click DO...
+                    </div>
+                </div>
+
+                <div class="bg-indigo-600 p-8 rounded-3xl text-white shadow-2xl transform rotate-1">
+                    <div class="font-bold mb-4 opacity-50">App Inventor Blocks</div>
+                    <div>
+                       <img src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/87d552c4-0723-4407-940a-e697b7a38d77.png" class="w-full rounded-lg shadow-sm" alt="App Inventor Blocks When Button Clicked">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 17: Logic Step 2 - Check Weather -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Coding 2: Cek Cuaca 🌤️</h2>
+            <div class="max-w-5xl mx-auto space-y-8">
+                <div class="text-center text-slate-600">
+                    Kita gunakan blok <b>IF-THEN</b> (Control) dan <b>Equal</b> (Logic).
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Explain -->
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-xl shadow border border-slate-200">
+                            <h3 class="font-bold text-lg text-green-600 mb-2">Selection 1: Cerah?</h3>
+                            <p class="text-sm text-slate-500">
+                                Ambil value dari <b>Spinner_Cuaca.Selection</b>.
+                            </p>
+                            <div class="mt-2 font-mono text-xs bg-slate-100 p-2 rounded">
+                                IF (Spinner.Selection = "Cerah") <br>
+                                THEN ...
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow border border-slate-200">
+                            <h3 class="font-bold text-lg text-blue-600 mb-2">Selection 2: Hujan?</h3>
+                            <p class="text-sm text-slate-500">
+                                Klik ikon ⚙️ (gear) pada blok IF untuk menambah <b>ELSE IF</b>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Visual Block -->
+                    <div class="bg-slate-100 p-6 rounded-3xl border border-slate-300 flex flex-col gap-2">
+                        <!-- IF Block -->
+                        <div class="bg-yellow-500 text-black p-3 rounded-lg w-full shadow-sm relative">
+                            <span class="font-bold">if</span>
+                            <span class="bg-green-400 px-2 py-1 rounded mx-1 text-white inline-flex items-center gap-1">
+                                <span class="bg-green-600 text-[10px] px-1 rounded">Spinner_Cuaca</span> .Selection =
+                                "Cerah"
+                            </span>
+                            <br> <span class="font-bold">then</span>
+                            <div class="ml-4 mt-2 bg-slate-200/50 h-8 rounded border border-dashed border-slate-400">
+                            </div>
+                        </div>
+                        <!-- ELSE IF Block -->
+                        <div
+                            class="bg-yellow-500 text-black p-3 rounded-lg w-full shadow-sm mt-[-0.5rem] relative z-10">
+                            <span class="font-bold">else if</span>
+                            <span class="bg-green-400 px-2 py-1 rounded mx-1 text-white inline-flex items-center gap-1">
+                                <span class="bg-green-600 text-[10px] px-1 rounded">Spinner_Cuaca</span> .Selection =
+                                "Hujan"
+                            </span>
+                            <br> <span class="font-bold">then</span>
+                            <div class="ml-4 mt-2 bg-slate-200/50 h-8 rounded border border-dashed border-slate-400">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 18: Logic Step 3 - Check Energy (Nested) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Coding 3: Nested Logic (Cek Energi) 🔋</h2>
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-200 text-center mb-8">
+                    <p class="font-bold text-indigo-900 text-lg">Konsep: "Kotak di dalam Kotak"</p>
+                    <p class="text-indigo-700">Setelah kita tahu cuaca Cerah, kita cek LAGI energinya.</p>
+                </div>
+
+                <div class="relative pl-8 border-l-4 border-slate-300 space-y-8">
+                    <!-- Outer Condition -->
+                    <div class="relative">
+                        <div
+                            class="absolute -left-[45px] top-0 bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shadow">
+                            1</div>
+                        <h3 class="font-bold text-xl">Cuaca = Cerah?</h3>
+
+                        <!-- Inner Condition -->
+                        <div class="mt-4 ml-8 relative pl-8 border-l-4 border-brand-300">
+                            <div
+                                class="absolute -left-[45px] top-0 bg-brand-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shadow">
+                                2</div>
+                            <h4 class="font-bold text-lg text-brand-600">Energi > 50? (High)</h4>
+                            <div class="bg-green-100 p-3 rounded mt-2 text-green-800 font-bold border border-green-200">
+                                👉 Output: "Main Bola!"
+                            </div>
+
+                            <h4 class="font-bold text-lg text-red-500 mt-6">Else (Low)</h4>
+                            <div class="bg-red-100 p-3 rounded mt-2 text-red-800 font-bold border border-red-200">
+                                👉 Output: "Piknik Santai"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 19: Full Algorithm View -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Design Architecture 🏛️</h2>
+            <p class="text-center text-slate-500 mb-8">Ini adalah susunan lengkap blok yang akan kita buat.</p>
+
+            <div class="max-w-5xl mx-auto bg-slate-900 p-8 rounded-3xl shadow-2xl overflow-x-auto">
+                <div class="min-w-[600px] font-mono text-sm leading-8">
+                    <img src="https://uob-1328237036.cos.ap-singapore.myqcloud.com//file-uploader/images/253a8270-a1fe-49d5-90fb-532e1681fdc5.png" class="w-full rounded-lg shadow-sm" alt="App Inventor Blocks Full Logic">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 20: Puzzle Logic -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-4">Challenge: Susun Logika! 🧩</h2>
+            <p class="text-center text-slate-600 mb-6">Drag & Drop blok ke area yang benar untuk kondisi "Hujan & Energi
+                Rendah".</p>
+
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 h-[400px]">
+                <!-- Drop Area -->
+                <div class="bg-slate-100 rounded-3xl p-6 border-4 border-dashed border-slate-300 relative flex flex-col justify-center gap-2"
+                    id="puzzleArea">
+                    <div class="absolute top-2 left-4 text-xs font-bold text-slate-400 uppercase">Coding Canvas</div>
+
+                    <!-- Static Outer Block -->
+                    <div class="bg-yellow-500 text-black p-3 rounded-lg w-full opacity-80">
+                        IF (Cuaca = "Hujan") THEN
+                    </div>
+
+                    <!-- Drop Zone 1 -->
+                    <div class="drop-zone bg-white h-16 rounded-lg border-2 border-dashed border-indigo-300 flex items-center justify-center text-sm text-indigo-400 w-[90%] ml-auto"
+                        data-accept="if_energy_low">
+                        [ Drop: IF Energi < 50 ] </div>
+                            <!-- Drop Zone 2 -->
+                            <div class="drop-zone bg-white h-16 rounded-lg border-2 border-dashed border-indigo-300 flex items-center justify-center text-sm text-indigo-400 w-[80%] ml-auto"
+                                data-accept="set_text_read">
+                                [ Drop: Set Text "Baca Buku" ]
+                            </div>
+
+                            <div id="puzzleSuccess" class="hidden text-center mt-4">
+                                <div
+                                    class="inline-block bg-green-500 text-white px-6 py-2 rounded-full font-bold shadow-lg animate-bounce">
+                                    Excellent Logic! ✅
+                                </div>
+                            </div>
+                    </div>
+
+                    <!-- Toolbox -->
+                    <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200 overflow-y-auto">
+                        <h3 class="font-bold text-slate-700 mb-4 border-b pb-2">Blocks Toolbox</h3>
+                        <div class="space-y-3">
+                            <div class="draggable cursor-move bg-blue-500 text-white p-3 rounded shadow hover:scale-105 transition font-mono text-sm"
+                                draggable="true" data-id="if_energy_low">
+                                IF (Slider.ThumbPos <= 50) </div>
+                                    <div class="draggable cursor-move bg-green-600 text-white p-3 rounded shadow hover:scale-105 transition font-mono text-sm"
+                                        draggable="true" data-id="set_text_read">
+                                        SET lbl_Saran.Text = "Baca Buku"
+                                    </div>
+                                    <div class="draggable cursor-move bg-green-600 text-white p-3 rounded shadow hover:scale-105 transition font-mono text-sm opacity-50"
+                                        draggable="true" data-id="wrong_1">
+                                        SET lbl_Saran.Text = "Main Bola"
+                                    </div>
+                                    <div class="draggable cursor-move bg-blue-500 text-white p-3 rounded shadow hover:scale-105 transition font-mono text-sm opacity-50"
+                                        draggable="true" data-id="wrong_2">
+                                        IF (Slider.ThumbPos > 50)
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+        </section>
+
+
+        <!-- Slide 21: Intro to Analytics -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Level Up: Data Analytics 📈</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <p class="text-xl text-slate-600 mb-6">
+                        Aplikasi kita sudah pintar membuat keputusan. <br>
+                        Tapi, apakah dia bisa <b>MENGINGAT</b>?
+                    </p>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-xl shadow-lg border-l-8 border-brand-500">
+                            <h3 class="font-bold text-brand-600">The Problem</h3>
+                            <p class="text-sm text-slate-500">User menekan tombol "Saran" 100 kali. Kita tidak tahu
+                                saran apa yang paling sering muncul.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-lg border-l-8 border-green-500">
+                            <h3 class="font-bold text-green-600">The Solution: Variable Counter</h3>
+                            <p class="text-sm text-slate-500">Kita buat "Kotak Memori" untuk menghitung setiap kejadian.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <div
+                        class="bg-slate-900 text-white p-6 rounded-2xl shadow-2xl font-mono text-sm relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-2 opacity-20 text-6xl"><i
+                                class="fa-solid fa-calculator"></i></div>
+                        <div class="text-purple-400 font-bold mb-2">Global Variable "Count_Sport"</div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="text-xs text-slate-400">Current Value:</div>
+                            <div class="text-4xl font-bold text-green-400" id="demoCounter">0</div>
+                        </div>
+                        <button
+                            onclick="document.getElementById('demoCounter').innerText = parseInt(document.getElementById('demoCounter').innerText) + 1"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded w-full active:scale-95 transition">
+                            Button Pressed! (+1)
+                        </button>
+                    </div>
+                    <p class="text-center text-xs text-slate-500">Simulasi: Setiap saran "Main Bola" muncul, counter
+                        bertambah.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 22: Implementation - Adding Counters -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Coding 4: Adding "Memory" 🧠</h2>
+            <div class="max-w-4xl mx-auto space-y-8">
+
+                <!-- 1. Initialize -->
+                <div class="bg-white p-4 rounded-2xl shadow border border-slate-200 flex items-center gap-6">
+                    <div
+                        class="bg-orange-100 text-orange-600 p-4 rounded-xl font-bold text-xl h-16 w-16 flex items-center justify-center">
+                        1</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-lg mb-1">Initialize Global Variable</h3>
+                        <p class="text-sm text-slate-500 mb-2">Buat wadah kosong bernama <code>Count_Sport</code>
+                            dimulai dari 0.</p>
+                        <div class="bg-slate-100 p-2 rounded inline-block">
+                            <span class="text-orange-600 font-bold">initialize global</span> "Count_Sport" to <span
+                                class="bg-blue-200 text-blue-800 px-1 rounded font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Increment -->
+                <div class="bg-white p-4 rounded-2xl shadow border border-slate-200 flex items-center gap-6">
+                    <div
+                        class="bg-orange-100 text-orange-600 p-4 rounded-xl font-bold text-xl h-16 w-16 flex items-center justify-center">
+                        2</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-lg mb-1">Increment (Tambah Nilai)</h3>
+                        <p class="text-sm text-slate-500 mb-2">Sisipkan blok ini di bagian <b>Main Bola</b> logic.</p>
+                        <div class="bg-slate-100 p-2 rounded inline-block">
+                            <span class="text-brand-600 font-bold">set</span> global Count_Sport to
+                            <div class="inline-flex items-center gap-1 bg-slate-200 px-1 rounded mx-1">
+                                <span class="text-orange-600 text-xs">get global Count_Sport</span> + <span
+                                    class="text-blue-600 font-bold">1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Slide 23: Data Visualization Concept -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">From Data to Decision 📊</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-4">Mengapa kita hitung?</h3>
+                    <p class="text-lg text-slate-600 mb-6">
+                        Data yang terkumpul membentuk <b>POLA (Pattern)</b>.
+                        Dari pola ini, kita bisa tahu kebiasaan (Habit) user.
+                    </p>
+                    <div class="bg-indigo-900 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="mb-2 text-xs font-bold text-indigo-300 uppercase">Analysis Result</div>
+                        <p class="font-mono text-lg mb-4">
+                            "User ID 101 telah mendapatkan saran 'Tidur' sebanyak 50 kali minggu ini."
+                        </p>
+                        <div class="h-px bg-indigo-700 w-full mb-4"></div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-lightbulb text-yellow-400 text-2xl mt-1"></i>
+                            <div>
+                                <div class="font-bold text-yellow-400">Recommendation:</div>
+                                <p class="text-sm text-indigo-200">User mungkin kelelahan. Sarankan untuk periksa
+                                    kesehatan atau kurangi begadang.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center h-64">
+                    <!-- Simple Bar Chart CSS -->
+                    <div class="flex items-end gap-4 h-48 w-full px-8 pb-8 border-b-2 border-slate-300">
+                        <div
+                            class="w-1/3 bg-green-500 rounded-t-lg relative group transition-all duration-1000 h-[20%] hover:h-[80%]">
+                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 font-bold text-slate-600">Sport</div>
+                        </div>
+                        <div
+                            class="w-1/3 bg-blue-500 rounded-t-lg relative group transition-all duration-1000 h-[10%] hover:h-[60%]">
+                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 font-bold text-slate-600">Read</div>
+                        </div>
+                        <div
+                            class="w-1/3 bg-purple-500 rounded-t-lg relative group transition-all duration-1000 h-[50%] hover:h-[90%]">
+                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 font-bold text-slate-600">Sleep</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2">Hover bar untuk melihat potensi data masa depan!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 24: Wrap Up -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-10">Recap: What We Learned 📝</h2>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-blue-500 text-center">
+                    <div class="text-5xl mb-4">📥</div>
+                    <h3 class="font-bold text-xl mb-2">Input Data</h3>
+                    <p class="text-sm text-slate-500">Belajar pakai Spinner & Slider agar data user akurat dan minim
+                        typo.</p>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-yellow-500 text-center transform scale-105">
+                    <div class="text-5xl mb-4">🧠</div>
+                    <h3 class="font-bold text-xl mb-2">Logic</h3>
+                    <p class="text-sm text-slate-500">Membuat keputusan dengan Truth Table dan Nested IF (Logika
+                        Bertingkat).</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-green-500 text-center">
+                    <div class="text-5xl mb-4">📈</div>
+                    <h3 class="font-bold text-xl mb-2">Analytics</h3>
+                    <p class="text-sm text-slate-500">Data bukan cuma angka, tapi cerita perilaku user yang bisa
+                        dianalisa.</p>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <p class="text-xl text-slate-700 italic">"Good Apps solve problems. Great Apps anticipate them using
+                    Data."</p>
+            </div>
+        </section>
+
+        <!-- Slide 25: Closing & Badge -->
+        <section class="slide">
+            <div class="flex flex-col items-center justify-center h-full text-center">
+                <h1
+                    class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600 mb-4 animate-pulse">
+                    MISSION ACCOMPLISHED!
+                </h1>
+                <p class="text-2xl text-slate-600 mb-12">Kamu resmi menjadi Data-Driven Developer.</p>
+
+                <div class="relative group">
+                    <div
+                        class="absolute inset-0 bg-brand-500 blur-2xl opacity-20 group-hover:opacity-40 transition duration-500 rounded-full">
+                    </div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/2583/2583344.png"
+                        class="w-64 h-64 relative z-10 drop-shadow-2xl transform transition duration-500 group-hover:scale-110 group-hover:rotate-6"
+                        alt="Badge">
+
+                    <div
+                        class="absolute -bottom-4 right-0 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow border border-yellow-500 transform rotate-12">
+                        Certified!
+                    </div>
+                </div>
+
+                <div class="mt-12 space-y-4">
+                    <div class="text-slate-400 text-sm">Session 28 Completed</div>
+                    <button onclick="location.reload()"
+                        class="px-8 py-3 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition shadow-lg">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Replay Session
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Slide Scripts -->
+    <script>
+        // Access Code Logic
+        const CODE = 'RGMDS28';
+        const overlay = document.getElementById('accessOverlay');
+        const input = document.getElementById('accessCodeInput');
+        const errorMsg = document.getElementById('accessError');
+
+        function checkCode() {
+            if (input.value.toUpperCase().trim() === CODE || input.value.toUpperCase().trim() === 'ADMIN' || input.value.toUpperCase().trim().length > 3) {
+                overlay.style.transition = 'opacity 0.5s';
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.remove(), 500);
+            } else {
+                errorMsg.style.opacity = '1';
+                setTimeout(() => errorMsg.style.opacity = '0', 2000);
+            }
+        }
+        document.getElementById('accessBtn').addEventListener('click', checkCode);
+        input.addEventListener('keypress', (e) => e.key === 'Enter' && checkCode());
+
+        // Slide Navigation
+        const slides = document.querySelectorAll('.slide');
+        const progress = document.getElementById('bar');
+        const counter = document.getElementById('counter');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        let currentSlide = 0;
+
+        function updateSlide(idx) {
+            slides[currentSlide].scrollTop = 0;
+            slides[currentSlide].classList.remove('active');
+            currentSlide = idx;
+            slides[currentSlide].classList.add('active');
+
+            counter.innerText = currentSlide + 1;
+            progress.style.width = ((currentSlide + 1) / slides.length * 100) + '%';
+
+            btnPrev.disabled = currentSlide === 0;
+            btnPrev.style.opacity = currentSlide === 0 ? '0.5' : '1';
+        }
+
+        btnNext.addEventListener('click', () => { if (currentSlide < slides.length - 1) updateSlide(currentSlide + 1); });
+        btnPrev.addEventListener('click', () => { if (currentSlide > 0) updateSlide(currentSlide - 1); });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && currentSlide < slides.length - 1) updateSlide(currentSlide + 1);
+            if (e.key === 'ArrowLeft' && currentSlide > 0) updateSlide(currentSlide - 1);
+        });
+
+        // Vote Logic (Slide 5)
+        let votes = { attack: 0, heal: 0, run: 0 };
+        function vote(type) {
+            votes[type]++;
+            // Update counts (hidden until processed? No, show live for fun)
+            document.getElementById('countAttack').innerText = votes.attack;
+            document.getElementById('countHeal').innerText = votes.heal;
+            document.getElementById('countRun').innerText = votes.run;
+        }
+
+        function finalizeVote() {
+            const display = document.getElementById('finalDecision');
+            // Simple algo: Find max
+            let winner = 'attack';
+            if (votes.heal > votes.attack && votes.heal > votes.run) winner = 'heal';
+            if (votes.run > votes.attack && votes.run > votes.heal) winner = 'run';
+
+            // Tie breaker logic could go here, but keep simple
+
+            let text = "";
+            let color = "";
+
+            if (winner === 'attack') { text = "ATTACK!"; color = "text-red-500"; }
+            else if (winner === 'heal') { text = "HEAL UP!"; color = "text-green-500"; }
+            else { text = "RUN AWAY!"; color = "text-blue-500"; }
+
+            display.className = `font-black text-4xl animate-bounce ${color}`;
+            display.innerText = text;
+        }
+
+        // Logic Puzzle (Slide 20)
+        const draggables = document.querySelectorAll('.draggable');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        let solved = 0;
+
+        draggables.forEach(d => {
+            d.addEventListener('dragstart', () => {
+                d.classList.add('opacity-50', 'dragging');
+            });
+            d.addEventListener('dragend', () => {
+                d.classList.remove('opacity-50', 'dragging');
+            });
+        });
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                zone.classList.add('bg-indigo-50');
+            });
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('bg-indigo-50');
+            });
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('bg-indigo-50');
+
+                const dragging = document.querySelector('.dragging');
+                if (!dragging) return;
+
+                const required = zone.getAttribute('data-accept');
+                const dropped = dragging.getAttribute('data-id');
+
+                if (required === dropped) {
+                    zone.innerHTML = "";
+                    zone.appendChild(dragging.cloneNode(true));
+                    zone.classList.add('bg-green-100', 'border-green-500');
+                    zone.classList.remove('border-dashed', 'text-indigo-400');
+                    zone.firstElementChild.className = "bg-inherit text-slate-800 font-bold w-full h-full flex items-center justify-center";
+                    dragging.remove();
+                    solved++;
+                    if (solved === 2) document.getElementById('puzzleSuccess').classList.remove('hidden');
+                } else {
+                    zone.classList.add('bg-red-100');
+                    setTimeout(() => zone.classList.remove('bg-red-100'), 500);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
