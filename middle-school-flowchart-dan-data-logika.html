@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4.5 Flowchart & Logika Data (SMP)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .slide {
+            display: none
+        }
+
+        .slide.active {
+            display: block
+        }
+
+        .pill {
+            padding: .3rem .65rem;
+            border-radius: 999px;
+            font-size: .8rem;
+            border: 1px solid rgba(148, 163, 184, .3);
+            background: rgba(15, 23, 42, .6)
+        }
+
+        .card {
+            border: 1px solid rgba(148, 163, 184, .25);
+            background: rgba(15, 23, 42, .7);
+            border-radius: 24px
+        }
+
+        .kbox {
+            border: 1px dashed rgba(148, 163, 184, .35);
+            border-radius: 18px;
+            padding: 14px;
+            background: rgba(2, 6, 23, .35)
+        }
+
+        .btn {
+            border-radius: 16px;
+            padding: .7rem 1rem;
+            font-weight: 700
+        }
+
+        .btn2 {
+            border-radius: 16px;
+            padding: .65rem 1rem
+        }
+
+        .hint {
+            display: none
+        }
+
+        .hint.show {
+            display: block
+        }
+
+        .opt {
+            transition: .15s
+        }
+
+        .opt.good {
+            background: rgba(16, 185, 129, .25) !important;
+            border-color: rgba(16, 185, 129, .6) !important
+        }
+
+        .opt.bad {
+            background: rgba(244, 63, 94, .22) !important;
+            border-color: rgba(244, 63, 94, .55) !important
+        }
+
+        .chip {
+            cursor: pointer;
+            user-select: none
+        }
+
+        .chip.on {
+            outline: 3px solid rgba(56, 189, 248, .45)
+        }
+
+        .gridbg {
+            background-image: radial-gradient(rgba(148, 163, 184, .15) 1px, transparent 1px);
+            background-size: 22px 22px;
+        }
+
+        .flow-node {
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, .35);
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, .95);
+            color: #0f172a;
+            font-weight: 800;
+        }
+
+        .flow-sub {
+            font-weight: 600;
+            color: #334155;
+            font-size: .85rem;
+            margin-top: .25rem;
+        }
+
+        .arrow {
+            opacity: .7;
+            font-weight: 900
+        }
+
+        /* Access gate */
+        .gate-card {
+            border: 1px solid rgba(148, 163, 184, .25);
+            background: rgba(15, 23, 42, .82);
+            border-radius: 24px
+        }
+
+        .shake {
+            animation: shake .25s linear 0s 2
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0)
+            }
+
+            25% {
+                transform: translateX(-6px)
+            }
+
+            50% {
+                transform: translateX(6px)
+            }
+
+            75% {
+                transform: translateX(-4px)
+            }
+
+            100% {
+                transform: translateX(0)
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <!-- Access Gate -->
+    <div id="gate" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 px-4">
+        <div id="gateCard" class="gate-card w-full max-w-md p-7">
+            <div class="flex items-center gap-3 mb-3">
+                <div
+                    class="w-10 h-10 rounded-2xl bg-sky-500/15 border border-sky-400/25 flex items-center justify-center font-black text-sky-200">
+                    🔒</div>
+                <div>
+                    <div class="text-2xl font-black leading-tight">Kode Akses</div>
+                    <div class="text-slate-300 text-sm">Masukkan kode untuk membuka slides</div>
+                </div>
+            </div>
+
+            <input id="accessInput"
+                class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 font-black tracking-widest"
+                placeholder="" autocomplete="off" inputmode="text" style="text-transform:uppercase" />
+
+            <button id="accessBtn" class="btn w-full mt-3 bg-sky-600 hover:bg-sky-500">Buka Materi</button>
+            <div id="accessFb" class="mt-3 text-sm"></div>
+        </div>
+    </div>
+
+    <!-- Top Bar -->
+    <header class="px-6 py-4 flex items-center justify-between border-b border-slate-800">
+        <div class="flex items-center gap-3">
+            <div
+                class="w-11 h-11 rounded-2xl bg-sky-500/15 border border-sky-400/25 flex items-center justify-center font-black text-sky-200">
+                4.5
+            </div>
+            <div>
+                <div class="text-lg font-black leading-tight">Flowchart dan Logika Data</div>
+                <div class="text-slate-300 text-sm">Level SMP — Semester 2 (lanjutan)</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span id="counter" class="pill">Slide 1/15</span>
+            <button id="prev" class="btn2 bg-slate-800 hover:bg-slate-700">← Back</button>
+            <button id="next" class="btn bg-sky-600 hover:bg-sky-500">Next →</button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-6">
+        <!-- Slide 1 -->
+        <section class="slide active">
+            <div class="grid md:grid-cols-2 gap-6 items-center">
+                <div class="card p-7">
+                    <h1 class="text-4xl font-black mb-3">Flowchart “Naik Level”</h1>
+                    <p class="text-slate-200 leading-relaxed">
+                        Kamu sudah pernah belajar flowchart untuk menggambarkan urutan langkah.
+                        Sekarang kita pakai flowchart untuk <span class="text-sky-300 font-bold">merancang logika
+                            aplikasi</span> yang lebih kompleks:
+                        banyak aturan, banyak keputusan, dan ada kemungkinan input salah.
+                    </p>
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        <span class="pill border-sky-400/35 text-sky-200">Multi-condition</span>
+                        <span class="pill border-emerald-400/35 text-emerald-200">Validasi</span>
+                        <span class="pill border-amber-400/35 text-amber-200">State / Status</span>
+                    </div>
+                    <div class="mt-6 kbox">
+                        <div class="font-bold mb-1">Hari ini kamu akan bisa:</div>
+                        <ul class="list-disc ml-5 text-slate-200 space-y-1">
+                            <li>Menjelaskan fungsi flowchart untuk desain aplikasi</li>
+                            <li>Mengenali logika bertingkat (multi-condition)</li>
+                            <li>Membuat flowchart validasi password (kompleks)</li>
+                        </ul>
+                    </div>
+                    <div class="text-slate-400 text-xs mt-4">
+                        Materi mengacu pada Bab 4.5: peran flowchart, logika bertingkat, state, validasi.
+                        :contentReference[oaicite:1]{index=1}
+                    </div>
+                </div>
+
+                <div class="card p-7 gridbg">
+                    <div class="text-slate-200 font-bold mb-3">Contoh “alur aplikasi nyata”</div>
+                    <div class="grid gap-3">
+                        <div class="flow-node">
+                            State: Belum Input
+                            <div class="flow-sub">TextBox kosong → jangan diproses</div>
+                        </div>
+                        <div class="flow-node">
+                            State: Error
+                            <div class="flow-sub">Ada aturan yang gagal → tampilkan pesan</div>
+                        </div>
+                        <div class="flow-node">
+                            State: Valid
+                            <div class="flow-sub">Lolos semua aturan → tampilkan hasil</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-slate-300 text-sm">
+                        Flowchart membantu kita menggambar perubahan state dan jalur alternatif.
+                        :contentReference[oaicite:2]{index=2}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-2">Pemanasan: Kenapa aplikasi suka error?</h2>
+                <p class="text-slate-200 mb-5">
+                    Pilih jawaban yang paling masuk akal. (Klik)
+                </p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="kbox">
+                        <div class="font-bold mb-3">Aplikasi error karena…</div>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="q1" data-c="false">A. HP-nya selalu lemot</button>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="q1" data-c="true">B. Input pengguna bisa kosong / salah format</button>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700"
+                            data-q="q1" data-c="false">C. Flowchart bikin aplikasi jadi berat</button>
+                        <div id="q1fb" class="mt-3 text-sm"></div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-bold mb-3">Validasi itu…</div>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="q2" data-c="true">A. Mengecek input sebelum diproses</button>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="q2" data-c="false">B. Mengganti tema warna aplikasi</button>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700"
+                            data-q="q2" data-c="false">C. Menambah musik di aplikasi</button>
+                        <div id="q2fb" class="mt-3 text-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Apa fokus Bab 4.5?</h2>
+                <p class="text-slate-200 mb-5">
+                    Di bab ini, flowchart tidak lagi cuma untuk langkah sederhana,
+                    tapi untuk <span class="text-sky-300 font-bold">merancang logika aplikasi</span> yang kompleks:
+                    banyak data, banyak keputusan, dan kemungkinan input salah. :contentReference[oaicite:3]{index=3}
+                </p>
+                <div class="grid md:grid-cols-4 gap-3">
+                    <div class="kbox">
+                        <div class="font-black">Desain logika</div>
+                        <div class="text-slate-300 text-sm mt-1">Rancang dulu sebelum coding</div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-black">Multi-condition</div>
+                        <div class="text-slate-300 text-sm mt-1">Aturan bertingkat</div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-black">State</div>
+                        <div class="text-slate-300 text-sm mt-1">Status aplikasi berubah</div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-black">Validasi</div>
+                        <div class="text-slate-300 text-sm mt-1">Cegah error input</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">4.5.1 Peran Flowchart untuk Aplikasi</h2>
+                <p class="text-slate-200 mb-4">
+                    Flowchart itu <span class="font-bold">alat perencanaan logika</span>, bukan sekadar gambar alur.
+                    Sebelum menyusun blok di App Inventor, kita perlu paham alur kerja aplikasi dari awal sampai akhir.
+                    :contentReference[oaicite:4]{index=4}
+                </p>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="kbox">
+                        <div class="font-bold">Pertanyaan 1</div>
+                        <div class="text-slate-200 mt-1">Data apa saja yang dibutuhkan?</div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-bold">Pertanyaan 2</div>
+                        <div class="text-slate-200 mt-1">Keputusan apa yang harus diambil?</div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-bold">Pertanyaan 3</div>
+                        <div class="text-slate-200 mt-1">Kalau kondisi tidak terpenuhi, apa yang terjadi?</div>
+                    </div>
+                </div>
+                <div class="mt-5 kbox border-sky-400/30">
+                    <div class="font-bold text-sky-200">Intinya:</div>
+                    <div class="text-slate-200">Flowchart membantu melihat banyak cabang & jalur alternatif sebelum
+                        coding, supaya risiko kesalahan berkurang. :contentReference[oaicite:5]{index=5}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Latihan cepat: “Data & keputusan”</h2>
+                <p class="text-slate-200 mb-4">
+                    Bayangkan aplikasi “Cek Umur Masuk Film”.
+                    Centang data yang dibutuhkan dan keputusan yang harus dibuat.
+                </p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="kbox">
+                        <div class="font-bold mb-2">Data yang dibutuhkan:</div>
+                        <div class="flex flex-wrap gap-2" id="chipsData"></div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-bold mb-2">Keputusan yang dibuat:</div>
+                        <div class="flex flex-wrap gap-2" id="chipsDecision"></div>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <button class="btn bg-emerald-600 hover:bg-emerald-500" id="checkChips">Cek jawaban</button>
+                    <button class="btn2 bg-slate-800 hover:bg-slate-700" id="resetChips">Reset</button>
+                </div>
+                <div id="chipsFb" class="mt-3 text-sm"></div>
+            </div>
+        </section>
+
+        <!-- Slide 6 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">4.5.2 Logika Data Bertingkat (Multi-condition)</h2>
+                <p class="text-slate-200 mb-4">
+                    Di aplikasi kompleks, keputusan tidak hanya ditentukan oleh satu data.
+                    Aplikasi sering memproses <span class="font-bold">lebih dari satu input</span> sebelum menentukan
+                    hasil. :contentReference[oaicite:6]{index=6}
+                </p>
+                <div class="kbox">
+                    <div class="font-bold mb-2">Contoh gampang:</div>
+                    <div class="text-slate-200">
+                        “Diskon” tidak hanya cek <b>umur</b>, tapi juga <b>status pelajar</b>.
+                        Jadi hasil dipilih berdasarkan <b>kombinasi data</b>, bukan cuma “ya/tidak”.
+                        :contentReference[oaicite:7]{index=7}
+                    </div>
+                </div>
+                <div class="mt-5 grid md:grid-cols-3 gap-4">
+                    <div class="kbox"><b>Aturan 1</b>
+                        <div class="text-slate-300 text-sm mt-1">Cek kondisi cepat dulu</div>
+                    </div>
+                    <div class="kbox"><b>Aturan 2</b>
+                        <div class="text-slate-300 text-sm mt-1">Kalau lolos, lanjut cek berikutnya</div>
+                    </div>
+                    <div class="kbox"><b>Aturan 3</b>
+                        <div class="text-slate-300 text-sm mt-1">Kalau gagal, tampilkan pesan</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Mini Quiz: Mana yang multi-condition?</h2>
+                <p class="text-slate-200 mb-4">Pilih 1 jawaban.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="kbox">
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="q3" data-c="false">
+                            A. “Jika hujan, bawa payung.”
+                        </button>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="q3" data-c="true">
+                            B. “Jika umur ≥ 13 DAN punya kartu pelajar, diskon. Kalau tidak, harga normal.”
+                        </button>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700"
+                            data-q="q3" data-c="false">
+                            C. “Jika lapar, makan.”
+                        </button>
+                        <div id="q3fb" class="mt-3 text-sm"></div>
+                    </div>
+                    <div class="kbox border-sky-400/30">
+                        <div class="font-bold mb-2">Ingat:</div>
+                        <div class="text-slate-200 text-sm">
+                            Multi-condition = keputusan berdasarkan <b>lebih dari satu data/aturan</b>.
+                            :contentReference[oaicite:8]{index=8}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">4.5.3 State & Status dalam Alur Aplikasi</h2>
+                <p class="text-slate-200 mb-4">
+                    Aplikasi tidak selalu berjalan satu arah dari awal ke akhir.
+                    Dalam penggunaan sehari-hari, aplikasi punya <span class="font-bold">state/status</span> yang bisa
+                    berubah. :contentReference[oaicite:9]{index=9}
+                </p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="kbox">
+                        <div class="font-bold mb-2">Contoh state:</div>
+                        <ul class="list-disc ml-5 text-slate-200 space-y-1">
+                            <li>Belum menerima input</li>
+                            <li>Pengguna sedang mengisi data</li>
+                            <li>Data sedang diproses</li>
+                            <li>Hasil sudah ditampilkan</li>
+                            <li>Terjadi kesalahan input</li>
+                        </ul>
+                        <div class="text-slate-400 text-sm mt-2">
+                            Ini disebut di modul sebagai contoh state aplikasi. :contentReference[oaicite:10]{index=10}
+                        </div>
+                    </div>
+                    <div class="kbox border-amber-400/30">
+                        <div class="font-bold mb-2">Contoh situasi nyata:</div>
+                        <div class="text-slate-200">
+                            Tombol ditekan sebelum data dimasukkan → aplikasi harus merespons dengan benar (kasih pesan,
+                            jangan lanjut).
+                            Atau data diubah setelah hasil ditampilkan → aplikasi harus update.
+                            :contentReference[oaicite:11]{index=11}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Simulasi State: klik yang benar</h2>
+                <p class="text-slate-200 mb-4">
+                    Kamu punya TextBox umur dan tombol “Cek”. Kamu klik tombol saat TextBox kosong. Apa yang harus
+                    terjadi?
+                </p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="kbox">
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="q4" data-c="true">
+                            A. Tampilkan pesan: “Isi dulu ya!”
+                        </button>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="q4" data-c="false">
+                            B. Langsung hitung hasil pakai angka 0
+                        </button>
+                        <button class="opt w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-700"
+                            data-q="q4" data-c="false">
+                            C. Aplikasi diam tanpa pesan
+                        </button>
+                        <div id="q4fb" class="mt-3 text-sm"></div>
+                    </div>
+                    <div class="kbox border-sky-400/30">
+                        <div class="font-bold mb-2">Kenapa?</div>
+                        <div class="text-slate-200 text-sm">
+                            Karena state “belum input” harus punya respon yang jelas.
+                            Ini yang membuat aplikasi terasa “beneran” dipakai orang.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">4.5.4 Validasi Data & Penanganan Kesalahan</h2>
+                <p class="text-slate-200 mb-4">
+                    Salah satu penyebab utama aplikasi bermasalah adalah <b>data tidak valid</b>.
+                    Maka sebelum memproses data, aplikasi perlu melakukan <b>validasi</b>.
+                    :contentReference[oaicite:12]{index=12}
+                </p>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="kbox">
+                        <div class="font-bold">Validasi memastikan:</div>
+                        <ul class="list-disc ml-5 text-slate-200 mt-2 space-y-1">
+                            <li>Data tidak kosong</li>
+                            <li>Tipe data sesuai</li>
+                            <li>Nilai masih masuk akal</li>
+                        </ul>
+                    </div>
+                    <div class="kbox border-rose-400/25">
+                        <div class="font-bold text-rose-200">Jika tidak divalidasi:</div>
+                        <ul class="list-disc ml-5 text-slate-200 mt-2 space-y-1">
+                            <li>Hasil keliru</li>
+                            <li>Error logika</li>
+                            <li>Pengguna bingung</li>
+                        </ul>
+                        <div class="text-slate-400 text-sm mt-2">Ini disebut di modul.
+                            :contentReference[oaicite:13]{index=13}</div>
+                    </div>
+                    <div class="kbox border-emerald-400/25">
+                        <div class="font-bold text-emerald-200">Kunci penting:</div>
+                        <div class="text-slate-200 mt-2">
+                            Kalau data tidak valid, aplikasi <b>jangan lanjut proses</b>.
+                            Tampilkan pesan error / minta perbaiki input. :contentReference[oaicite:14]{index=14}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Kenapa penting di App Inventor?</h2>
+                <p class="text-slate-200 mb-4">
+                    Di App Inventor, blok logika bisa tetap berjalan meskipun TextBox kosong atau input salah.
+                    Jadi validasi itu wajib. :contentReference[oaicite:15]{index=15}
+                </p>
+                <div class="kbox">
+                    <div class="font-bold mb-2">Contoh kondisi yang sering terjadi:</div>
+                    <ul class="list-disc ml-5 text-slate-200 space-y-1">
+                        <li>TextBox masih kosong</li>
+                        <li>Input bukan angka</li>
+                        <li>Nilai tidak sesuai aturan aplikasi</li>
+                    </ul>
+                </div>
+                <div class="mt-4 kbox border-sky-400/30">
+                    <div class="font-bold text-sky-200 mb-2">Trik sederhana di App Inventor:</div>
+                    <div class="text-slate-200">
+                        Semua validasi biasanya ditaruh di <b>when Button.Click</b> pakai <b>if–then–else</b>, sebelum
+                        proses utama.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Jenis validasi (yang sering dipakai)</h2>
+                <p class="text-slate-200 mb-4">
+                    Modul menyebut 3 jenis validasi yang umum di App Inventor. :contentReference[oaicite:16]{index=16}
+                </p>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="kbox">
+                        <div class="font-black text-emerald-200">1) Input kosong</div>
+                        <div class="text-slate-200 text-sm mt-2">
+                            Cek apakah pengguna sudah memasukkan data sebelum tombol ditekan.
+                            :contentReference[oaicite:17]{index=17}
+                        </div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-black text-sky-200">2) Tipe data</div>
+                        <div class="text-slate-200 text-sm mt-2">
+                            Pastikan input sesuai jenis data yang diharapkan (misalnya angka untuk perhitungan).
+                            :contentReference[oaicite:18]{index=18}
+                        </div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-black text-amber-200">3) Rentang nilai</div>
+                        <div class="text-slate-200 text-sm mt-2">
+                            Pastikan nilai masuk akal (misalnya umur tidak negatif).
+                            :contentReference[oaicite:19]{index=19}
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 text-slate-300 text-sm">
+                    Validasi ini biasanya dilakukan menggunakan <b>if–then–else</b> sebelum proses utama dijalankan.
+                    :contentReference[oaicite:20]{index=20}
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Manfaat validasi (biar aplikasi “pro”)</h2>
+                <p class="text-slate-200 mb-4">
+                    Dengan menerapkan validasi, aplikasi jadi: lebih tahan kesalahan, hasil lebih akurat, terasa
+                    profesional,
+                    dan mudah dikembangkan ke fitur yang lebih kompleks. :contentReference[oaicite:21]{index=21}
+                </p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="kbox">
+                        <div class="font-bold mb-2">Tanpa validasi</div>
+                        <ul class="list-disc ml-5 text-slate-200 space-y-1">
+                            <li>Sering salah hitung</li>
+                            <li>Pesan tidak jelas</li>
+                            <li>Pengguna bingung</li>
+                        </ul>
+                    </div>
+                    <div class="kbox border-emerald-400/30">
+                        <div class="font-bold mb-2 text-emerald-200">Dengan validasi</div>
+                        <ul class="list-disc ml-5 text-slate-200 space-y-1">
+                            <li>Input salah ketahuan cepat</li>
+                            <li>Pesan error jelas</li>
+                            <li>Flowchart & blok lebih rapi</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Latihan Utama: Flowchart Validasi Password (Kompleks)</h2>
+                <p class="text-slate-200 mb-4">
+                    Sekarang kita pakai semua konsep: multi-condition + state + validasi.
+                    Kamu akan membuat flowchart untuk tombol <b>“Cek Password”</b>.
+                </p>
+                <div class="kbox">
+                    <div class="font-bold mb-2">Aturan password (wajib):</div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="pill">Tidak boleh kosong</span>
+                        <span class="pill">Minimal 8 karakter</span>
+                        <span class="pill">Ada huruf besar</span>
+                        <span class="pill">Ada huruf kecil</span>
+                        <span class="pill">Ada angka</span>
+                        <span class="pill">Ada simbol</span>
+                        <span class="pill">Password = Konfirmasi</span>
+                    </div>
+                    <div class="text-slate-400 text-sm mt-2">
+                        Tujuan: bikin jalur “error” yang jelas dan jalur “valid” yang rapi.
+                    </div>
+                </div>
+
+                <div class="mt-4 grid md:grid-cols-2 gap-4">
+                    <div class="kbox">
+                        <div class="font-bold mb-2">Isi 3 pesan error (contoh):</div>
+                        <input id="err1"
+                            class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 mb-2 text-slate-100"
+                            placeholder="Error 1: Password kosong" />
+                        <input id="err2"
+                            class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 mb-2 text-slate-100"
+                            placeholder="Error 2: Minimal 8 karakter" />
+                        <input id="err3"
+                            class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100"
+                            placeholder="Error 3: Konfirmasi tidak cocok" />
+                    </div>
+                    <div class="kbox border-sky-400/30">
+                        <div class="font-bold mb-2">Hint (klik jika buntu)</div>
+                        <button class="btn2 bg-slate-800 hover:bg-slate-700" onclick="toggleHint('hpass')">Tampilkan
+                            hint urutan cek</button>
+                        <div id="hpass" class="hint mt-3 text-slate-200 text-sm">
+                            Urutan yang sering dipakai: <b>kosong?</b> → <b>konfirmasi cocok?</b> → <b>panjang?</b> →
+                            <b>komposisi (besar/kecil/angka/simbol)?</b> → hasil.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex gap-2">
+                    <button id="makeSummary" class="btn bg-emerald-600 hover:bg-emerald-500">Buat ringkasan
+                        alur</button>
+                    <button class="btn2 bg-slate-800 hover:bg-slate-700" id="clearSummary">Reset</button>
+                </div>
+                <div id="passSummary" class="mt-4 kbox"></div>
+            </div>
+        </section>
+
+        <!-- Slide 15 -->
+        <section class="slide">
+            <div class="card p-7">
+                <h2 class="text-3xl font-black mb-3">Exit Ticket (3 soal)</h2>
+                <p class="text-slate-200 mb-4">Jawab cepat. Klik salah satu.</p>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="kbox">
+                        <div class="font-bold mb-2">1) Flowchart dipakai untuk…</div>
+                        <button class="opt w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="e1" data-c="true">
+                            A. Merancang alur & keputusan sebelum coding
+                        </button>
+                        <button class="opt w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-700"
+                            data-q="e1" data-c="false">
+                            B. Mengganti wallpaper HP
+                        </button>
+                        <div id="e1fb" class="mt-2 text-sm"></div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-bold mb-2">2) Multi-condition artinya…</div>
+                        <button class="opt w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="e2" data-c="true">
+                            A. Mengecek beberapa aturan bertahap
+                        </button>
+                        <button class="opt w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-700"
+                            data-q="e2" data-c="false">
+                            B. Cuma ada 1 keputusan
+                        </button>
+                        <div id="e2fb" class="mt-2 text-sm"></div>
+                    </div>
+                    <div class="kbox">
+                        <div class="font-bold mb-2">3) Kalau input kosong sebaiknya…</div>
+                        <button class="opt w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-700 mb-2"
+                            data-q="e3" data-c="true">
+                            A. Tampilkan pesan error, jangan lanjut proses
+                        </button>
+                        <button class="opt w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-700"
+                            data-q="e3" data-c="false">
+                            B. Tetap lanjut pakai nilai 0
+                        </button>
+                        <div id="e3fb" class="mt-2 text-sm"></div>
+                    </div>
+                </div>
+
+                <div class="mt-6 kbox border-emerald-400/30">
+                    <div class="font-bold text-emerald-200 mb-1">Tugas kumpul (output):</div>
+                    <div class="text-slate-200">
+                        Flowchart validasi password minimal <b>6 decision</b>, punya <b>jalur error</b>, dan jalur akhir
+                        <b>“Password kuat ✅”</b>.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ===== Access Gate =====
+        const ACCESS_CODE = "RGMDSMS25";
+        let unlocked = false;
+
+        const gate = document.getElementById('gate');
+        const gateCard = document.getElementById('gateCard');
+        const accessInput = document.getElementById('accessInput');
+        const accessBtn = document.getElementById('accessBtn');
+        const accessFb = document.getElementById('accessFb');
+
+        function setGateMessage(ok, msg) {
+            if (!accessFb) return;
+            accessFb.innerHTML = ok
+                ? `<span class="text-emerald-300 font-bold">✅ ${msg}</span>`
+                : `<span class="text-rose-300 font-bold">❌ ${msg}</span>`;
+        }
+
+        function tryUnlock() {
+            const val = (accessInput?.value || "").trim().toUpperCase();
+            if (accessInput) accessInput.value = val; // enforce uppercase
+            if (val === ACCESS_CODE) {
+                unlocked = true;
+                if (gate) gate.style.display = "none";
+                setGateMessage(true, "Akses diterima. Selamat belajar!");
+            } else {
+                unlocked = false;
+                setGateMessage(false, "Kodenya belum tepat. Coba lagi ya.");
+                if (gateCard) {
+                    gateCard.classList.remove('shake');
+                    void gateCard.offsetWidth; // restart animation
+                    gateCard.classList.add('shake');
+                }
+            }
+        }
+
+        // Auto uppercase while typing
+        if (accessInput) {
+            accessInput.addEventListener('input', () => {
+                accessInput.value = accessInput.value.toUpperCase();
+                accessFb.innerHTML = "";
+            });
+            accessInput.addEventListener('keydown', (e) => {
+                if (e.key === "Enter") { tryUnlock(); }
+            });
+            // focus on load
+            setTimeout(() => accessInput.focus(), 50);
+        }
+        if (accessBtn) accessBtn.addEventListener('click', tryUnlock);
+
+        // Slide engine
+        const slides = [...document.querySelectorAll('.slide')];
+        let i = 0;
+        const counter = document.getElementById('counter');
+        const prev = document.getElementById('prev');
+        const next = document.getElementById('next');
+
+        function render() {
+            slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+            counter.textContent = `Slide ${i + 1}/${slides.length}`;
+            prev.disabled = i === 0;
+            prev.classList.toggle('opacity-40', i === 0);
+        }
+        next.addEventListener('click', () => { if (!unlocked) { tryUnlock(); return; } if (i < slides.length - 1) { i++; render(); } });
+        prev.addEventListener('click', () => { if (!unlocked) { tryUnlock(); return; } if (i > 0) { i--; render(); } });
+        document.addEventListener('keydown', (e) => {
+            if (!unlocked) return;
+            if (e.key === 'ArrowRight' && i < slides.length - 1) { i++; render(); }
+            if (e.key === 'ArrowLeft' && i > 0) { i--; render(); }
+        });
+        render();
+
+        // Quiz buttons (opt)
+        document.querySelectorAll('.opt').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const q = btn.dataset.q;
+                const correct = btn.dataset.c === 'true';
+                document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(b => {
+                    b.classList.remove('good', 'bad');
+                });
+                const fb = document.getElementById(q + 'fb');
+                if (correct) {
+                    btn.classList.add('good');
+                    if (fb) fb.innerHTML = `<span class="text-emerald-300 font-bold">Benar ✅</span>`;
+                } else {
+                    btn.classList.add('bad');
+                    if (fb) fb.innerHTML = `<span class="text-rose-300 font-bold">Belum tepat ❌</span> Coba ingat konsepnya ya.`;
+                }
+            });
+        });
+
+        // Hint toggles
+        function toggleHint(id) {
+            document.getElementById(id)?.classList.toggle('show');
+        }
+        window.toggleHint = toggleHint;
+
+        // Chips activity (Slide 5)
+        const chipsData = [
+            { t: "Umur", ok: true },
+            { t: "Warna baju", ok: false },
+            { t: "Jenis film", ok: true },
+            { t: "Nama hewan", ok: false },
+            { t: "Jam tayang", ok: true },
+        ];
+        const chipsDecision = [
+            { t: "Boleh masuk atau tidak?", ok: true },
+            { t: "Harus pakai topi?", ok: false },
+            { t: "Perlu pendamping?", ok: true },
+            { t: "Beli es krim dulu?", ok: false },
+        ];
+
+        const wrapData = document.getElementById('chipsData');
+        const wrapDec = document.getElementById('chipsDecision');
+        let selData = new Set();
+        let selDec = new Set();
+
+        function makeChip(text, onClick) {
+            const sp = document.createElement('span');
+            sp.className = 'chip pill';
+            sp.textContent = text;
+            sp.addEventListener('click', onClick);
+            return sp;
+        }
+
+        function renderChips() {
+            if (wrapData) {
+                wrapData.innerHTML = '';
+                chipsData.forEach((c, idx) => {
+                    const sp = makeChip(c.t, () => {
+                        if (selData.has(idx)) selData.delete(idx); else selData.add(idx);
+                        sp.classList.toggle('on');
+                    });
+                    if (selData.has(idx)) sp.classList.add('on');
+                    wrapData.appendChild(sp);
+                });
+            }
+            if (wrapDec) {
+                wrapDec.innerHTML = '';
+                chipsDecision.forEach((c, idx) => {
+                    const sp = makeChip(c.t, () => {
+                        if (selDec.has(idx)) selDec.delete(idx); else selDec.add(idx);
+                        sp.classList.toggle('on');
+                    });
+                    if (selDec.has(idx)) sp.classList.add('on');
+                    wrapDec.appendChild(sp);
+                });
+            }
+        }
+        renderChips();
+
+        document.getElementById('checkChips')?.addEventListener('click', () => {
+            const fb = document.getElementById('chipsFb');
+            let good = 0, total = 0;
+
+            chipsData.forEach((c, idx) => { if (c.ok) total++; if (c.ok && selData.has(idx)) good++; });
+            chipsDecision.forEach((c, idx) => { if (c.ok) total++; if (c.ok && selDec.has(idx)) good++; });
+
+            if (!fb) return;
+            if (good === total) {
+                fb.innerHTML = `<span class="text-emerald-300 font-bold">Mantap ✅</span> Kamu memilih data & keputusan yang masuk akal.`;
+            } else {
+                fb.innerHTML = `<span class="text-amber-300 font-bold">Hampir ✅</span> Kamu benar ${good}/${total}. Coba pilih yang benar-benar berpengaruh ke keputusan.`;
+            }
+        });
+
+        document.getElementById('resetChips')?.addEventListener('click', () => {
+            selData = new Set();
+            selDec = new Set();
+            renderChips();
+            const fb = document.getElementById('chipsFb');
+            if (fb) fb.innerHTML = '';
+        });
+
+        // Password summary (Slide 14)
+        function esc(s) { return (s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+
+        document.getElementById('makeSummary')?.addEventListener('click', () => {
+            const e1 = document.getElementById('err1')?.value.trim() || 'Password tidak boleh kosong';
+            const e2 = document.getElementById('err2')?.value.trim() || 'Minimal 8 karakter';
+            const e3 = document.getElementById('err3')?.value.trim() || 'Konfirmasi tidak cocok';
+
+            const out = `
+        <div class="font-bold mb-2">Ringkasan alur flowchart (teks):</div>
+        <div class="text-slate-200">
+          START → INPUT (password & konfirmasi)
+          <div class="mt-2"><span class="arrow">→</span> D1: Password kosong? Jika YA: <b>${esc(e1)}</b> → END</div>
+          <div class="mt-1"><span class="arrow">→</span> D2: Password = Konfirmasi? Jika TIDAK: <b>${esc(e3)}</b> → END</div>
+          <div class="mt-1"><span class="arrow">→</span> D3: Panjang ≥ 8? Jika TIDAK: <b>${esc(e2)}</b> → END</div>
+          <div class="mt-1"><span class="arrow">→</span> D4–D7: Cek huruf besar, huruf kecil, angka, simbol (jika gagal: tampilkan pesan)</div>
+          <div class="mt-2 text-emerald-200 font-bold">Jika semua lolos → “Password kuat ✅” → END</div>
+        </div>
+        <div class="text-slate-400 text-sm mt-2">
+          Catatan: kamu boleh memilih apakah setelah error kembali ke INPUT atau langsung END.
+        </div>
+      `;
+            const box = document.getElementById('passSummary');
+            if (box) box.innerHTML = out;
+        });
+
+        document.getElementById('clearSummary')?.addEventListener('click', () => {
+            ['err1', 'err2', 'err3'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            const box = document.getElementById('passSummary');
+            if (box) box.innerHTML = '';
+        });
+    </script>
+</body>
+
+</html>
