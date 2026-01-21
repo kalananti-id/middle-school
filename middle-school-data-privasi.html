@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesi 30: Data & Privacy App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e', // Green theme for Security/Safety
+                            600: '#16a34a',
+                            900: '#14532d',
+                        },
+                        accent: {
+                            500: '#ef4444', // Red for Danger/Private
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Outfit', sans-serif; overflow: hidden; background-color: #f8fafc; }
+        .slide { display: none; height: 100vh; flex-direction: column; justify-content: center; padding: 2rem; opacity: 0; transition: opacity 0.5s ease-in-out; }
+        .slide.active { display: flex; opacity: 1; }
+        .code-block { background: #1e293b; color: #a5b4fc; border-radius: 0.75rem; padding: 1.5rem; font-family: 'JetBrains Mono', monospace; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid #334155; }
+        
+        /* Floating Animation */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        
+        /* Pulse Animation */
+        @keyframes pulse-soft { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        .pulse-soft { animation: pulse-soft 3s infinite; }
+        
+        /* Grid Background */
+        .grid-bg { background-size: 40px 40px; background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px); }
+        
+        /* Glass Effect */
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
+    </style>
+</head>
+<body class="text-slate-800 grid-bg">
+
+    <!-- Access Control -->
+    <div id="accessOverlay" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4">
+        <div class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center">
+            <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+            <p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 30</p>
+            <input type="text" id="accessCodeInput" placeholder="Enter Class Code" class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase">
+            <button id="accessBtn" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">UNLOCK SYSTEM</button>
+            <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED</p>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Sesi 30: Data & Privacy</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="btnPrev" class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition disabled:opacity-30"><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="font-mono text-sm font-bold text-slate-400"><span id="counter" class="text-brand-600">1</span>/24</span>
+            <button id="btnNext" class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg shadow-brand-500/20"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+        <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[5%]"></div>
+    </div>
+
+    <main class="relative h-screen w-full overflow-hidden">
+        
+
+        <!-- Slide 1: Title & Mission -->
+        <section class="slide active">
+            <div class="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
+                 <div class="absolute top-10 left-10 text-9xl font-black text-slate-900 rotate-12">DATA</div>
+                 <div class="absolute bottom-20 right-20 text-9xl font-black text-slate-900 -rotate-12">PRIVACY</div>
+            </div>
+            
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-24 z-10 w-full">
+                <div class="flex-1 text-center md:text-left">
+                    <div class="inline-block px-4 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6 tracking-widest border border-brand-200">
+                        MIDDLE SCHOOL • APP DEVELOPMENT
+                    </div>
+                    <h1 class="text-6xl md:text-8xl font-black text-slate-900 mb-6 leading-tight tracking-tight">
+                        DATA & <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-emerald-500">PRIVACY</span>
+                    </h1>
+                    <p class="text-2xl text-slate-600 font-light mb-8 max-w-lg">
+                        Melindungi rahasia di dunia digital dengan logika cerdas! 🛡️
+                    </p>
+                    
+                    <!-- Added Mission Board -->
+                    <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border-l-4 border-brand-500 max-w-xl">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-crosshairs text-brand-500"></i> MISI SQUAD HARI INI:</h3>
+                        <ul class="space-y-2 text-slate-600 text-sm font-medium">
+                            <li class="flex items-center gap-2"><i class="fa-regular fa-square-check text-green-500"></i> Membedakan Public vs Private Data.</li>
+                            <li class="flex items-center gap-2"><i class="fa-regular fa-square-check text-green-500"></i> Membuat Sistem Keamanan (Login).</li>
+                            <li class="flex items-center gap-2"><i class="fa-regular fa-square-check text-green-500"></i> Mencegah "Hacker" mengintip data kita.</li>
+                        </ul>
+                    </div>
+
+                </div>
+                
+                <div class="flex-1 relative animate-float flex justify-center">
+                    <div class="bg-white p-6 rounded-[3rem] shadow-2xl border border-slate-100 relative w-96 h-96 flex items-center justify-center">
+                         <div class="absolute inset-0 bg-gradient-to-tr from-brand-50 to-emerald-50 rounded-[3rem] opacity-50"></div>
+                         <i class="fa-solid fa-user-shield text-9xl text-brand-500 drop-shadow-2xl"></i>
+                         
+                         <!-- Decorative Elements -->
+                         <div class="absolute -top-4 -right-4 bg-white p-4 rounded-2xl shadow-lg animate-bounce delay-700">
+                             <i class="fa-solid fa-lock text-3xl text-yellow-400"></i>
+                         </div>
+                         <div class="absolute bottom-8 -left-8 bg-white p-4 rounded-2xl shadow-lg animate-bounce">
+                             <i class="fa-solid fa-key text-3xl text-slate-700"></i>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Recall Logic & Real World -->
+        <section class="slide">
+             <div class="max-w-6xl mx-auto text-center w-full">
+                <h2 class="text-3xl font-bold mb-8">Recall: Alur Kerja & "Otak" Aplikasi 🔄</h2>
+                
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <!-- Standard Flow -->
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100">
+                        <h3 class="text-xl font-bold text-slate-400 mb-6 uppercase tracking-widest">Sistem Komputer</h3>
+                        <div class="flex items-center justify-center gap-4 relative">
+                            <!-- Input -->
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-2xl shadow-sm">⌨️</div>
+                                <span class="text-xs font-bold text-slate-500">INPUT</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                            
+                            <!-- Process -->
+                            <div class="flex flex-col items-center gap-2 scale-110">
+                                <div class="w-16 h-16 bg-brand-100 rounded-2xl flex items-center justify-center text-2xl shadow-md border-2 border-brand-500 animate-pulse">⚙️</div>
+                                <span class="text-xs font-bold text-brand-600">PROCESS</span>
+                            </div>
+                             <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                            
+                            <!-- Output -->
+                             <div class="flex flex-col items-center gap-2">
+                                <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-2xl shadow-sm">📱</div>
+                                <span class="text-xs font-bold text-slate-500">OUTPUT</span>
+                            </div>
+                        </div>
+                        <p class="mt-6 text-sm text-slate-500">
+                            Tanpa <b>PROCESS</b>, aplikasi hanya mendengarkan tapi tidak bisa berpikir!
+                        </p>
+                    </div>
+
+                    <!-- Real World Example -->
+                    <div class="bg-indigo-50 p-8 rounded-[2.5rem] shadow-xl border border-indigo-100 text-left">
+                        <h3 class="text-xl font-bold text-indigo-400 mb-6 uppercase tracking-widest">Contoh Sehari-hari</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">1</div>
+                                <div>
+                                    <span class="font-bold text-slate-700 block">Input:</span>
+                                    <span class="text-slate-600 text-sm">Cuaca Mendung & Gelap ☁️</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border-l-4 border-indigo-500">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">2</div>
+                                <div>
+                                    <span class="font-bold text-indigo-600 block">Process (Logika):</span>
+                                    <span class="text-slate-600 text-sm">"JIKA hujan -> MAKA bawa payung"</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">3</div>
+                                <div>
+                                    <span class="font-bold text-slate-700 block">Output:</span>
+                                    <span class="text-slate-600 text-sm">Kamu selamat, tidak basah! ☂️</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- Slide 3: Concept - Public vs Private Detail -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-4">Jenis Data: Public vs Private 🌍🔐</h2>
+            <p class="text-center text-slate-500 mb-10 max-w-3xl mx-auto">
+                Di era digital, data itu berharga! Kita harus bijak memilah mana yang boleh disebar (Share) dan mana yang harus disimpan (Keep).
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto w-full">
+                <!-- Public -->
+                <div class="bg-white p-8 rounded-[2rem] shadow-lg border-t-8 border-blue-400 hover:shadow-2xl transition group">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl text-blue-600 group-hover:scale-110 transition">
+                            📢
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-black text-slate-800">PUBLIC DATA</h3>
+                            <p class="text-blue-500 font-bold text-sm">Aman untuk diketahui umum</p>
+                        </div>
+                    </div>
+                    <div class="text-slate-600 mb-6 text-sm leading-relaxed">
+                        Data ini tidak membahayakan dirimu jika orang asing tahu. Biasanya bersifat umum atau prestasi.
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl">
+                            <i class="fa-solid fa-check text-green-500"></i>
+                            <span class="text-slate-600">Nama Sekolah / Kelas</span>
+                        </li>
+                        <li class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl">
+                            <i class="fa-solid fa-check text-green-500"></i>
+                            <span class="text-slate-600">Hobi (Main Bola, coding)</span>
+                        </li>
+                        <li class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl">
+                            <i class="fa-solid fa-check text-green-500"></i>
+                            <span class="text-slate-600">Karya / Portofolio</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Private -->
+                <div class="bg-white p-8 rounded-[2rem] shadow-lg border-t-8 border-red-500 hover:shadow-2xl transition relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-bl-xl z-20">TOP SECRET</div>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-3xl text-red-600 group-hover:scale-110 transition">
+                            🛡️
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-black text-slate-800">PRIVATE DATA</h3>
+                            <p class="text-red-500 font-bold text-sm">Hanya untukmu & Orang Tua</p>
+                        </div>
+                    </div>
+                    <div class="text-slate-600 mb-6 text-sm leading-relaxed">
+                        ⚠️ <b>BAHAYA!</b> Jika data ini bocor, bisa dipakai orang jahat untuk mencuri akun, menipu, atau mendatangi rumahmu.
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 bg-red-50 p-3 rounded-xl border border-red-100">
+                            <i class="fa-solid fa-lock text-red-500"></i>
+                            <span class="text-slate-700 font-bold">Password & PIN ATM</span>
+                        </li>
+                        <li class="flex items-center gap-3 bg-red-50 p-3 rounded-xl border border-red-100">
+                            <i class="fa-solid fa-lock text-red-500"></i>
+                            <span class="text-slate-700 font-bold">Alamat Rumah Lengkap</span>
+                        </li>
+                        <li class="flex items-center gap-3 bg-red-50 p-3 rounded-xl border border-red-100">
+                            <i class="fa-solid fa-lock text-red-500"></i>
+                            <span class="text-slate-700 font-bold">Nomor HP Pribadi</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Interactive Sorting Game -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-2">Game: Sortir Data! 🎮</h2>
+            <p class="text-center text-slate-500 mb-6 max-w-2xl mx-auto">
+                Bantu agen keamanan memilah data. Klik item data di atas, lalu klik kotak <b>PUBLIC (Biru)</b> atau <b>PRIVATE (Merah)</b>.
+            </p>
+            
+            <div class="max-w-5xl mx-auto w-full">
+                <!-- Source Area -->
+                <div id="dataSource" class="flex flex-wrap gap-4 justify-center mb-10 min-h-[80px]">
+                    <!-- Items generated by JS -->
+                </div>
+
+                <!-- Targets -->
+                <div class="grid grid-cols-2 gap-12">
+                    <div class="bg-blue-50 border-4 border-dashed border-blue-300 rounded-3xl p-8 flex flex-col items-center justify-center relative min-h-[300px] hover:bg-blue-100 transition cursor-pointer" id="publicZone">
+                        <i class="fa-solid fa-bullhorn text-6xl text-blue-200 mb-4 pointer-events-none"></i>
+                        <h3 class="text-2xl font-bold text-blue-400 pointer-events-none">PUBLIC ZONE</h3>
+                        <p class="text-xs text-blue-400 pointer-events-none">Share to World</p>
+                        <div id="publicCount" class="absolute top-4 right-4 font-bold text-blue-500 text-xl">0</div>
+                    </div>
+
+                    <div class="bg-red-50 border-4 border-dashed border-red-300 rounded-3xl p-8 flex flex-col items-center justify-center relative min-h-[300px] hover:bg-red-100 transition cursor-pointer" id="privateZone">
+                        <i class="fa-solid fa-user-secret text-6xl text-red-200 mb-4 pointer-events-none"></i>
+                        <h3 class="text-2xl font-bold text-red-400 pointer-events-none">PRIVATE ZONE</h3>
+                        <p class="text-xs text-red-400 pointer-events-none">Keep Secret!</p>
+                        <div id="privateCount" class="absolute top-4 right-4 font-bold text-red-500 text-xl">0</div>
+                    </div>
+                </div>
+                
+                <div id="gameMsg" class="text-center mt-6 font-bold text-xl h-8 text-brand-600"></div>
+            </div>
+
+            <script>
+                // Sorting Game Logic
+                const dataItems = [
+                    { id: 1, text: "Foto Liburan", type: "public", icon: "📸" },
+                    { id: 2, text: "Password IG", type: "private", icon: "🔑" },
+                    { id: 3, text: "Nomor HP Ibu", type: "private", icon: "📞" },
+                    { id: 4, text: "Judul Lagu Fav", type: "public", icon: "🎵" },
+                    { id: 5, text: "Alamat Rumah", type: "private", icon: "🏠" },
+                    { id: 6, text: "Nama Kucing", type: "public", icon: "🐱" },
+                    { id: 7, text: "NIK / KTP", type: "private", icon: "🆔" },
+                    { id: 8, text: "Sekolahku", type: "public", icon: "🏫" }
+                ];
+
+                const sourceContainer = document.getElementById('dataSource');
+                let completed = 0;
+
+                function initGame() {
+                    sourceContainer.innerHTML = '';
+                    dataItems.forEach(item => {
+                        const el = document.createElement('button');
+                        el.className = 'bg-white px-5 py-2 rounded-full shadow-lg border border-slate-200 font-bold hover:scale-105 transition-transform active:scale-95 flex items-center gap-2 text-sm';
+                        el.innerHTML = `<span>${item.icon}</span> ${item.text}`;
+                        el.onclick = () => sortItem(el, item);
+                        sourceContainer.appendChild(el);
+                    });
+                }
+
+                function sortItem(el, item) {
+                    
+                    if(el.classList.contains('ring-4')) {
+                        el.classList.remove('ring-4', 'ring-brand-500');
+                        activeItem = null;
+                        return;
+                    }
+                    
+                    // Deselect others
+                    Array.from(sourceContainer.children).forEach(c => c.classList.remove('ring-4', 'ring-brand-500'));
+                    
+                    el.classList.add('ring-4', 'ring-brand-500');
+                    activeItem = { el, data: item };
+                }
+                
+                let activeItem = null;
+
+                // Zone click handlers
+                document.getElementById('publicZone').onclick = () => checkSort('public');
+                document.getElementById('privateZone').onclick = () => checkSort('private');
+
+                function checkSort(zoneType) {
+                    if(!activeItem) {
+                        document.getElementById('gameMsg').innerText = "Pilih item dulu di atas! 👆";
+                         setTimeout(() => document.getElementById('gameMsg').innerText = "", 2000);
+                        return;
+                    }
+                    
+                    if(activeItem.data.type === zoneType) {
+                        // Correct
+                        activeItem.el.remove();
+                        const clone = document.createElement('div');
+                        clone.className = 'bg-white px-3 py-1 rounded-full shadow text-xs font-bold mb-2 animate-bounce flex items-center gap-2';
+                        clone.innerHTML = activeItem.data.icon + " " + activeItem.data.text;
+                        
+                        if(zoneType === 'public') {
+                            document.getElementById('publicZone').appendChild(clone);
+                            document.getElementById('publicCount').innerText = parseInt(document.getElementById('publicCount').innerText) + 1;
+                        } else {
+                            document.getElementById('privateZone').appendChild(clone);
+                            document.getElementById('privateCount').innerText = parseInt(document.getElementById('privateCount').innerText) + 1;
+                        }
+                        
+                        document.getElementById('gameMsg').innerText = "Benar! 🎉";
+                        document.getElementById('gameMsg').className = "text-center mt-6 font-bold text-xl h-8 text-green-500";
+                        activeItem = null;
+                        
+                        if(sourceContainer.children.length === 0) {
+                            document.getElementById('gameMsg').innerText = "MISSION COMPLETE: DATA AMAN! 🛡️";
+                        }
+                    } else {
+                        // Wrong
+                        document.getElementById('gameMsg').innerText = "Ups! Kurang tepat. Coba lagi. ❌";
+                        document.getElementById('gameMsg').className = "text-center mt-6 font-bold text-xl h-8 text-red-500";
+                        // Shake effect
+                        activeItem.el.classList.add('animate-shake'); 
+                        activeItem.el.style.backgroundColor = '#fee2e2'; // Light red
+                        setTimeout(() => {
+                             activeItem.el.classList.remove('animate-shake');
+                             activeItem.el.style.backgroundColor = 'white';
+                        }, 500);
+                    }
+                }
+                
+                // Initialize on load
+                setTimeout(initGame, 1000);
+            </script>
+        </section>
+
+        <!-- Slide 5: Password Analogy & Fundamentals -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Sistem Keamanan Digital 🔐</h2>
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                
+                <!-- Analogy Visual -->
+                <div class="flex-1 bg-white p-6 rounded-[2rem] shadow-xl border border-slate-200 text-center">
+                    <div class="relative inline-block">
+                        <img src="https://itondemand.com/wp-content/uploads/2020/03/IToD_Email-Animation-2.gif" alt="Lock and Key" class="w-80 rounded-2xl mb-4 mx-auto">
+                        <div class="absolute -bottom-2 -right-2 bg-yellow-400 text-black font-bold px-3 py-1 rounded-lg text-xs transform rotate-3 shadow-lg">Analogi</div>
+                    </div>
+                    <p class="text-slate-600 text-sm mt-2">
+                        "Aplikasi Private itu seperti Rumah Kaca Anti-Peluru. Transparan dari dalam, tapi butuh Kunci Khusus dari luar."
+                    </p>
+                </div>
+
+                <!-- Explanation -->
+                <div class="flex-1 space-y-6">
+                    <h3 class="text-2xl font-bold text-slate-800">Apa Kuncinya? 🔑</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Di dunia digital, "Kunci Rumah" itu bisa berupa banyak hal. Ini disebut <b>Autentikasi</b>.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-brand-500 transition">
+                            <i class="fa-solid fa-asterisk text-brand-500 mb-2 text-xl"></i>
+                            <div class="font-bold text-slate-700 text-sm">Password / PIN</div>
+                            <div class="text-[10px] text-slate-500">Kombinasi Rahasia</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-brand-500 transition">
+                            <i class="fa-solid fa-fingerprint text-brand-500 mb-2 text-xl"></i>
+                            <div class="font-bold text-slate-700 text-sm">Biometrik</div>
+                            <div class="text-[10px] text-slate-500">Sidik Jari / Wajah</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-50 p-5 rounded-2xl border-l-4 border-brand-500 mt-4">
+                        <h4 class="font-bold text-brand-800 mb-1 text-sm">Logic Kita Hari Ini:</h4>
+                        <p class="text-slate-600 text-xs">
+                            Kita akan membuat simulasi Logic sederhana:
+                            <br><code class="bg-white px-2 py-0.5 rounded border border-brand-200 text-brand-600 font-mono mt-1 inline-block">IF (Input == Password) THEN Masuk</code>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- Slide 6: Project Brief - Secret Diary -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Misi Kita: "My Secret Diary" 📔</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 space-y-6">
+                    <p class="text-xl text-slate-600">
+                        Kita akan membuat aplikasi Buku Harian Rahasia.
+                        <br>Hanya pemilik yang tahu password yang bisa membacanya!
+                    </p>
+                    <div class="bg-purple-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                        <h3 class="font-bold text-purple-900 mb-2">Fitur Utama:</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <span class="bg-purple-200 text-purple-800 px-2 py-1 rounded text-xs font-bold font-mono">Screen1</span>
+                                <span class="text-slate-700">Halaman Login (Gembok)</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="bg-purple-200 text-purple-800 px-2 py-1 rounded text-xs font-bold font-mono">Screen2</span>
+                                <span class="text-slate-700">Halaman Rahasia (Isi Diary)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="flex-1 flex justify-center">
+                    <div class="relative w-64 h-[400px] bg-slate-900 rounded-[2.5rem] border-8 border-slate-800 shadow-2xl overflow-hidden flex flex-col items-center pt-10 group">
+                         <!-- Screen Mockup -->
+                         <div class="absolute inset-0 bg-slate-800 flex flex-col items-center justify-center text-white transition-opacity duration-500 group-hover:opacity-0 pointer-events-none z-10">
+                             <i class="fa-solid fa-lock text-6xl mb-4 text-slate-600"></i>
+                             <p class="font-mono text-sm">LOCKED</p>
+                         </div>
+                         
+                         <!-- Unlocked State (Hover) -->
+                         <div class="absolute inset-0 bg-white p-6 flex flex-col">
+                             <h3 class="font-handwriting text-2xl font-bold text-purple-600 mb-4" style="font-family: cursive;">Dear Diary...</h3>
+                             <p class="text-xs text-slate-500 font-handwriting" style="font-family: cursive;">
+                                 Hari ini aku belajar coding. Ternyata seru banget! Aku bisa membuat aplikasi sendiri...
+                             </p>
+                             <div class="mt-auto text-[10px] text-slate-300 text-center">Rahasia Terjamin aman!</div>
+                         </div>
+                    </div>
+                    <p class="absolute -bottom-10 text-slate-400 text-xs italic">(Hover HP untuk melihat isi)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: UI Components - TextBox vs PasswordBox -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8">Pilih Komponen yang Tepat 🛠️</h2>
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                
+                <!-- Helper: TextBox -->
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-lg flex flex-col items-center text-center hover:border-blue-400 transition">
+                    <div class="w-full bg-slate-100 p-4 rounded-xl mb-4 border border-slate-300">
+                        <div class="text-left text-xs text-slate-400 mb-1">TextBox1</div>
+                        <div class="text-left font-mono text-slate-800">Halo Dun|</div>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-800 mb-2">TextBox Biasa</h3>
+                    <p class="text-sm text-slate-500">
+                        Tulisan terlihat jelas. Cocok untuk Nama, Chat, atau Catatan.
+                    </p>
+                    <div class="mt-4 bg-red-100 text-red-600 px-4 py-2 rounded-full text-xs font-bold">
+                        ❌ BUKAN UNTUK PASSWORD
+                    </div>
+                </div>
+
+                <!-- Helper: PasswordBox -->
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-lg flex flex-col items-center text-center hover:border-green-400 transition ring-4 ring-green-100">
+                    <div class="absolute -top-4 bg-green-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow">USE THIS!</div>
+                    <div class="w-full bg-slate-100 p-4 rounded-xl mb-4 border border-slate-300">
+                        <div class="text-left text-xs text-slate-400 mb-1">PasswordTextBox1</div>
+                        <div class="text-left font-mono text-slate-800">••••••••|</div>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-800 mb-2">PasswordTextBox</h3>
+                    <p class="text-sm text-slate-500">
+                        Tulisan otomatis disensor (disembunyikan) menjadi titik/bintang.
+                    </p>
+                    <div class="mt-4 bg-green-100 text-green-600 px-4 py-2 rounded-full text-xs font-bold">
+                        ✅ AMAN DARI PENGINTIP
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Slide 8: Interactive Privacy Demo -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Coba Sendiri: Apa Bedanya? 👀</h2>
+            <p class="text-center text-slate-500 mb-8">Ketik "RAHASIA" di kedua kotak ini.</p>
+            
+            <div class="max-w-3xl mx-auto bg-slate-50 p-8 rounded-[2rem] border border-slate-200 shadow-inner">
+                
+                <div class="mb-8">
+                    <label class="block text-slate-600 font-bold mb-2 text-sm uppercase tracking-wide">TextBox Biasa:</label>
+                    <input type="text" placeholder="Ketik di sini..." class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 font-mono text-slate-800 focus:ring-2 focus:ring-blue-400 outline-none text-xl transition">
+                    <p class="text-xs text-red-400 mt-2 font-bold flex items-center gap-2"><i class="fa-solid fa-eye"></i> Orang di sebelahmu bisa melihat!</p>
+                </div>
+
+                <div class="border-t border-slate-200 my-6"></div>
+
+                <div>
+                    <label class="block text-slate-600 font-bold mb-2 text-sm uppercase tracking-wide">PasswordTextBox:</label>
+                    <input type="password" placeholder="Ketik di sini..." class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 font-mono text-slate-800 focus:ring-2 focus:ring-green-400 outline-none text-xl transition">
+                    <p class="text-xs text-green-500 mt-2 font-bold flex items-center gap-2"><i class="fa-solid fa-eye-slash"></i> Aman! Huruf berubah menjadi titik.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Slide 9: Password Strength Meter -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Seberapa Kuat Passwordmu? 💪</h2>
+            <div class="max-w-md mx-auto">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
+                    <label class="block text-slate-400 text-xs font-bold uppercase mb-2">Test Password:</label>
+                    <input type="text" id="passMeterInput" placeholder="Ketik password..." class="w-full bg-slate-100 border-none rounded-xl px-4 py-3 font-mono text-slate-800 mb-4 focus:ring-2 focus:ring-brand-500 outline-none">
+                    
+                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden mb-2">
+                        <div id="passStrengthBar" class="h-full bg-red-500 w-0 transition-all duration-500"></div>
+                    </div>
+                    <p id="passStrengthText" class="text-xs font-bold text-slate-400 text-right">Menunggu input...</p>
+
+                    <div class="mt-6 bg-blue-50 p-4 rounded-xl text-xs text-blue-800 space-y-2">
+                        <p><b>Tips Password Kuat:</b></p>
+                        <ul class="list-disc list-inside">
+                            <li>Lebih dari 8 karakter.</li>
+                            <li>Pakai Angka (0-9).</li>
+                            <li>Pakai Simbol (!@#$).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Simple Strength Meter
+                const pmInput = document.getElementById('passMeterInput');
+                const pmBar = document.getElementById('passStrengthBar');
+                const pmText = document.getElementById('passStrengthText');
+
+                if(pmInput) {
+                    pmInput.addEventListener('input', (e) => {
+                        const val = e.target.value;
+                        let strength = 0;
+                        if(val.length > 4) strength += 20;
+                        if(val.length > 8) strength += 30;
+                        if(/[0-9]/.test(val)) strength += 25;
+                        if(/[^A-Za-z0-9]/.test(val)) strength += 25;
+
+                        pmBar.style.width = strength + '%';
+                        
+                        if(strength < 40) {
+                            pmBar.className = 'h-full w-full bg-red-500 transition-all duration-300';
+                            pmText.innerText = 'LEMAH 😱';
+                            pmText.className = 'text-xs font-bold text-red-500 text-right';
+                        } else if(strength < 80) {
+                            pmBar.className = 'h-full w-full bg-yellow-500 transition-all duration-300';
+                            pmText.innerText = 'LUMAYAN 🤔';
+                            pmText.className = 'text-xs font-bold text-yellow-500 text-right';
+                        } else {
+                            pmBar.className = 'h-full w-full bg-green-500 transition-all duration-300';
+                            pmText.innerText = 'KUAT! 😎';
+                            pmText.className = 'text-xs font-bold text-green-500 text-right';
+                        }
+                    });
+                }
+            </script>
+        </section>
+
+        <!-- Slide 10: The Logic - IF THEN -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8">Logika Aplikasi Kita 🧠</h2>
+            
+            <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8">
+                
+                <!-- Flowchart Style -->
+                <div class="flex-1 flex flex-col items-center">
+                    <div class="bg-yellow-100 border-2 border-yellow-400 text-yellow-800 px-6 py-3 rounded-lg font-bold shadow rotate-3d">
+                        User Klik "LOGIN"
+                    </div>
+                    <div class="h-8 w-1 bg-slate-300"></div>
+                    <div class="bg-slate-800 text-white p-4 rounded-lg shadow-xl font-mono text-sm relative">
+                        <div class="absolute -left-4 top-1/2 -translate-y-1/2 w-4 h-1 bg-slate-800"></div>
+                        IF Password.Text == "1234"
+                    </div>
+                    
+                    <!-- Branches -->
+                    <div class="flex w-full justify-between mt-4 px-8 relative">
+                        <div class="absolute left-1/2 -translate-x-1/2 top-0 h-4 w-1 bg-slate-300"></div>
+                        <div class="absolute left-1/2 -translate-x-1/2 top-4 w-32 h-1 bg-slate-300"></div>
+                        
+                        <!-- True -->
+                        <div class="flex flex-col items-center mt-4">
+                            <div class="bg-green-100 text-green-700 px-2 py-1 text-xs font-bold rounded mb-2">TRUE</div>
+                            <div class="bg-green-500 text-white px-4 py-2 rounded shadow font-bold text-sm">
+                                Buka Screen2 🔓
+                            </div>
+                        </div>
+                        
+                        <!-- False -->
+                        <div class="flex flex-col items-center mt-4">
+                            <div class="bg-red-100 text-red-700 px-2 py-1 text-xs font-bold rounded mb-2">FALSE</div>
+                            <div class="bg-red-500 text-white px-4 py-2 rounded shadow font-bold text-sm">
+                                Muncul Pesan Error ⛔
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <p class="text-center mt-12 text-slate-500 max-w-2xl mx-auto">
+                Kita akan menggunakan password sederhana <b>"1234"</b> dulu untuk latihan. Di aplikasi asli, password tersimpan di database aman.
+            </p>
+        </section>
+
+
+        <!-- Slide 11: Step 1 - Designer View -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 1: Desain Tampilan (Designer) 🎨</h2>
+            <div class="max-w-6xl mx-auto flex gap-8 items-start">
+                
+                <div class="flex-1 space-y-4">
+                     <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                         <h3 class="font-bold text-lg mb-2">Instruksi:</h3>
+                         <ol class="list-decimal list-inside text-slate-600 space-y-3">
+                             <li>Masukkan <span class="bg-slate-100 px-2 py-1 rounded font-mono text-sm font-bold border border-slate-300">PasswordTextBox</span> ke layar.
+                                 <ul class="list-disc list-inside ml-6 text-sm text-slate-500 mt-1">
+                                     <li>Ganti <b>Hint</b> jadi "Masukkan Password".</li>
+                                     <li>(Penting) Uncheck <b>NumbersOnly</b> jika mau huruf.</li>
+                                 </ul>
+                             </li>
+                             <li>Masukkan <span class="bg-slate-100 px-2 py-1 rounded font-mono text-sm font-bold border border-slate-300">Button</span>.
+                                 <ul class="list-disc list-inside ml-6 text-sm text-slate-500 mt-1">
+                                     <li>Ganti Text jadi "LOGIN".</li>
+                                     <li>Rename jadi <b>btn_login</b>.</li>
+                                 </ul>
+                             </li>
+                             <li>Masukkan <span class="bg-slate-100 px-2 py-1 rounded font-mono text-sm font-bold border border-slate-300">Notifier</span> (Non-visible).</li>
+                         </ol>
+                     </div>
+                     <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-sm text-yellow-800">
+                         <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+                         Jangan pakai TextBox biasa! Nanti passwordnya kelihatan.
+                     </div>
+                </div>
+
+                <div class="bg-slate-800 p-4 rounded-xl border-4 border-slate-600 shadow-2xl">
+                    <div class="w-64 h-[400px] bg-white rounded overflow-hidden relative">
+                        <!-- Mockup Designer -->
+                        <div class="bg-teal-700 h-10 w-full mb-4"></div>
+                        <div class="p-4 space-y-4">
+                            <div class="border border-blue-400 p-2 rounded">
+                                <span class="text-xs text-slate-400">PasswordTextBox1</span>
+                                <div class="text-slate-300 text-sm">Masukkan Password</div>
+                            </div>
+                            <button class="w-full bg-slate-200 py-2 rounded text-black font-bold border border-slate-400">LOGIN</button>
+                            <div class="text-center text-xs text-slate-400 mt-8">Non-visible components</div>
+                            <div class="border border-dashed border-slate-400 p-2 text-center text-xs rounded">Notifier1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Step 2 - Blocks: When Click -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 2: Mulai Coding! 🧩</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 space-y-4">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                        <h3 class="font-bold text-lg mb-4">Memicu Program:</h3>
+                        <p class="text-slate-600 mb-4">
+                            Kita ingin program berjalan <b>SAAT</b> tombol Login ditekan.
+                        </p>
+                        <hr class="border-slate-100 mb-4">
+                        <ol class="list-decimal list-inside text-slate-600 space-y-2">
+                            <li>Klik component <b>btn_login</b> di menu kiri.</li>
+                            <li>Tarik blok <span class="bg-yellow-600 text-white px-2 py-1 rounded text-xs font-bold">when btn_login.Click</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 p-8 rounded-2xl border-4 border-slate-300 shadow-inner flex items-center justify-center min-h-[300px] min-w-[400px]">
+                    <div class="scale-125">
+                         <div class="bg-yellow-600 text-white px-4 py-2 rounded-t-lg rounded-br-lg shadow-xl font-bold text-sm cursor-grab active:cursor-grabbing hover:scale-105 transition">
+                            when btn_login.Click do
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: Step 3 - Logic Checker -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 3: Cek Password (IF..ELSE) 🕵️</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 space-y-4">
+                    <p class="text-slate-600 text-lg">
+                        Sekarang kita pasang "Otak" untuk memeriksa passwordnya.
+                    </p>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-yellow-500">
+                        <h3 class="font-bold text-slate-800 mb-2">Instruksi:</h3>
+                        <ol class="list-decimal list-inside text-slate-600 space-y-2">
+                            <li>Ambil blok <b>IF..THEN..ELSE</b> dari Control.</li>
+                            <li>Klik tombol ⚙️ (Gear) biru kalau bloknya cuma IF-THEN.</li>
+                            <li>Sambungkan logika: <br>
+                                <span class="font-mono bg-slate-100 text-brand-600 px-2 rounded">PasswordTextBox1.Text == "1234"</span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl text-left scale-90">
+                     <div class="bg-yellow-600 text-white px-4 py-2 rounded-t-lg rounded-br-lg shadow-md font-bold text-sm mb-1">
+                        when btn_login.Click do
+                    </div>
+                    <div class="pl-4 border-l-4 border-slate-600 ml-2">
+                        <div class="bg-yellow-500 text-white px-4 py-2 rounded shadow-md font-bold text-sm flex flex-col gap-2">
+                             <div class="flex items-center gap-2">
+                                 <span>if</span>
+                                 <div class="bg-green-500 text-white px-2 py-1 rounded shadow-sm text-xs flex items-center gap-1">
+                                     <span class="bg-green-700 px-1 rounded">PasswordBox1.Text</span>
+                                     <span>=</span>
+                                     <span class="bg-red-400 text-white px-1 rounded font-mono">"1234"</span>
+                                 </div>
+                             </div>
+                             <div class="flex flex-col gap-1">
+                                 <span>then</span>
+                                 <div class="h-6 bg-black/20 rounded border border-white/20 w-32 ml-4"></div>
+                             </div>
+                             <div class="flex flex-col gap-1">
+                                 <span>else</span>
+                                 <div class="h-6 bg-black/20 rounded border border-white/20 w-32 ml-4"></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Step 4 - Logic TRUE (Open Door) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 4: Jika BENAR (Open Screen) 🔓</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                 <div class="flex-1 space-y-4">
+                    <div class="bg-green-50 p-6 rounded-2xl border border-green-200">
+                        <h3 class="font-bold text-green-800 mb-2">Bagian THEN (Maka...):</h3>
+                        <p class="text-slate-600 mb-4">
+                            Jika password cocok, kita pindah ke halaman rahasia.
+                        </p>
+                        <ol class="list-decimal list-inside text-slate-600 space-y-2">
+                            <li>Buka drawer <b>Control</b>.</li>
+                            <li>Cari blok <span class="bg-yellow-500 text-white px-2 rounded text-xs font-bold">open another screen</span>.</li>
+                            <li>Isi nama screen dengan blok Text kosong: <span class="bg-red-400 text-white px-2 rounded text-xs font-mono">"Screen2"</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl text-left scale-100">
+                    <div class="bg-yellow-500 text-white px-4 py-2 rounded shadow-md font-bold text-sm flex flex-col gap-2">
+                         <div class="flex items-center gap-2">
+                             <span>if</span>
+                             <span class="opacity-50 text-xs">[Logika Benar]</span>
+                         </div>
+                         <div class="flex flex-col gap-1">
+                             <span>then</span>
+                             <div class="ml-4 bg-yellow-500 border-2 border-white px-2 py-1 rounded shadow-sm text-xs flex items-center gap-2">
+                                 <span>open another screenName</span>
+                                 <span class="bg-red-400 text-white px-2 py-0.5 rounded shadow-inner font-mono">"Screen2"</span>
+                             </div>
+                         </div>
+                         <div class="flex flex-col gap-1 opacity-50">
+                             <span>else</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 15: Step 5 - Logic FALSE (Security Alert) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 5: Jika SALAH (Peringatan) ⛔</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                 <div class="flex-1 space-y-4">
+                    <div class="bg-red-50 p-6 rounded-2xl border border-red-200">
+                        <h3 class="font-bold text-red-800 mb-2">Bagian ELSE (Jika Tidak...):</h3>
+                        <p class="text-slate-600 mb-4">
+                            Jika password salah, kita harus beri tahu user (dan menakuti pencuri!).
+                        </p>
+                        <ol class="list-decimal list-inside text-slate-600 space-y-2">
+                            <li>Klik component <b>Notifier1</b>.</li>
+                            <li>Pilih blok ungu <span class="bg-purple-500 text-white px-2 rounded text-xs font-bold">Call Notifier1.ShowAlert</span>.</li>
+                            <li>Pasang pesan: <span class="bg-red-400 text-white px-2 rounded text-xs font-mono">"PASSWORD SALAH! 😡"</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl text-left scale-100">
+                    <div class="bg-yellow-500 text-white px-4 py-2 rounded shadow-md font-bold text-sm flex flex-col gap-2">
+                         <div class="flex items-center gap-2 opacity-50">
+                             <span>if</span>
+                             <span class="text-xs">...</span>
+                         </div>
+                         <div class="flex flex-col gap-1 opacity-50">
+                             <span>then</span>
+                             <span class="text-xs ml-4">...</span>
+                         </div>
+                         <div class="flex flex-col gap-1">
+                             <span>else</span>
+                              <div class="ml-4 bg-purple-500 border-2 border-white px-2 py-1 rounded shadow-sm text-xs flex items-center gap-2">
+                                 <span>call Notifier1.ShowAlert notice</span>
+                                 <span class="bg-red-400 text-white px-2 py-0.5 rounded shadow-inner font-mono">"SALAH!"</span>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Slide 16: Debugging Case - InputType -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Debugging: "Kok Password-nya Kelihatan?" 🐛</h2>
+            
+            <div class="max-w-4xl mx-auto bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200">
+                <div class="flex items-start gap-6">
+                    <div class="w-1/3">
+                        <div class="bg-slate-100 p-4 rounded-xl border border-slate-300 mb-4 h-48 flex items-center justify-center">
+                            <!-- Bug Visual -->
+                            <div class="text-center">
+                                <div class="bg-white border border-slate-300 p-2 rounded mb-2 w-32 mx-auto font-mono text-slate-800">
+                                    rahasia123
+                                </div>
+                                <div class="text-red-500 font-bold text-xs"><i class="fa-solid fa-bug"></i> BUG ALERT!</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <h3 class="font-bold text-xl text-slate-800 mb-2">Masalah:</h3>
+                        <p class="text-slate-600 mb-6">
+                            Kita sudah coding benar, tapi saat dijalankan, tulisan di kotak password malah <b>terbaca jelas</b> (tidak jadi bintang-bintang).
+                        </p>
+                        
+                        <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+                            <h3 class="font-bold text-green-800 mb-2">Solusi: Cek Properties! 🛠️</h3>
+                            <ul class="list-disc list-inside text-sm text-slate-700 space-y-2">
+                                <li>Klik component <b>TextBox</b> di Designer.</li>
+                                <li>Cari properti bernama <b>InputType</b> (biasanya di kanan).</li>
+                                <li>Pastikan nilainya bukan <em>Normal</em>, tapi <b>Password</b> (Number Password).</li>
+                                <li>Atau... kamu salah pakai komponen (TextBox biasa vs PasswordTextBox).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 17: Quiz 1 - Security Identity -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8">Mini Quiz: Mana yang Aman? 🛡️</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <button onclick="quiz1(true)" class="bg-white p-8 rounded-3xl shadow-lg border-2 border-slate-200 hover:border-green-400 hover:scale-105 transition group text-center">
+                    <div class="text-6xl mb-4 group-hover:animate-bounce">🔒</div>
+                    <div class="bg-slate-100 font-mono p-2 rounded text-slate-400 mb-2">••••••</div>
+                    <p class="font-bold text-slate-700">PasswordTextBox</p>
+                </button>
+
+                <button onclick="quiz1(false)" class="bg-white p-8 rounded-3xl shadow-lg border-2 border-slate-200 hover:border-red-400 hover:scale-105 transition group text-center">
+                    <div class="text-6xl mb-4 group-hover:animate-shake">📝</div>
+                    <div class="bg-slate-100 font-mono p-2 rounded text-slate-800 mb-2">rahasia123</div>
+                    <p class="font-bold text-slate-700">TextBox Biasa</p>
+                </button>
+            </div>
+            
+            <div id="quiz1Res" class="text-center mt-8 font-bold text-2xl h-10"></div>
+
+            <script>
+                function quiz1(correct) {
+                    const res = document.getElementById('quiz1Res');
+                    if(correct) {
+                        res.innerText = "BENAR! 💯 Data Terlindungi.";
+                        res.className = "text-center mt-8 font-bold text-2xl h-10 text-green-500 animate-pulse";
+                    } else {
+                        res.innerText = "SALAH! 😱 Itu tidak aman.";
+                        res.className = "text-center mt-8 font-bold text-2xl h-10 text-red-500 animate-shake";
+                    }
+                }
+            </script>
+        </section>
+
+        <!-- Slide 18: Quiz 2 - Logic Prediction -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8">Tebak Logic: Apa yang Terjadi? 🤔</h2>
+            
+            <div class="max-w-2xl mx-auto bg-slate-900 p-8 rounded-3xl text-white font-mono mb-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-yellow-500 text-black px-4 py-1 text-xs font-bold">KODE PROGRAM:</div>
+                <div class="mb-4">
+                    IF (Password.Text == "1234") <br>
+                    &nbsp; THEN Open "Screen2" <br>
+                    &nbsp; ELSE Alert "Salah!"
+                </div>
+                <div class="border-t border-slate-700 pt-4 text-center">
+                    <p class="text-slate-400 text-xs uppercase mb-2">User Memasukkan:</p>
+                    <div class="bg-white text-black p-2 rounded inline-block font-bold">"12345"</div>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-4">
+                <button onclick="quiz2(false)" class="bg-green-100 text-green-800 px-6 py-3 rounded-xl font-bold border border-green-300 hover:bg-green-200 transition">
+                    Buka Screen2 🔓
+                </button>
+                <button onclick="quiz2(true)" class="bg-red-100 text-red-800 px-6 py-3 rounded-xl font-bold border border-red-300 hover:bg-red-200 transition">
+                    Alert "Salah!" ⛔
+                </button>
+            </div>
+            
+            <div id="quiz2Res" class="text-center mt-8 font-bold text-2xl h-10"></div>
+
+            <script>
+                function quiz2(correct) {
+                    const res = document.getElementById('quiz2Res');
+                    if(correct) {
+                        res.innerText = "TEPAT! 👍 '12345' tidak sama dengan '1234'.";
+                        res.className = "text-center mt-8 font-bold text-2xl h-10 text-green-500 animate-pulse";
+                    } else {
+                        res.innerText = "KURANG TEPAT. ❌ Cek lagi angkanya.";
+                        res.className = "text-center mt-8 font-bold text-2xl h-10 text-red-500 animate-shake";
+                    }
+                }
+            </script>
+        </section>
+
+        <!-- Slide 19: Bonus Project Brief -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Misi Bonus: Biodata App 👤</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 space-y-6">
+                    <p class="text-xl text-slate-600">
+                        Aplikasi kedua: <b>Form Biodata</b>. <br>
+                        Kita akan belajar menggabungkan banyak data menjadi satu kalimat.
+                    </p>
+                    <div class="bg-yellow-50 p-6 rounded-2xl border-l-4 border-yellow-500">
+                        <h3 class="font-bold text-yellow-900 mb-2">Tantangan:</h3>
+                        <p class="text-slate-700 mb-2">User mengisi:</p>
+                        <ul class="list-disc list-inside text-sm text-slate-600 mb-4 font-mono">
+                            <li>Nama</li>
+                            <li>Hobi</li>
+                            <li>Kelas</li>
+                            <li>No Telp</li>
+                        </ul>
+                        <p class="text-slate-700">Output satu baris:</p>
+                        <div class="bg-white p-3 rounded font-mono text-sm border border-slate-200 shadow-sm mt-2">
+                            "Rin | Membaca | 7A | 08123456"
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex-1 flex justify-center">
+                    <div class="relative w-64 h-[450px] bg-slate-800 rounded-[2.5rem] border-8 border-slate-700 shadow-2xl overflow-hidden flex flex-col group">
+                        <!-- App Header -->
+                        <div class="bg-blue-600 h-16 flex items-center justify-between px-4">
+                            <span class="text-white font-bold">Biodata_App</span>
+                            <i class="fa-solid fa-book text-white"></i>
+                        </div>
+                        
+                        <!-- App Body -->
+                        <div class="bg-yellow-500 flex-1 p-6 relative">
+                            <h4 class="text-center font-bold text-slate-900 mb-6 font-mono">Welcome to Biodata App</h4>
+                            
+                            <!-- Form Mockup -->
+                            <div class="space-y-2 mb-6">
+                                <div class="h-8 bg-yellow-200 rounded border border-yellow-600 opacity-50"></div>
+                                <div class="h-8 bg-yellow-200 rounded border border-yellow-600 opacity-50"></div>
+                                <div class="h-8 bg-yellow-200 rounded border border-yellow-600 opacity-50"></div>
+                                <div class="h-8 bg-yellow-200 rounded border border-yellow-600 opacity-50"></div>
+                            </div>
+                            
+                            <div class="w-full h-10 bg-yellow-700 rounded shadow-lg flex items-center justify-center text-white font-bold text-sm">SUBMIT</div>
+                            
+                            <div class="mt-8 text-[10px] text-green-800 font-mono text-center">
+                                Rin | Membaca | 1 | 089699921111
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 20: Step 1 - Designer Setup -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 1: Desain Form (Designer) 🎨</h2>
+            <div class="max-w-6xl mx-auto flex gap-8">
+                
+                <div class="flex-1 space-y-4">
+                     <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 h-full">
+                         <h3 class="font-bold text-lg mb-4">Komponen yang Dibutuhkan:</h3>
+                         
+                         <div class="space-y-4">
+                             <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                 <div class="bg-blue-100 p-2 rounded text-blue-600"><i class="fa-solid fa-font"></i></div>
+                                 <div>
+                                     <div class="font-bold text-slate-700">Labels (Judul)</div>
+                                     <div class="text-xs text-slate-500">"Nama:", "Hobi:", dll.</div>
+                                 </div>
+                             </div>
+                             
+                             <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                 <div class="bg-yellow-100 p-2 rounded text-yellow-600"><i class="fa-regular fa-square"></i></div>
+                                 <div>
+                                     <div class="font-bold text-slate-700">TextBoxes (Input)</div>
+                                     <div class="text-xs text-slate-500">Rename jadi: <b>inputNama</b>, <b>inputHobi</b>, <b>inputKelas</b>, <b>inputTelp</b>.</div>
+                                 </div>
+                             </div>
+
+                             <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                 <div class="bg-green-100 p-2 rounded text-green-600"><i class="fa-solid fa-mobile-button"></i></div>
+                                 <div>
+                                     <div class="font-bold text-slate-700">Button (Aksi)</div>
+                                     <div class="text-xs text-slate-500">Text: "SUBMIT"</div>
+                                 </div>
+                             </div>
+                             
+                             <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                 <div class="bg-purple-100 p-2 rounded text-purple-600"><i class="fa-solid fa-tag"></i></div>
+                                 <div>
+                                     <div class="font-bold text-slate-700">Label Output</div>
+                                     <div class="text-xs text-slate-500">Kosongkan textnya. Rename jadi <b>lbl_hasil</b>.</div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+
+                <div class="flex-1 bg-slate-100 p-6 rounded-2xl border-4 border-slate-300 flex justify-center">
+                    <img src="https://lh3.googleusercontent.com/pw/AP1GczO_A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf-A8-Gf" alt="Designer View Mockup" class="h-full object-contain drop-shadow-xl rounded-xl">
+                    <!-- Since I don't have the exact image URL for the layout, I'll build a CSS mock representation for clarity -->
+                    <div class="w-64 bg-yellow-500 p-4 rounded-xl shadow-lg border-4 border-slate-800 relative space-y-3">
+                         <div class="bg-blue-600 text-white p-2 text-center text-xs font-bold -mx-4 -mt-4 rounded-t-lg mb-4">Screen1</div>
+                         
+                         <label class="text-[10px] font-bold block">NAMA:</label>
+                         <div class="bg-yellow-200 h-6 border border-yellow-600 rounded w-full"></div>
+                         
+                         <label class="text-[10px] font-bold block">HOBI:</label>
+                         <div class="bg-yellow-200 h-6 border border-yellow-600 rounded w-full"></div>
+                         
+                         <label class="text-[10px] font-bold block">KELAS:</label>
+                         <div class="bg-yellow-200 h-6 border border-yellow-600 rounded w-full"></div>
+
+                         <div class="bg-yellow-700 text-white text-center py-2 rounded text-xs font-bold mt-4 shadow">SUBMIT</div>
+                         
+                         <div class="text-center text-[10px] text-green-900 mt-4 min-h-[20px]">(Hasil muncul di sini)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 21: Step 2 - Logic (Join Block) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Step 2: Coding "Join" (Gabung Text) 🧩</h2>
+            <div class="max-w-5xl mx-auto flex flex-col items-center gap-8">
+                
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 w-full text-center">
+                    <h3 class="font-bold text-lg mb-2">Logika:</h3>
+                    <p class="text-slate-600">
+                        Saat tombol diklik <i class="fa-solid fa-arrow-right text-slate-300 mx-2"></i> Gabungkan semua input <i class="fa-solid fa-arrow-right text-slate-300 mx-2"></i> Tampilkan di Label Hasil.
+                    </p>
+                </div>
+
+                <!-- Block Visualization -->
+                <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl w-full overflow-x-auto">
+                    <div class="min-w-[700px] transform scale-90 origin-top-left">
+                        
+                        <!-- Event Block -->
+                        <div class="bg-yellow-600 text-white px-4 py-2 rounded-t-lg rounded-br-lg shadow-md font-bold text-sm mb-1 inline-block">
+                             when btn_Submit.Click do
+                        </div>
+                        
+                        <!-- Action Block -->
+                        <div class="pl-4 border-l-4 border-slate-600 ml-2">
+                             <div class="bg-green-700 text-white px-4 py-2 rounded shadow-md font-bold text-sm flex gap-2 items-center">
+                                 <span>set lbl_hasil.Text to</span>
+                                 
+                                 <!-- Join Block -->
+                                 <div class="bg-purple-500 p-1 rounded shadow-inner flex flex-col gap-1 items-start pl-2">
+                                     <div class="flex items-center gap-2 pr-2">
+                                         <i class="fa-solid fa-gear text-white/50 text-xs"></i>
+                                         <span>join</span>
+                                     </div>
+                                     
+                                     <!-- Inputs -->
+                                     <div class="bg-green-500 text-white px-2 py-0.5 rounded text-xs w-full shadow-sm">inputNama.Text</div>
+                                     <div class="bg-red-400 text-white px-2 py-0.5 rounded text-xs w-full shadow-sm font-mono">" | "</div>
+                                     <div class="bg-green-500 text-white px-2 py-0.5 rounded text-xs w-full shadow-sm">inputHobi.Text</div>
+                                     <div class="bg-red-400 text-white px-2 py-0.5 rounded text-xs w-full shadow-sm font-mono">" | "</div>
+                                     <div class="bg-green-500 text-white px-2 py-0.5 rounded text-xs w-full shadow-sm">inputKelas.Text</div>
+                                 </div>
+                             </div>
+                        </div>
+
+                    </div>
+                    <p class="text-slate-400 mt-4 text-sm text-center">
+                        <i class="fa-solid fa-lightbulb text-yellow-500 mr-2"></i>
+                        Tips: Gunakan blok text <b>" | "</b> (spasi garis spasi) sebagai pemisah agar rapi!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 22: Interactive Demo Biodata -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6">Demo Biodata App 🚀</h2>
+            
+            <div class="max-w-md mx-auto bg-yellow-500 p-6 rounded-[2rem] shadow-2xl border-4 border-slate-800 relative">
+                <div class="bg-blue-600 text-white p-3 text-center font-bold text-sm -mx-6 -mt-6 rounded-t-[1.5rem] mb-6 flex justify-between px-6">
+                    <span>Biodata_App</span>
+                    <i class="fa-solid fa-battery-full"></i>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="font-bold text-[10px] text-slate-800">NAMA:</label>
+                        <input type="text" id="demoNama" class="w-full bg-yellow-100 border border-yellow-600 rounded px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="font-bold text-[10px] text-slate-800">HOBI:</label>
+                        <input type="text" id="demoHobi" class="w-full bg-yellow-100 border border-yellow-600 rounded px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="font-bold text-[10px] text-slate-800">KELAS:</label>
+                        <input type="text" id="demoKelas" class="w-full bg-yellow-100 border border-yellow-600 rounded px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <button id="demoSubmit" class="w-full bg-yellow-800 text-white py-3 rounded-lg font-bold shadow-lg mt-4 active:scale-95 transition">SUBMIT</button>
+
+                    <div class="mt-4 p-3 bg-yellow-100 rounded border border-yellow-300 min-h-[3rem] flex items-center justify-center">
+                        <p id="demoOutput" class="text-xs text-green-800 font-mono font-bold break-all text-center">...</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Bar Mockup -->
+                <div class="absolute bottom-0 left-0 right-0 h-10 bg-black flex justify-around items-center text-white/50 text-xl rounded-b-[1.5rem]">
+                    <i class="fa-solid fa-caret-left"></i>
+                    <i class="fa-regular fa-circle"></i>
+                    <i class="fa-regular fa-square"></i>
+                </div>
+            </div>
+
+            <script>
+                // Demo Logic
+                document.getElementById('demoSubmit').addEventListener('click', () => {
+                    const nama = document.getElementById('demoNama').value || "(Nama)";
+                    const hobi = document.getElementById('demoHobi').value || "(Hobi)";
+                    const kelas = document.getElementById('demoKelas').value || "(Kelas)";
+                    
+                    const result = `${nama} | ${hobi} | ${kelas}`;
+                    
+                    const out = document.getElementById('demoOutput');
+                    out.innerText = result;
+                    out.classList.add('animate-pulse');
+                    setTimeout(() => out.classList.remove('animate-pulse'), 500);
+                });
+            </script>
+        </section>
+
+        <!-- Slide 23: Conclusion -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8">Rangkuman Misi Hari Ini 📝</h2>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-6">
+                
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-brand-500 flex flex-col items-center text-center hover:-translate-y-2 transition-transform">
+                    <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center text-3xl mb-4">🛡️</div>
+                    <h3 class="font-bold text-lg mb-2">Privacy First</h3>
+                    <p class="text-sm text-slate-600">Bedakan data Public (boleh sebar) dan Private (rahasia).</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-brand-500 flex flex-col items-center text-center hover:-translate-y-2 transition-transform delay-75">
+                    <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center text-3xl mb-4">🔒</div>
+                    <h3 class="font-bold text-lg mb-2">Secure UI</h3>
+                    <p class="text-sm text-slate-600">Gunakan <b>PasswordTextBox</b> agar input tersensor otomatis.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-brand-500 flex flex-col items-center text-center hover:-translate-y-2 transition-transform delay-100">
+                    <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center text-3xl mb-4">🧠</div>
+                    <h3 class="font-bold text-lg mb-2">Strict Logic</h3>
+                    <p class="text-sm text-slate-600">Logika <b>IF..ELSE</b> menjaga pintu gerbang aplikasi kita.</p>
+                </div>
+
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="text-2xl font-light text-slate-500 italic mb-4">
+                    "Programmer yang hebat tidak hanya membuat aplikasi yang 'Bisa Jalan', tapi juga 'Aman'."
+                </p>
+                <div class="inline-block bg-slate-900 text-white px-6 py-2 rounded-full text-sm font-bold tracking-widest">
+                    GOOD JOB CODERS! 🚀
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 20: Outro / Logout -->
+        <section class="slide">
+            <div class="text-center z-10">
+                <h1 class="text-6xl md:text-8xl font-black text-slate-900 mb-4 tracking-tighter">
+                    SESI 30 <br> <span class="text-brand-500">COMPLETE!</span>
+                </h1>
+                <p class="text-2xl text-slate-600 font-light mb-12">
+                    Sampai jumpa di misi berikutnya! 👋
+                </p>
+                
+                <button onclick="localStorage.removeItem('sesi30_access_v3'); location.reload();" class="bg-white text-red-500 px-8 py-4 rounded-xl font-bold shadow-xl border-2 border-red-100 hover:bg-red-50 hover:border-red-200 transition-all active:scale-95 group">
+                    <i class="fa-solid fa-power-off mr-2 group-hover:rotate-90 transition-transform"></i> LOGOUT SYSTEM
+                </button>
+            </div>
+            
+            <!-- Background Decoration -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-50 rounded-full blur-3xl opacity-50 animate-pulse"></div>
+            </div>
+        </section>
+
+
+    <script>
+        // Core Logic for Slide System (Adapted from previous session)
+        const activeClass = 'active';
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('bar');
+        const counter = document.getElementById('counter');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const accessOverlay = document.getElementById('accessOverlay');
+        const accessInput = document.getElementById('accessCodeInput');
+        const accessBtn = document.getElementById('accessBtn');
+        const accessError = document.getElementById('accessError');
+
+        let currentSlide = 0;
+        const totalSlides = slides.length; // Will increase as we add more sections
+
+        // Access Control
+        const VALID_CODE = "RGMDSMS25";
+        
+        // Check local storage for session
+        if(localStorage.getItem('sesi30_access_v3') === 'true') {
+            accessOverlay.style.display = 'none';
+        }
+
+        accessBtn.addEventListener('click', () => {
+            if(accessInput.value.toUpperCase().trim() === VALID_CODE) {
+                localStorage.setItem('sesi30_access_v3', 'true');
+                accessOverlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => accessOverlay.style.display = 'none', 500);
+            } else {
+                accessError.style.opacity = '1';
+                accessInput.classList.add('border-red-500', 'animate-shake');
+                setTimeout(() => accessInput.classList.remove('animate-shake'), 500);
+            }
+        });
+
+
+            
+        // Navigation
+        function updateSlide() {
+            slides.forEach((slide, idx) => {
+                if(idx === currentSlide) {
+                    slide.classList.add(activeClass);
+                } else {
+                    slide.classList.remove(activeClass);
+                }
+            });
+            
+            // Update UI
+            progressBar.style.width = ((currentSlide + 1) / 24) * 100 + '%'; // Updated to 24 slides
+            counter.innerText = currentSlide + 1;
+            
+            btnPrev.disabled = currentSlide === 0;
+            btnNext.disabled = currentSlide === totalSlides - 1;
+        }
+
+        btnNext.addEventListener('click', () => {
+            if(currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if(currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+
+        // Keyboard Nav
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowRight') btnNext.click();
+            if(e.key === 'ArrowLeft') btnPrev.click();
+        });
+
+        // Init
+        updateSlide();
+    </script>
+</body>
+</html>
