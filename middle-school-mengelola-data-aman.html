@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesi 32: Mengelola Data Aman</title>
+    <script>
+        // Check access BEFORE rendering to prevent flash
+        if (localStorage.getItem('sesi32_access') === 'true') {
+            document.documentElement.style.setProperty('--overlay-display', 'none');
+        } else {
+            document.documentElement.style.setProperty('--overlay-display', 'flex');
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6', // Violet/Purple for Data Management
+                            600: '#7c3aed',
+                            900: '#4c1d95',
+                        },
+                        accent: {
+                            500: '#10b981', // Emerald for Safety
+                            600: '#059669',
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        popIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --overlay-display: flex;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        .slide {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Keyframe Animations - CRITICAL: These must be defined for slide content to appear */
+        @keyframes slideUp {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        /* Staggered Animations */
+        .slide.active .animate-entry-1 {
+            opacity: 0;
+            animation: slideUp 0.8s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .animate-entry-2 {
+            opacity: 0;
+            animation: slideUp 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .animate-entry-3 {
+            opacity: 0;
+            animation: slideUp 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .pop-entry {
+            opacity: 0;
+            animation: popIn 0.7s 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #a5b4fc;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #334155;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Grid Background */
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .quiz-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Overlay with CSS variable control */
+        #accessOverlay {
+            display: var(--overlay-display) !important;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 grid-bg">
+
+    <!-- Access Control -->
+    <div id="accessOverlay" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4">
+        <div
+            class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center">
+            <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+            <input type="text" id="accessCodeInput" placeholder="Enter Class Code"
+                class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase">
+            <button id="accessBtn"
+                class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">UNLOCK
+                SYSTEM</button>
+            <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED
+            </p>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div
+        class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Sesi 32: Manage Data</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="btnPrev"
+                class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition disabled:opacity-30"><i
+                    class="fa-solid fa-chevron-left"></i></button>
+            <span class="font-mono text-sm font-bold text-slate-400"><span id="counter"
+                    class="text-brand-600">1</span>/15</span>
+            <button id="btnNext"
+                class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg shadow-brand-500/20"><i
+                    class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+        <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[5%]"></div>
+    </div>
+
+    <main class="relative h-screen w-full overflow-hidden">
+
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <div class="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
+                <div class="absolute top-10 left-10 text-9xl font-black text-slate-900 rotate-12">SAFE</div>
+                <div class="absolute bottom-20 right-20 text-9xl font-black text-slate-900 -rotate-12">DATA</div>
+            </div>
+
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-24 z-10 w-full">
+                <div class="flex-1 text-center md:text-left animate-entry-1">
+                    <div
+                        class="inline-block px-4 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6 tracking-widest border border-brand-200">
+                        MIDDLE SCHOOL • SESSION 32
+                    </div>
+                    <h1 class="text-6xl md:text-8xl font-black text-slate-900 mb-6 leading-tight tracking-tight">
+                        MENGELOLA <br><span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-accent-500">DATA
+                            AMAN</span>
+                    </h1>
+                    <p class="text-2xl text-slate-600 font-light mb-8 max-w-lg">
+                        Update, Hapus, dan Lindungi datamu di TinyDB! 🛡️💾
+                    </p>
+                </div>
+
+                <div class="flex-1 relative animate-float flex justify-center pop-entry">
+                    <div
+                        class="bg-white p-6 rounded-[3rem] shadow-2xl border border-slate-100 relative w-96 h-96 flex items-center justify-center">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-tr from-brand-50 to-accent-50 rounded-[3rem] opacity-50">
+                        </div>
+                        <i class="fa-solid fa-file-shield text-9xl text-brand-500 drop-shadow-2xl"></i>
+
+                        <!-- Decoration -->
+                        <div
+                            class="absolute -top-4 -right-4 bg-white p-4 rounded-2xl shadow-lg animate-bounce delay-700">
+                            <i class="fa-solid fa-trash-can text-3xl text-red-500"></i>
+                        </div>
+                        <div class="absolute bottom-8 -left-8 bg-white p-4 rounded-2xl shadow-lg animate-bounce">
+                            <i class="fa-solid fa-pen-to-square text-3xl text-blue-500"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Recall TinyDB -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 animate-entry-1">Recall: TinyDB itu Apa? 🤔</h2>
+            <div
+                class="max-w-4xl mx-auto bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-200 flex items-center gap-8 animate-entry-2">
+                <div class="w-32 h-32 bg-slate-100 rounded-full flex items-center justify-center text-6xl shadow-inner">
+                    🐜
+                </div>
+                <div>
+                    <p class="text-xl text-slate-700 mb-4 leading-relaxed">
+                        <b>TinyDB</b> adalah Database Lokal di HP. <br>
+                        Sifatnya <b>PERMANEN</b> (Data tidak hilang walaupun aplikasi ditutup).
+                    </p>
+                    <div class="flex gap-4">
+                        <div class="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold text-sm">
+                            <i class="fa-solid fa-check mr-2"></i> Simpan Data
+                        </div>
+                        <div class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-bold text-sm">
+                            <i class="fa-solid fa-check mr-2"></i> Ambil Data
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center mt-8 text-slate-500 animate-entry-3">Tapi ingat, tidak semua data boleh disimpan
+                sembarangan! ⚠️</p>
+        </section>
+
+        <!-- Slide 3 (NEW): Analogi Visual -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-10 animate-entry-1">Analogi: Variable vs TinyDB 🏦</h2>
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-stretch">
+
+                <!-- Variable = Meja -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-xl flex flex-col items-center text-center animate-entry-2 hover:-translate-y-2 transition duration-500">
+                    <div class="h-40 flex items-center justify-center">
+                        <span class="text-8xl">🪑</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">VARIABLE = MEJA</h3>
+                    <div class="bg-orange-100 text-orange-800 px-4 py-2 rounded-lg font-bold text-sm mb-4 w-full">
+                        Sementara (Temporary)</div>
+                    <p class="text-slate-600 text-sm">
+                        Saat kamu pulang sekolah (Close App), meja dibersihkan Pak Bon. <br>
+                        <b>Barang di atas meja akan HILANG.</b> 🧹
+                    </p>
+                </div>
+
+                <!-- TinyDB = Laci Besi -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-xl flex flex-col items-center text-center animate-entry-3 hover:-translate-y-2 transition duration-500 border-2 border-brand-500">
+                    <div class="h-40 flex items-center justify-center">
+                        <span class="text-8xl">🗄️</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-brand-700 mb-2">TinyDB = LACI BESI</h3>
+                    <div class="bg-brand-100 text-brand-800 px-4 py-2 rounded-lg font-bold text-sm mb-4 w-full">Permanen
+                        (Storage)</div>
+                    <p class="text-slate-600 text-sm">
+                        Barang disimpan di dalam laci terkunci. <br>
+                        Saat kamu kembali besok, <b>Barangnya MASIH ADA.</b> ✅
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Slide 4: Principles - Do's and Don'ts -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Prinsip Keamanan Data 🛡️</h2>
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 w-full">
+
+                <!-- Safe Zone -->
+                <div
+                    class="bg-green-50 p-8 rounded-[2rem] border-2 border-green-200 shadow-lg relative overflow-hidden group animate-entry-2">
+                    <div
+                        class="absolute top-0 right-0 bg-green-500 text-white px-4 py-1 rounded-bl-xl font-bold text-sm">
+                        SAFE ✅</div>
+                    <div class="text-center mb-6">
+                        <i
+                            class="fa-solid fa-shield-halved text-6xl text-green-500 mb-4 group-hover:scale-110 transition"></i>
+                        <h3 class="text-2xl font-bold text-green-800">DATA AMAN</h3>
+                        <p class="text-sm text-green-700">Boleh disimpan di TinyDB</p>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="bg-white p-3 rounded-xl shadow-sm flex items-center gap-3">
+                            <i class="fa-solid fa-gamepad text-green-500"></i>
+                            <span class="text-slate-700 font-bold">Skor Game</span>
+                        </li>
+                        <li class="bg-white p-3 rounded-xl shadow-sm flex items-center gap-3">
+                            <i class="fa-solid fa-gear text-green-500"></i>
+                            <span class="text-slate-700 font-bold">Pengaturan (Setting)</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Danger Zone -->
+                <div
+                    class="bg-red-50 p-8 rounded-[2rem] border-2 border-red-200 shadow-lg relative overflow-hidden group animate-entry-3">
+                    <div class="absolute top-0 right-0 bg-red-500 text-white px-4 py-1 rounded-bl-xl font-bold text-sm">
+                        DANGER ❌</div>
+                    <div class="text-center mb-6">
+                        <i
+                            class="fa-solid fa-user-secret text-6xl text-red-500 mb-4 group-hover:scale-110 transition"></i>
+                        <h3 class="text-2xl font-bold text-red-800">DATA SENSITIF</h3>
+                        <p class="text-sm text-red-700">JANGAN simpan di TinyDB (Plain Text)</p>
+                    </div>
+                    <ul class="space-y-3 opacity-90">
+                        <li class="bg-white p-3 rounded-xl shadow-sm flex items-center gap-3 border border-red-100">
+                            <i class="fa-solid fa-key text-red-500"></i>
+                            <span class="text-slate-700 font-bold text-red-600">Password / PIN ATM</span>
+                        </li>
+                        <li class="bg-white p-3 rounded-xl shadow-sm flex items-center gap-3 border border-red-100">
+                            <i class="fa-solid fa-id-card text-red-500"></i>
+                            <span class="text-slate-700 font-bold text-red-600">Nomor KTP / NIK</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Slide 5 (NEW): Interactive Quiz -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 animate-entry-1">Mini Game: Aman atau Bahaya? 🚦</h2>
+
+            <div
+                class="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-200 text-center animate-entry-2">
+                <div id="quizContainer">
+                    <div class="mb-8">
+                        <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Soal <span
+                                id="qNum">1</span>/5</p>
+                        <h3 id="qText" class="text-3xl font-black text-slate-800 h-20 flex items-center justify-center">
+                            Password Facebook</h3>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="checkAnswer('SAFE')"
+                            class="quiz-btn bg-green-100 hover:bg-green-500 hover:text-white text-green-700 py-6 rounded-2xl font-bold text-xl transition-all shadow-md">
+                            ✅ AMAN
+                        </button>
+                        <button onclick="checkAnswer('DANGER')"
+                            class="quiz-btn bg-red-100 hover:bg-red-500 hover:text-white text-red-700 py-6 rounded-2xl font-bold text-xl transition-all shadow-md">
+                            ❌ BAHAYA
+                        </button>
+                    </div>
+                    <p id="qResult" class="mt-4 font-bold text-lg h-8 opacity-0 transition-opacity">Benar!</p>
+                </div>
+
+                <div id="quizEnd" class="hidden">
+                    <h3 class="text-4xl font-black text-brand-600 mb-4">Quiz Selesai! 🎉</h3>
+                    <p class="text-slate-600 mb-6 font-bold">Kamu sudah paham mana data yang boleh disimpan!</p>
+                    <button onclick="resetQuiz()"
+                        class="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-700">Main
+                        Lagi</button>
+                </div>
+            </div>
+
+            <script>
+                const questions = [
+                    // { text: "Soal", type: "SAFE" | "DANGER" }
+                    { text: "Skor Tertinggi Game", type: "SAFE" },
+                    { text: "Password Email", type: "DANGER" },
+                    { text: "Alamat Rumah", type: "DANGER" },
+                    { text: "Warna Tema (Setting)", type: "SAFE" },
+                    { text: "Nomor Kartu Kredit", type: "DANGER" }
+                ];
+                let qIdx = 0;
+
+                function loadQuestion() {
+                    if (qIdx >= questions.length) {
+                        document.getElementById('quizContainer').classList.add('hidden');
+                        document.getElementById('quizEnd').classList.remove('hidden');
+                        return;
+                    }
+                    document.getElementById('qNum').innerText = qIdx + 1;
+                    document.getElementById('qText').innerText = questions[qIdx].text;
+                    document.getElementById('qResult').style.opacity = '0';
+                }
+
+                function checkAnswer(ans) {
+                    const correct = questions[qIdx].type;
+                    const resEl = document.getElementById('qResult');
+                    if (ans === correct) {
+                        resEl.innerText = "✨ Benar!";
+                        resEl.className = "mt-4 font-bold text-lg text-green-500 h-8 transition-opacity slide-up";
+                    } else {
+                        resEl.innerText = "💀 Salah!";
+                        resEl.className = "mt-4 font-bold text-lg text-red-500 h-8 transition-opacity shake";
+                    }
+                    resEl.style.opacity = '1';
+
+                    setTimeout(() => {
+                        qIdx++;
+                        loadQuestion();
+                    }, 1000);
+                }
+
+                function resetQuiz() {
+                    qIdx = 0;
+                    document.getElementById('quizContainer').classList.remove('hidden');
+                    document.getElementById('quizEnd').classList.add('hidden');
+                    loadQuestion();
+                }
+                loadQuestion();
+            </script>
+        </section>
+
+        <!-- Slide 6: CRUD Operations - Theory -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Operasi Data: C.R.U.D ⚙️</h2>
+            <div class="max-w-5xl mx-auto space-y-6">
+                <!-- CRUD Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-entry-2">
+                    <!-- Create -->
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-lg text-center border-b-4 border-blue-500 hover:-translate-y-2 transition duration-300">
+                        <div
+                            class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center text-blue-600 mx-auto mb-3 text-xl font-bold">
+                            C</div>
+                        <h3 class="font-bold text-slate-800">CREATE</h3>
+                        <p class="text-xs text-slate-500">Buat Baru</p>
+                    </div>
+                    <!-- Read -->
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-lg text-center border-b-4 border-green-500 hover:-translate-y-2 transition duration-300">
+                        <div
+                            class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center text-green-600 mx-auto mb-3 text-xl font-bold">
+                            R</div>
+                        <h3 class="font-bold text-slate-800">READ</h3>
+                        <p class="text-xs text-slate-500">Baca Data</p>
+                    </div>
+                    <!-- Update -->
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-lg text-center border-b-4 border-yellow-500 hover:-translate-y-2 transition duration-300">
+                        <div
+                            class="bg-yellow-100 w-12 h-12 rounded-full flex items-center justify-center text-yellow-600 mx-auto mb-3 text-xl font-bold">
+                            U</div>
+                        <h3 class="font-bold text-slate-800">UPDATE</h3>
+                        <p class="text-xs text-slate-500">Perbarui</p>
+                    </div>
+                    <!-- Delete -->
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-lg text-center border-b-4 border-red-500 hover:-translate-y-2 transition duration-300">
+                        <div
+                            class="bg-red-100 w-12 h-12 rounded-full flex items-center justify-center text-red-600 mx-auto mb-3 text-xl font-bold">
+                            D</div>
+                        <h3 class="font-bold text-slate-800">DELETE</h3>
+                        <p class="text-xs text-slate-500">Hapus</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-indigo-50 p-6 rounded-2xl border border-indigo-200 animate-entry-3">
+                    <h3 class="font-bold text-indigo-900 mb-2">Di App Inventor:</h3>
+                    <ul class="grid md:grid-cols-2 gap-4 text-sm">
+                        <li class="flex items-center gap-3">
+                            <span
+                                class="bg-purple-600 text-white px-2 py-1 rounded font-mono text-xs shadow">StoreValue</span>
+                            <span class="text-slate-700">Untuk <b>Create</b> DAN <b>Update</b>. (Otomatis menimpa jika
+                                Tag sama).</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span
+                                class="bg-purple-600 text-white px-2 py-1 rounded font-mono text-xs shadow">ClearTag</span>
+                            <span class="text-slate-700">Untuk <b>Delete</b> satu data spesifik.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Project Brief - Data Manager -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Misi: Aplikasi Manajer Data 💼</h2>
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 space-y-6 animate-entry-2">
+                    <p class="text-xl text-slate-600">
+                        Kita akan upgrade aplikasi kemarin agar bisa <b>Mengedit</b> dan <b>Menghapus</b> nama yang
+                        salah.
+                    </p>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-brand-500">
+                        <h3 class="font-bold text-brand-900 mb-2">Fitur Baru:</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center gap-4">
+                                <button
+                                    class="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-lg font-bold text-xs shadow-sm shadow-yellow-400/50">PERBARUI</button>
+                                <span class="text-sm text-slate-600">Mengganti nama lama dengan yang baru.</span>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <button
+                                    class="bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-xs shadow-sm shadow-red-500/50">HAPUS</button>
+                                <span class="text-sm text-slate-600">Menghapus nama dari memori HP.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex justify-center pop-entry">
+                    <div
+                        class="relative w-64 h-[450px] bg-slate-900 rounded-[2.5rem] border-8 border-slate-800 shadow-2xl overflow-hidden flex flex-col">
+                        <!-- Simulation Mockup -->
+                        <div class="bg-slate-50 flex-1 p-6 flex flex-col items-center pt-8 space-y-3">
+                            <div class="w-full bg-white border border-slate-300 rounded p-2 text-sm text-slate-400">Budi
+                                Santoso</div>
+                            <div class="grid grid-cols-2 gap-2 w-full">
+                                <div
+                                    class="bg-green-500 text-white py-2 rounded shadow font-bold w-full text-center text-[10px]">
+                                    SIMPAN</div>
+                                <div
+                                    class="bg-blue-500 text-white py-2 rounded shadow font-bold w-full text-center text-[10px]">
+                                    TAMPILKAN</div>
+                                <div
+                                    class="bg-yellow-500 text-white py-2 rounded shadow font-bold w-full text-center text-[10px]">
+                                    PERBARUI</div>
+                                <div
+                                    class="bg-red-500 text-white py-2 rounded shadow font-bold w-full text-center text-[10px]">
+                                    HAPUS</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Step 1 - UI Designer -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Step 1: Tambah Tombol (Designer) 🎨</h2>
+            <div class="max-w-6xl mx-auto flex gap-10">
+                <div class="flex-1 bg-white p-8 rounded-3xl shadow-xl border border-slate-100 animate-entry-2">
+                    <h3 class="font-bold text-xl mb-4 text-slate-700 flex items-center gap-2"><i
+                            class="fa-solid fa-layer-group text-brand-500"></i> Lengkapi UI:</h3>
+                    <div class="space-y-4">
+                        <div
+                            class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-slate-800 block">Button Perbarui</span>
+                            </div>
+                            <span class="text-xs font-mono bg-white px-2 py-1 rounded border border-slate-200">Rename:
+                                btperbarui</span>
+                        </div>
+                        <div class="p-4 bg-red-50 rounded-xl border border-red-200 flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-slate-800 block">Button Hapus</span>
+                            </div>
+                            <span class="text-xs font-mono bg-white px-2 py-1 rounded border border-slate-200">Rename:
+                                bthapus</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="flex-1 flex justify-center items-center bg-slate-100 rounded-3xl border-4 border-slate-200 p-4 relative pop-entry">
+                    <div class="w-48 bg-white border border-slate-300 rounded shadow-lg p-2">
+                        <div class="flex gap-1">
+                            <div
+                                class="flex-1 bg-yellow-200 h-8 rounded border border-yellow-400 flex items-center justify-center text-[8px] font-bold">
+                                Perbarui</div>
+                            <div
+                                class="flex-1 bg-red-200 h-8 rounded border border-red-400 flex items-center justify-center text-[8px] font-bold">
+                                Hapus</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Step 2 - Update Logic -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Step 2: Coding "Perbarui" (Overwrite) 🔄
+            </h2>
+            <div class="max-w-5xl mx-auto flex flex-col gap-6 animate-entry-2">
+
+                <div class="bg-yellow-50 p-6 rounded-2xl border-l-4 border-yellow-500">
+                    <p class="text-slate-700">
+                        <b>Konsep Overwrite:</b> Jika kita simpan data baru dengan <b>TAG YANG SAMA</b>, data lama
+                        otomatis tertimpa.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl overflow-x-auto">
+                    <!-- Blocks -->
+                    <div class="flex flex-col items-start gap-1">
+                        <div
+                            class="bg-yellow-600 text-white px-4 py-2 rounded-t-lg rounded-br-lg shadow-md font-bold text-sm">
+                            when btperbarui.Click do
+                        </div>
+                        <div class="pl-4 border-l-4 border-slate-600 ml-2 space-y-2">
+                            <div
+                                class="bg-purple-600 text-white px-4 py-2 rounded shadow-md font-bold text-sm flex gap-3 items-center">
+                                <span>call TinyDB1.StoreValue</span>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs opacity-70">tag</span>
+                                        <span
+                                            class="bg-red-400 text-white px-2 py-0.5 rounded font-mono text-xs">"NamaPengguna"</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs opacity-70">valueToStore</span>
+                                        <span
+                                            class="bg-green-600 text-white px-2 py-0.5 rounded font-mono text-xs">TextBox_Nama.Text</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Step 3 - Delete Logic -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Step 3: Coding "Hapus" (ClearTag) 🗑️</h2>
+            <div class="max-w-5xl mx-auto flex flex-col gap-6 animate-entry-2">
+
+                <div class="bg-red-50 p-6 rounded-2xl border-l-4 border-red-500">
+                    <p class="text-slate-700">
+                        Gunakan blok <b>ClearTag</b> untuk menghapus satu data. <br>
+                        (WARNING: Jangan pakai <b>ClearAll</b> kecuali mau reset aplikasi!).
+                    </p>
+                </div>
+
+                <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl overflow-x-auto">
+                    <div class="flex flex-col items-start gap-1">
+                        <div
+                            class="bg-yellow-600 text-white px-4 py-2 rounded-t-lg rounded-br-lg shadow-md font-bold text-sm">
+                            when bthapus.Click do
+                        </div>
+                        <div class="pl-4 border-l-4 border-slate-600 ml-2 space-y-2">
+                            <div
+                                class="bg-purple-600 text-white px-4 py-2 rounded shadow-md font-bold text-sm flex gap-3 items-center">
+                                <span>call TinyDB1.ClearTag</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs opacity-70">tag</span>
+                                    <span
+                                        class="bg-red-400 text-white px-2 py-0.5 rounded font-mono text-xs">"NamaPengguna"</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide X: ClearTag vs ClearAll -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 animate-entry-1">
+                ClearTag vs ClearAll ⚖️
+            </h2>
+
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10">
+
+                <!-- ClearTag -->
+                <div class="bg-green-50 p-8 rounded-3xl border-2 border-green-300 shadow-lg animate-entry-2">
+                    <div class="text-center mb-6">
+                        <i class="fa-solid fa-eraser text-6xl text-green-500 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-green-700">ClearTag</h3>
+                        <p class="text-sm text-green-600 font-bold">HAPUS SATU DATA</p>
+                    </div>
+
+                    <ul class="space-y-3 text-slate-700 text-sm">
+                        <li>✅ Menghapus data berdasarkan <b>1 tag</b></li>
+                        <li>✅ Aman untuk aplikasi pengguna</li>
+                        <li>✅ Cocok untuk fitur “Hapus Nama”</li>
+                    </ul>
+
+                    <div class="mt-6 bg-white p-4 rounded-xl border border-green-200 font-mono text-xs">
+                        call TinyDB1.ClearTag<br>
+                        tag = "NamaPengguna"
+                    </div>
+                </div>
+
+                <!-- ClearAll -->
+                <div class="bg-red-50 p-8 rounded-3xl border-2 border-red-300 shadow-lg animate-entry-3">
+                    <div class="text-center mb-6">
+                        <i class="fa-solid fa-bomb text-6xl text-red-500 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-red-700">ClearAll</h3>
+                        <p class="text-sm text-red-600 font-bold">HAPUS SEMUA DATA</p>
+                    </div>
+
+                    <ul class="space-y-3 text-slate-700 text-sm">
+                        <li>⚠️ Menghapus <b>SEMUA isi TinyDB</b></li>
+                        <li>⚠️ Tidak bisa dikembalikan</li>
+                        <li>❌ Tidak dipakai di proyek hari ini</li>
+                    </ul>
+
+                    <div class="mt-6 bg-white p-4 rounded-xl border border-red-200 font-mono text-xs">
+                        call TinyDB1.ClearAll
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="text-center mt-8 text-slate-500 text-sm animate-entry-3">
+                👉 Di kelas ini, kita <b>WAJIB menggunakan ClearTag</b> agar data tetap aman.
+            </p>
+        </section>
+
+
+        <!-- Slide 11: Tag Logic Visualization -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Penting: Tag itu Sensitif! 🏷️</h2>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 animate-entry-2">
+                <!-- Correct -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-green-500">
+                    <h3 class="text-center font-bold text-green-600 text-xl mb-4">Cara yang Benar ✅</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="bg-yellow-100 px-2 py-1 rounded font-mono text-sm border border-yellow-300">"NamaUser"</span>
+                        </div>
+                        <div class="flex justify-center text-slate-300"><i class="fa-solid fa-arrow-down"></i></div>
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="bg-yellow-100 px-2 py-1 rounded font-mono text-sm border border-yellow-300">"NamaUser"</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Incorrect -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-red-500">
+                    <h3 class="text-center font-bold text-red-600 text-xl mb-4">Cara Salah (Typo) ❌</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="bg-yellow-100 px-2 py-1 rounded font-mono text-sm border border-yellow-300">"NamaUser"</span>
+                        </div>
+                        <div class="flex justify-center text-slate-300"><i class="fa-solid fa-arrow-down"></i></div>
+                        <div class="border-2 border-red-400 rounded p-1">
+                            <span class="bg-red-100 px-2 py-1 rounded font-mono text-sm">"namauser"</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center mt-6 text-slate-500 text-sm animate-entry-3">
+                Huruf besar dan kecil itu BEDA (Case Sensitive).
+            </p>
+        </section>
+
+        <!-- Slide Y: Flowchart TinyDB -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-10 animate-entry-1">
+                Flowchart Logika TinyDB 🧠
+            </h2>
+
+            <div class="max-w-5xl mx-auto flex flex-col items-center gap-4 animate-entry-2">
+
+                <div class="flow-box">Mulai Aplikasi</div>
+                <div class="flow-arrow">⬇️</div>
+
+                <div class="flow-box">Screen.Initialize</div>
+                <div class="flow-arrow">⬇️</div>
+
+                <div class="flow-box">GetValue dari TinyDB</div>
+                <div class="flow-arrow">⬇️</div>
+
+                <div class="flow-box">Tampilkan ke Label</div>
+                <div class="flow-arrow">⬇️</div>
+
+                <div class="grid grid-cols-3 gap-4 w-full mt-4">
+                    <div class="flow-box-small bg-green-100">
+                        SIMPAN<br><span class="text-xs">(StoreValue)</span>
+                    </div>
+                    <div class="flow-box-small bg-yellow-100">
+                        PERBARUI<br><span class="text-xs">(StoreValue)</span>
+                    </div>
+                    <div class="flow-box-small bg-red-100">
+                        HAPUS<br><span class="text-xs">(ClearTag)</span>
+                    </div>
+                </div>
+
+                <div class="flow-arrow mt-4">⬇️</div>
+                <div class="flow-box">Tampilkan Pesan</div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-box">Selesai</div>
+
+            </div>
+
+            <style>
+                .flow-box {
+                    background: white;
+                    padding: 14px 24px;
+                    border-radius: 14px;
+                    border: 2px solid #8b5cf6;
+                    font-weight: bold;
+                    text-align: center;
+                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+                    width: 280px;
+                }
+
+                .flow-box-small {
+                    padding: 14px;
+                    border-radius: 14px;
+                    border: 2px solid #c7d2fe;
+                    font-weight: bold;
+                    text-align: center;
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+                }
+
+                .flow-arrow {
+                    font-size: 22px;
+                }
+            </style>
+        </section>
+
+
+        <!-- Slide 12: Simulator -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Simulasi Data Manager 🕹️</h2>
+            <div class="max-w-2xl mx-auto bg-slate-800 p-8 rounded-3xl shadow-2xl relative pop-entry">
+                <!-- Wrapper for existing Simulator code -->
+                <div id="crudDB"
+                    class="bg-slate-900 border border-slate-700 p-4 rounded-xl mb-6 min-h-[60px] flex items-center justify-center text-slate-500 font-mono text-sm transition-all">
+                    (Database Kosong)
+                </div>
+                <div class="bg-white rounded-2xl p-6 space-y-4">
+                    <input type="text" id="crudInput" placeholder="Ketik Data..."
+                        class="w-full bg-slate-100 px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-brand-500 text-center font-bold">
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="opStore()"
+                            class="bg-green-500 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform">SIMPAN</button>
+                        <button onclick="opGet()"
+                            class="bg-blue-500 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform">TAMPILKAN</button>
+                        <button onclick="opUpdate()"
+                            class="bg-yellow-500 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform">PERBARUI</button>
+                        <button onclick="opDelete()"
+                            class="bg-red-500 text-white font-bold py-3 rounded-xl hover:scale-105 transition-transform">HAPUS</button>
+                    </div>
+                    <p id="crudStatus" class="text-center text-sm text-slate-400 mt-2">Siap...</p>
+                </div>
+            </div>
+            <!-- JS for Simulator reusing existing logic -->
+            <script>
+                // ... same simulator logic as before ...
+                let storedDataSim = null;
+                const dbDisplaySim = document.getElementById('crudDB');
+                const statusDisplaySim = document.getElementById('crudStatus');
+                const inputDisplaySim = document.getElementById('crudInput');
+
+                function updateDBDisplaySim() {
+                    if (storedDataSim) {
+                        dbDisplaySim.innerHTML = `<span class="text-green-400">Tag: "Data"</span> <span class="text-white">Val: "${storedDataSim}"</span>`;
+                    } else {
+                        dbDisplaySim.innerHTML = `(Database Kosong)`;
+                    }
+                }
+
+                function opStore() {
+                    const val = inputDisplaySim.value;
+                    if (!val) return;
+                    storedDataSim = val;
+                    updateDBDisplaySim();
+                    statusDisplaySim.innerText = "Disimpan!";
+                }
+
+                function opUpdate() {
+                    opStore(); // Same logic
+                    statusDisplaySim.innerText = "Diperbarui!";
+                }
+
+                function opGet() {
+                    if (storedDataSim) inputDisplaySim.value = storedDataSim;
+                }
+
+                function opDelete() {
+                    storedDataSim = null;
+                    inputDisplaySim.value = "";
+                    updateDBDisplaySim();
+                    statusDisplaySim.innerText = "Dihapus!";
+                }
+            </script>
+        </section>
+
+        <!-- Slide 13: Challenge -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 animate-entry-1">Tantangan Pro: Membuat Daftar! 📜</h2>
+            <div
+                class="max-w-4xl mx-auto bg-brand-50 p-8 rounded-[2.5rem] border border-brand-200 text-center animate-entry-2">
+                <p class="text-lg text-slate-700 mb-6">
+                    Bagaimana menyimpan banya nama? Pakai <b>LIST</b>!
+                </p>
+                <div class="bg-white p-6 rounded-2xl shadow-md border-2 border-brand-500 transform scale-105">
+                    <div class="p-2 bg-brand-100 rounded border border-brand-300 font-mono text-xs">
+                        Tag: <span class="font-bold">"TemanKelas"</span> <br>
+                        Value: <span class="font-bold text-brand-700">["Ali", "Budi", "Citra"]</span>
+                    </div>
+                    <p class="text-[10px] text-green-600 mt-2 font-bold">1 Tag untuk Banyak Data! (Next Level)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Conclusion -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 animate-entry-1">Misi Selesai! 🎉</h2>
+            <div class="max-w-4xl mx-auto text-center space-y-8 animate-entry-2">
+                <p class="text-2xl text-slate-600 font-light">
+                    Kalian sekarang Master Data! 🛡️
+                </p>
+                <div class="mt-12">
+                    <button onclick="localStorage.removeItem('sesi32_access'); location.reload();"
+                        class="bg-red-500 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-red-600 transition-all active:scale-95 group">
+                        <i class="fa-solid fa-power-off mr-2 group-hover:rotate-90 transition-transform"></i> LOGOUT
+                        SYSTEM
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Core Logic
+        const activeClass = 'active';
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('bar');
+        const counter = document.getElementById('counter');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const accessOverlay = document.getElementById('accessOverlay');
+        const accessInput = document.getElementById('accessCodeInput');
+        const accessBtn = document.getElementById('accessBtn');
+        const accessError = document.getElementById('accessError');
+
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+
+        // Access Control
+        const VALID_CODE = "RGMDSMS25";
+
+        if (localStorage.getItem('sesi32_access') === 'true') {
+            accessOverlay.style.display = 'none';
+        }
+
+        accessBtn.addEventListener('click', () => {
+            if (accessInput.value.toUpperCase().trim() === VALID_CODE) {
+                localStorage.setItem('sesi32_access', 'true');
+                accessOverlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => accessOverlay.style.display = 'none', 500);
+            } else {
+                accessError.style.opacity = '1';
+                accessInput.classList.add('border-red-500', 'animate-shake');
+                setTimeout(() => accessInput.classList.remove('animate-shake'), 500);
+            }
+        });
+
+        // Navigation
+        function updateSlide() {
+            slides.forEach((slide, idx) => {
+                if (idx === currentSlide) {
+                    slide.classList.add(activeClass);
+                } else {
+                    slide.classList.remove(activeClass);
+                }
+            });
+
+            progressBar.style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+            counter.innerText = currentSlide + 1;
+
+            btnPrev.disabled = currentSlide === 0;
+            btnNext.disabled = currentSlide === totalSlides - 1;
+        }
+
+        btnNext.addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') btnNext.click();
+            if (e.key === 'ArrowLeft') btnPrev.click();
+        });
+
+        updateSlide();
+    </script>
+</body>
+
+</html>
