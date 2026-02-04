@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modul 5.3: Membuat dan Memanggil Procedures (App Inventor)</title>
+    <script>
+        // Check access BEFORE rendering to prevent flash
+        if (localStorage.getItem('sesi35_access') === 'true') {
+            document.documentElement.style.setProperty('--overlay-display', 'none');
+        } else {
+            document.documentElement.style.setProperty('--overlay-display', 'flex');
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6', // Violet/Purple (reusing Sesi 30/32 theme)
+                            600: '#7c3aed',
+                            900: '#4c1d95',
+                        },
+                        accent: {
+                            500: '#3b82f6', // Blue for Logic blocks
+                            600: '#2563eb',
+                        },
+                        logic: {
+                            gold: '#d97706', // Control blocks
+                            green: '#16a34a', // Logic blocks
+                            blue: '#2563eb', // Math blocks
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        popIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --overlay-display: flex;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        .slide {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Keyframe Animations - CRITICAL: These must be defined for slide content to appear */
+        @keyframes slideUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        .block-shape {
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .grid-bg {
+            background-size: 30px 30px;
+            background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+        }
+
+        /* Staggered Animations */
+        .slide.active .anim-1 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-2 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-3 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-pop {
+            opacity: 0;
+            animation: popIn 0.5s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Overlay with CSS variable control */
+        #accessOverlay {
+            display: var(--overlay-display) !important;
+        }
+
+        /* ===== Overflow support (auto-scroll inside each slide) ===== */
+        .slide-scroll {
+            max-height: calc(100vh - 160px);
+            /* space for header/progress/nav */
+            overflow-y: auto;
+            padding-right: 10px;
+            overscroll-behavior: contain;
+        }
+
+        .slide-scroll::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .slide-scroll::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, .35);
+            border-radius: 999px;
+        }
+
+        .slide-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 grid-bg">
+    <!-- Access Overlay -->
+    <div class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4" id="accessOverlay">
+        <div
+            class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center relative">
+            <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+            <p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 35</p>
+            <input
+                class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase"
+                id="accessCodeInput" placeholder="Enter Class Code" type="text" />
+            <button
+                class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95"
+                id="accessBtn">UNLOCK SYSTEM</button>
+            <p class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity" id="accessError">⛔ ACCESS DENIED
+            </p>
+        </div>
+    </div>
+    <!-- Navigation -->
+    <div
+        class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Modul 5.3: Procedures</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button
+                class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition disabled:opacity-30"
+                id="btnPrev"><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="font-mono text-sm font-bold text-slate-400"><span class="text-brand-600"
+                    id="counter">1</span>/<span id="totalSlides">0</span></span>
+            <button
+                class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg"
+                id="btnNext"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+        <div class="h-full bg-brand-500 transition-all duration-500 w-[0%]" id="bar"></div>
+    </div>
+    <main class="relative w-full h-screen overflow-hidden">
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+
+            <div class="slide-scroll">
+                <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+                    <div class="flex-1 anim-1">
+                        <div
+                            class="inline-block px-4 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6 tracking-widest border border-brand-200">
+                            MIDDLE SCHOOL • MODUL 5.3
+                        </div>
+                        <h1 class="text-5xl md:text-6xl font-black text-slate-900 mb-6 leading-tight">
+                            PROCEDURES<br />
+                            <span class="text-brand-500">BUAT &amp; PANGGIL</span>
+                        </h1>
+                        <p class="text-xl md:text-2xl text-slate-600 font-light">
+                            Biar kode kamu <b>rapi</b>, <b>hemat</b>, dan bisa dipakai berulang kali ✨
+                        </p>
+                        <div class="mt-6 text-sm text-slate-500">
+                            Target hari ini: paham <b>procedure do</b>, <b>procedure result</b>, dan <b>call
+                                procedure</b>.
+                        </div>
+                    </div>
+                    <!-- Hero Block -->
+                    <div class="flex-1 flex justify-center anim-pop relative">
+                        <div class="absolute inset-0 bg-brand-200 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                        <div
+                            class="relative bg-[#7c3aed] p-8 rounded-3xl shadow-2xl border border-brand-200 block-shape w-full max-w-md">
+                            <div class="text-white font-bold text-lg mb-2">🚀 Ide Besar</div>
+                            <div class="bg-white/10 rounded-2xl p-5 text-white">
+                                <div class="font-mono text-sm opacity-90">to <b>HitungLuas</b> (panjang, lebar)</div>
+                                <div class="mt-3 bg-white/15 rounded-xl p-3 font-mono text-sm">
+                                    result → panjang × lebar
+                                </div>
+                                <div class="mt-4 font-mono text-sm opacity-90">call <b>HitungLuas</b> (12, 6)</div>
+                                <div class="mt-2 text-2xl font-black">= 72 ✅</div>
+                            </div>
+                            <div class="mt-5 text-white/80 text-sm">
+                                Procedure itu seperti <b>mesin kecil</b> yang bisa dipanggil kapan saja.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Slide 2: Why Procedures -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Kenapa Butuh Procedures? 🔁</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3 text-slate-800">Masalah yang sering terjadi…</h3>
+                        <ul class="text-slate-600 leading-relaxed list-disc ml-6 space-y-2">
+                            <li>Kita menulis blok yang sama <b>berulang-ulang</b>.</li>
+                            <li>Kalau ada bug, kita harus memperbaiki di <b>banyak tempat</b>.</li>
+                            <li>Kode jadi panjang dan susah dibaca.</li>
+                        </ul>
+                        <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-mono text-sm text-slate-700">
+                                "Hitung luas" dipakai 5x → kenapa tidak dibuat 1 kali saja?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3 text-slate-800">Solusinya: Procedure ✅</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            <b>Procedure</b> adalah blok khusus berisi rangkaian perintah yang bisa
+                            dijalankan (dipanggil) kapan pun dibutuhkan.
+                        </p>
+                        <div class="mt-5 grid gap-3">
+                            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                <div class="font-bold text-emerald-800">Kode lebih rapi</div>
+                                <div class="text-sm text-emerald-700">Satu tugas, satu procedure.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-brand-50 border border-brand-200">
+                                <div class="font-bold text-brand-800">Mudah dipakai ulang</div>
+                                <div class="text-sm text-brand-700">Tinggal panggil (call).</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center mt-8 text-lg text-slate-600 anim-3">
+                    Hari ini kita belajar: <b>jenis procedure</b> → <b>input &amp; output</b> → <b>contoh aplikasi</b>.
+                </p>
+            </div>
+        </section>
+        <!-- Slide 3: Types of Procedures (DETAILED) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-3 anim-1">2 Jenis Procedure di App Inventor 🧩</h2>
+            <div class="slide-scroll">
+                <p class="text-center text-slate-600 max-w-3xl mx-auto anim-2">
+                    Procedure itu “mesin kecil” yang bisa kamu panggil kapan saja. Bedanya, ada yang cuma menjalankan
+                    aksi (Do),
+                    dan ada yang menghasilkan nilai untuk dipakai di blok lain (Result).
+                </p>
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 mt-8 anim-3">
+                    <!-- CARD: DO -->
+                    <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div
+                                class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <h3 class="text-xl font-black">Procedure tanpa hasil (Do)</h3>
+                        </div>
+                        <p class="text-slate-600">
+                            Menjalankan aksi, lalu selesai. <b>Tidak mengembalikan nilai</b> (tidak ada “hasil
+                            angka/teks” yang bisa dipasang ke blok lain).
+                        </p>
+                        <!-- What it looks like -->
+                        <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-2">Bentuk bloknya</div>
+                            <div class="font-mono text-sm text-slate-700">
+                                <span class="px-2 py-1 rounded-lg bg-white border border-slate-200">to procedure
+                                    do</span>
+                                <span class="text-slate-500">→ berisi aksi-aksi</span>
+                            </div>
+                        </div>
+                        <!-- When to use -->
+                        <div class="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-2">Kapan dipakai?</div>
+                            <ul class="text-sm text-slate-700 space-y-1">
+                                <li>• Membersihkan input (reset TextBox)</li>
+                                <li>• Menampilkan notifikasi/alert</li>
+                                <li>• Mengubah warna / teks label</li>
+                                <li>• Reset tampilan sebelum input ulang</li>
+                            </ul>
+                        </div>
+                        <!-- Small example -->
+                        <div class="mt-4 p-4 rounded-2xl bg-white border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-2">Contoh mini</div>
+                            <div class="font-mono text-xs text-slate-700">
+                                Procedure: <b>BersihkanForm</b><br>
+                                Aksi: set TextBoxPanjang.Text = ""<br />
+                                Aksi: set TextBoxLebar.Text = ""<br />
+                                Aksi: set LabelHasil.Text = "Hasil Luas: -"
+                                </br></div>
+                        </div>
+                        <!-- Analogy -->
+                        <div class="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                            <div class="font-bold text-amber-800">Analogi</div>
+                            <div class="text-sm text-amber-700">
+                                Seperti menyuruh: <b>“Tutup pintu!”</b> ✅ <br />
+                                (Pekerjaan selesai, tidak ada “angka hasil” yang dikembalikan.)
+                            </div>
+                        </div>
+                        <!-- Quick check -->
+                        <div class="mt-5 p-4 rounded-2xl bg-slate-900 text-white">
+                            <div class="font-bold mb-2">Quick Check</div>
+                            <p class="text-sm text-white/80 mb-3">Kalau procedure kamu cuma <b>reset TextBox</b>,
+                                jenisnya apa?</p>
+                            <div class="flex gap-2 flex-wrap">
+                                <button class="btn btn-ghost text-sm" data-answer="do" data-quiz="procType">Do</button>
+                                <button class="btn btn-ghost text-sm" data-answer="result"
+                                    data-quiz="procType">Result</button>
+                                <span class="text-sm text-white/80 ml-2" id="procTypeFeedback"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CARD: RESULT -->
+                    <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div
+                                class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center">
+                                <i class="fa-solid fa-arrow-turn-up"></i>
+                            </div>
+                            <h3 class="text-xl font-black">Procedure dengan hasil (Result)</h3>
+                        </div>
+                        <p class="text-slate-600">
+                            Menjalankan proses lalu <b>mengembalikan nilai</b> (return). Nilai ini bisa langsung
+                            dipasang ke blok lain,
+                            misalnya untuk mengisi teks Label.
+                        </p>
+                        <!-- What it looks like -->
+                        <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-2">Bentuk bloknya</div>
+                            <div class="font-mono text-sm text-slate-700">
+                                <span class="px-2 py-1 rounded-lg bg-white border border-slate-200">to procedure
+                                    result</span>
+                                <span class="text-slate-500">→ ada output</span>
+                            </div>
+                        </div>
+                        <!-- When to use -->
+                        <div class="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-2">Kapan dipakai?</div>
+                            <ul class="text-sm text-slate-700 space-y-1">
+                                <li>• Perhitungan (diskon, luas, total)</li>
+                                <li>• Mengolah input menjadi output</li>
+                                <li>• Mengembalikan teks gabungan</li>
+                                <li>• Menghasilkan nilai untuk dipakai lagi</li>
+                            </ul>
+                        </div>
+                        <!-- Small example (matches module 5.3) -->
+                        <div class="mt-4 p-4 rounded-2xl bg-white border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-2">Contoh mini (Hitung Luas)</div>
+                            <div class="font-mono text-xs text-slate-700">
+                                Procedure: <b>HitungLuas(panjang, lebar)</b><br />
+                                Proses: panjang × lebar<br />
+                                Result: <b>luas</b><br />
+                                Dipakai di: set LabelHasil.Text = call HitungLuas
+                            </div>
+                        </div>
+                        <!-- Analogy -->
+                        <div class="mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                            <div class="font-bold text-emerald-800">Analogi</div>
+                            <div class="text-sm text-emerald-700">
+                                <b>“Tolong hitungkan total belanja saya.”</b> → ada hasil angka ✅<br />
+                                (Ada output yang dikembalikan.)
+                            </div>
+                        </div>
+                        <!-- Quick check -->
+                        <div class="mt-5 p-4 rounded-2xl bg-slate-900 text-white">
+                            <div class="font-bold mb-2">Quick Check</div>
+                            <p class="text-sm text-white/80 mb-3">Kalau procedure kamu menghasilkan <b>angka luas</b>,
+                                jenisnya apa?</p>
+                            <div class="flex gap-2 flex-wrap">
+                                <button class="btn btn-ghost text-sm" data-answer="do" data-quiz="procType2">Do</button>
+                                <button class="btn btn-ghost text-sm" data-answer="result"
+                                    data-quiz="procType2">Result</button>
+                                <span class="text-sm text-white/80 ml-2" id="procType2Feedback"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Compare strip -->
+                <div class="max-w-6xl mx-auto mt-8 anim-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">Do</div>
+                                <div class="text-slate-600 mt-1">Aksi saja, tidak ada hasil.</div>
+                            </div>
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">Result</div>
+                                <div class="text-slate-600 mt-1">Menghasilkan nilai yang bisa dipakai.</div>
+                            </div>
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">Ingat!</div>
+                                <div class="text-slate-600 mt-1">Kalau mau dipasang ke blok lain → biasanya
+                                    <b>Result</b>.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script>
+                // Lightweight quiz handler for this slide (safe to include once)
+                (function () {
+                    const onClick = (e) => {
+                        const btn = e.target.closest("button[data-quiz]");
+                        if (!btn) return;
+
+                        const key = btn.getAttribute("data-quiz");
+                        const ans = btn.getAttribute("data-answer");
+
+                        const feedbackId = key === "procType" ? "procTypeFeedback" : "procType2Feedback";
+                        const el = document.getElementById(feedbackId);
+                        if (!el) return;
+
+                        // expected answers:
+                        // procType -> do (reset textbox)
+                        // procType2 -> result (return luas)
+                        const expected = key === "procType" ? "do" : "result";
+
+                        if (ans === expected) {
+                            el.textContent = "✅ Benar!";
+                            el.className = "text-sm text-emerald-300 ml-2";
+                        } else {
+                            el.textContent = "❌ Coba lagi.";
+                            el.className = "text-sm text-rose-300 ml-2";
+                        }
+                    };
+
+                    document.addEventListener("click", onClick);
+                })();
+        </script>
+        <!-- Slide 4: Interactive - Choose the right type -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Mini Game: Do atau Result? 🎯</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <div class="text-sm font-bold text-slate-400 uppercase mb-2">Tugas</div>
+                        <h3 class="text-2xl font-black mb-4" id="taskTitle">Membersihkan TextBox</h3>
+                        <p class="text-slate-600 mb-6" id="taskDesc">Aplikasi menghapus isi input agar form kembali
+                            kosong.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button
+                                class="typeBtn bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 transition"
+                                data-type="do">
+                                Procedure DO
+                            </button>
+                            <button
+                                class="typeBtn bg-brand-600 text-white py-4 rounded-2xl font-bold hover:bg-brand-700 transition"
+                                data-type="result">
+                                Procedure RESULT
+                            </button>
+                        </div>
+                        <div class="mt-6 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-bold">Skor:</div>
+                            <div class="text-3xl font-black text-brand-600"><span id="typeScore">0</span> / 5</div>
+                            <div class="text-sm text-slate-500 mt-1" id="typeFeedback">Klik jawabanmu ya!</div>
+                        </div>
+                        <button
+                            class="mt-5 w-full bg-slate-100 hover:bg-slate-200 border border-slate-200 py-3 rounded-2xl font-bold transition"
+                            id="nextTaskBtn">
+                            Soal berikutnya →
+                        </button>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3 text-slate-800">Petunjuk</h3>
+                        <ul class="list-disc ml-6 text-slate-600 space-y-2">
+                            <li><b>DO</b> = melakukan aksi saja (tanpa nilai balik).</li>
+                            <li><b>RESULT</b> = menghasilkan nilai (return) yang bisa dipakai di blok lain.</li>
+                            <li>Kalau ada kata “hitung”, “total”, “berapa hasilnya”, biasanya <b>RESULT</b>.</li>
+                        </ul>
+                        <div class="mt-6 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm">
+                            <div class="opacity-60 mb-2">// Contoh result dipakai langsung</div>
+                            <div>set LabelHasil.Text to</div>
+                            <div class="ml-4">call <b>HitungLuas</b> (p, l)</div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    (function () {
+                        const TASKS = [
+                            { t: "Membersihkan TextBox", d: "Aplikasi menghapus isi input agar form kembali kosong.", a: "do" },
+                            { t: "Menampilkan Notifikasi", d: "Aplikasi menampilkan pesan 'Berhasil!' ke pengguna.", a: "do" },
+                            { t: "Mengubah Warna Tombol", d: "Aplikasi mengganti warna tombol menjadi hijau.", a: "do" },
+                            { t: "Menghitung Diskon", d: "Aplikasi menghitung harga setelah diskon dan menampilkan angkanya.", a: "result" },
+                            { t: "Menghitung Luas", d: "Aplikasi menghitung luas persegi panjang dari panjang dan lebar.", a: "result" }
+                        ];
+                        let idx = 0;
+                        let score = 0;
+
+                        const title = document.getElementById('taskTitle');
+                        const desc = document.getElementById('taskDesc');
+                        const feedback = document.getElementById('typeFeedback');
+                        const scoreEl = document.getElementById('typeScore');
+                        const nextBtn = document.getElementById('nextTaskBtn');
+
+                        function render() {
+                            title.textContent = TASKS[idx].t;
+                            desc.textContent = TASKS[idx].d;
+                            feedback.textContent = "Klik jawabanmu ya!";
+                            nextBtn.disabled = false;
+                        }
+                        function lockNext() {
+                            nextBtn.disabled = false;
+                        }
+
+                        document.querySelectorAll('.typeBtn').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                const pick = btn.dataset.type;
+                                const ans = TASKS[idx].a;
+                                if (pick === ans) {
+                                    score = Math.min(5, score + 1);
+                                    feedback.textContent = "✅ Benar!";
+                                    feedback.className = "text-sm text-green-600 mt-1 font-bold";
+                                } else {
+                                    feedback.textContent = "❌ Belum tepat. Coba ingat: Result itu ada nilai balik.";
+                                    feedback.className = "text-sm text-red-600 mt-1 font-bold";
+                                }
+                                scoreEl.textContent = score;
+                                lockNext();
+                            });
+                        });
+
+                        nextBtn.addEventListener('click', () => {
+                            if (idx < TASKS.length - 1) {
+                                idx++;
+                                render();
+                            } else {
+                                feedback.textContent = "Selesai! Kamu sudah bisa membedakan DO vs RESULT.";
+                                feedback.className = "text-sm text-brand-700 mt-1 font-bold";
+                                nextBtn.disabled = true;
+                            }
+                        });
+
+                        document.addEventListener('DOMContentLoaded', render);
+                        render();
+                    })();
+                </script>
+            </div>
+        </section>
+        <!-- Slide 5: Call procedure + parameters -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Memanggil Procedure (Call) 📣</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Call procedure (dengan parameter)</h3>
+                        <p class="text-slate-600">Dipakai saat procedure membutuhkan <b>input</b> (misalnya x dan y).
+                        </p>
+                        <div class="mt-5 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm">
+                            <div class="opacity-60 mb-2">// contoh: HitungDiskon(total, persen)</div>
+                            <div>call HitungDiskon</div>
+                            <div class="ml-4">x = 10000</div>
+                            <div class="ml-4">y = 10%</div>
+                        </div>
+                        <div class="mt-5 text-sm text-slate-500">
+                            Parameter itu seperti “kolom yang harus diisi” saat procedure dipanggil.
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Call procedure (tanpa parameter)</h3>
+                        <p class="text-slate-600">Dipakai saat procedure tidak membutuhkan input apa pun.</p>
+                        <div class="mt-5 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm">
+                            <div class="opacity-60 mb-2">// contoh: BersihkanForm</div>
+                            <div>to BersihkanForm do</div>
+                            <div class="ml-4">set TextBox1.Text to ""</div>
+                            <div class="ml-4">set TextBox2.Text to ""</div>
+                            <div class="mt-3">call BersihkanForm</div>
+                        </div>
+                        <div class="mt-5 text-sm text-slate-500">
+                            Cocok untuk reset tampilan, clear form, dan aksi rutin.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Slide 6: Input & Output concept -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Konsep Input &amp; Output 🔄</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-center anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Input (Parameter)</h3>
+                        <p class="text-slate-600">Nilai yang dikirim ke procedure agar bisa diproses.</p>
+                        <ul class="list-disc ml-6 text-slate-600 mt-4 space-y-2">
+                            <li>Membuat procedure <b>lebih fleksibel</b></li>
+                            <li>Menghindari pengulangan blok</li>
+                            <li>Bisa dipakai untuk nilai yang berbeda</li>
+                        </ul>
+                        <div class="mt-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 font-mono text-sm">
+                            HitungLuas(panjang, lebar)<br />
+                            input: 5 dan 4
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Output (Hasil / Return)</h3>
+                        <p class="text-slate-600">Nilai yang dikembalikan procedure setelah memproses input.</p>
+                        <div class="mt-6 p-5 rounded-2xl bg-emerald-50 border border-emerald-200">
+                            <div class="font-bold text-emerald-800">Contoh</div>
+                            <div class="text-sm text-emerald-700 mt-1 font-mono">
+                                set LabelHasil.Text to call HitungLuas
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 rounded-2xl bg-slate-900 text-white font-mono text-sm">
+                            <div class="opacity-60 mb-2">// proses</div>
+                            output: 20
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Slide 7: Juice analogy interactive -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Analogi: Mesin Pembuat Jus 🍊</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-center anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <p class="text-slate-600 leading-relaxed">
+                            Procedure itu seperti <b>mesin pembuat jus</b>: menerima input, diproses, lalu menghasilkan
+                            output.
+                        </p>
+                        <div class="mt-6 grid gap-3">
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">Input</div>
+                                <div class="text-sm text-slate-600">Buah (misalnya: jeruk)</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">Proses</div>
+                                <div class="text-sm text-slate-600">Diperas / diblender</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">Output</div>
+                                <div class="text-sm text-slate-600">Jus 🍹</div>
+                            </div>
+                        </div>
+                        <p class="mt-6 text-sm text-slate-500">
+                            Sama seperti program: output bagus butuh input yang benar.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 text-center">
+                        <div class="text-sm font-bold text-slate-400 uppercase mb-2">Simulasi</div>
+                        <p class="text-slate-600 mb-4">Pilih buah, lalu lihat output-nya.</p>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="fruitBtn bg-slate-100 hover:bg-slate-200 rounded-xl py-3 font-bold"
+                                data-fruit="🍊 Jeruk">🍊</button>
+                            <button class="fruitBtn bg-slate-100 hover:bg-slate-200 rounded-xl py-3 font-bold"
+                                data-fruit="🍎 Apel">🍎</button>
+                            <button class="fruitBtn bg-slate-100 hover:bg-slate-200 rounded-xl py-3 font-bold"
+                                data-fruit="🧽 Bukan Buah">🧽</button>
+                        </div>
+                        <div class="mt-6 p-5 rounded-2xl bg-slate-900 text-white">
+                            <div class="font-mono text-sm opacity-70">INPUT</div>
+                            <div class="text-2xl font-black" id="fruitInput">-</div>
+                            <div class="mt-3 font-mono text-sm opacity-70">OUTPUT</div>
+                            <div class="text-2xl font-black text-brand-300" id="fruitOutput">-</div>
+                        </div>
+                        <p class="mt-4 text-sm text-slate-500" id="fruitHint">Klik salah satu ikon buah.</p>
+                    </div>
+                </div>
+                <script>
+                    (function () {
+                        const buttons = document.querySelectorAll('.fruitBtn');
+                        const inEl = document.getElementById('fruitInput');
+                        const outEl = document.getElementById('fruitOutput');
+                        const hint = document.getElementById('fruitHint');
+
+                        buttons.forEach(b => {
+                            b.addEventListener('click', () => {
+                                const f = b.dataset.fruit;
+                                inEl.textContent = f;
+                                if (f.includes("Jeruk")) {
+                                    outEl.textContent = "Jus Jeruk 🍹";
+                                    outEl.className = "text-2xl font-black text-emerald-300";
+                                    hint.textContent = "✅ Input benar → output sesuai.";
+                                    hint.className = "mt-4 text-sm text-emerald-700 font-bold";
+                                } else if (f.includes("Apel")) {
+                                    outEl.textContent = "Jus Apel 🍹";
+                                    outEl.className = "text-2xl font-black text-emerald-300";
+                                    hint.textContent = "✅ Input benar → output sesuai.";
+                                    hint.className = "mt-4 text-sm text-emerald-700 font-bold";
+                                } else {
+                                    outEl.textContent = "ERROR ❌ (bukan buah)";
+                                    outEl.className = "text-2xl font-black text-red-300";
+                                    hint.textContent = "❌ Input salah → output tidak sesuai.";
+                                    hint.className = "mt-4 text-sm text-red-600 font-bold";
+                                }
+                            });
+                        });
+                    })();
+                </script>
+            </div>
+        </section>
+        <!-- Slide 8: Case Study UI -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Contoh Aplikasi: Hitung Luas Persegi Panjang 📐</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-4">Designer (Tampilan)</h3>
+                        <ul class="text-slate-700 space-y-2">
+                            <li>• LabelJudul → <span class="font-mono bg-slate-100 px-2 rounded">"Hitung Luas Persegi
+                                    Panjang"</span></li>
+                            <li>• LabelPanjang → <span class="font-mono bg-slate-100 px-2 rounded">"Masukkan
+                                    Panjang"</span></li>
+                            <li>• LabelLebar → <span class="font-mono bg-slate-100 px-2 rounded">"Masukkan Lebar"</span>
+                            </li>
+                            <li>• TextBoxPanjang / TextBoxLebar → Hint contoh angka</li>
+                            <li>• ButtonHitung → <span class="font-mono bg-slate-100 px-2 rounded">"Hitung Luas"</span>
+                            </li>
+                            <li>• LabelHasil → <span class="font-mono bg-slate-100 px-2 rounded">"Hasil Luas: -"</span>
+                            </li>
+                        </ul>
+                        <p class="mt-4 text-sm text-slate-500">
+                            Fokus sesi ini: logikanya pakai <b>procedure result</b>.
+                        </p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-4">Simulasi UI</h3>
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                            <div class="text-center font-black text-slate-800 text-lg mb-4">Hitung Luas Persegi Panjang
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input
+                                    class="bg-white border border-slate-200 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-brand-500"
+                                    id="pInput" placeholder="Panjang" type="number" />
+                                <input
+                                    class="bg-white border border-slate-200 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-brand-500"
+                                    id="lInput" placeholder="Lebar" type="number" />
+                            </div>
+                            <button
+                                class="mt-4 w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 transition"
+                                id="btnArea">
+                                Hitung Luas
+                            </button>
+                            <div class="mt-4 text-center">
+                                <div class="text-sm text-slate-500">Hasil Luas:</div>
+                                <div class="text-3xl font-black text-slate-300" id="areaOut">-</div>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-sm text-slate-500">
+                            Ini simulasi konsep. Di App Inventor, hasilnya berasal dari <b>call procedure</b>.
+                        </p>
+                    </div>
+                </div>
+                <script>
+                    (function () {
+                        const p = document.getElementById('pInput');
+                        const l = document.getElementById('lInput');
+                        const out = document.getElementById('areaOut');
+                        const btn = document.getElementById('btnArea');
+
+                        function HitungLuas(x, y) { return x * y; } // analogi procedure result
+
+                        if (btn) {
+                            btn.addEventListener('click', () => {
+                                const x = parseFloat(p.value);
+                                const y = parseFloat(l.value);
+                                if (isNaN(x) || isNaN(y)) {
+                                    out.textContent = "Isi angka dulu!";
+                                    out.className = "text-2xl font-black text-red-600";
+                                    return;
+                                }
+                                const res = HitungLuas(x, y);
+                                out.textContent = res;
+                                out.className = "text-3xl font-black text-emerald-700 anim-pop";
+                            });
+                        }
+                    })();
+                </script>
+            </div>
+        </section>
+        <!-- Slide 9: Blocks Steps -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Blocks: Buat Procedure &amp; Panggilnya 🧱</h2>
+            <div class="slide-scroll">
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-4">A. Membuat Procedure</h3>
+                        <ol class="list-decimal ml-6 text-slate-700 space-y-2">
+                            <li>Masuk tab <b>Blocks → Procedures</b></li>
+                            <li>Buat procedure baru: <b>HitungLuas</b> (gunakan parameter <b>x</b> dan <b>y</b>)</li>
+                            <li>Isi logika: <span class="font-mono bg-slate-100 px-2 rounded">x × y</span></li>
+                            <li>Pilih jenis <b>result</b> jika ingin mengembalikan nilai luas.</li>
+                        </ol>
+                        <div class="mt-6 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm">
+                            <div class="opacity-60 mb-2">// procedure result</div>
+                            <div>to HitungLuas (x, y)</div>
+                            <div class="ml-4">result x * y</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-4">B. Memanggil Procedure</h3>
+                        <ol class="list-decimal ml-6 text-slate-700 space-y-2">
+                            <li>Gunakan event: <b>when ButtonHitung.Click</b></li>
+                            <li>Panggil: <b>call HitungLuas</b></li>
+                            <li>Isi parameter: <b>x</b> dari TextBoxPanjang.Text, <b>y</b> dari TextBoxLebar.Text</li>
+                            <li>Set LabelHasil.Text menjadi hasil dari call procedure.</li>
+                        </ol>
+                        <div class="mt-6 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm">
+                            <div class="opacity-60 mb-2">// event click</div>
+                            <div>when ButtonHitung.Click</div>
+                            <div class="ml-4">set LabelHasil.Text to</div>
+                            <div class="ml-8">call HitungLuas(x=TextBoxPanjang.Text, y=TextBoxLebar.Text)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Slide 10: Logic Flow -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Alur Logika Aplikasi 🔎</h2>
+            <div class="slide-scroll">
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-3xl shadow-lg border border-slate-100 anim-2">
+                    <ol class="grid md:grid-cols-2 gap-4">
+                        <li class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-black text-brand-600">1</div>
+                            <div class="font-bold mt-1">Pengguna memasukkan panjang &amp; lebar</div>
+                            <div class="text-sm text-slate-500">TextBoxPanjang &amp; TextBoxLebar</div>
+                        </li>
+                        <li class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-black text-brand-600">2</div>
+                            <div class="font-bold mt-1">Tekan tombol Hitung</div>
+                            <div class="text-sm text-slate-500">Event Button.Click berjalan</div>
+                        </li>
+                        <li class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-black text-brand-600">3</div>
+                            <div class="font-bold mt-1">Procedure dipanggil</div>
+                            <div class="text-sm text-slate-500">call HitungLuas(x, y)</div>
+                        </li>
+                        <li class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-black text-brand-600">4</div>
+                            <div class="font-bold mt-1">Procedure menghitung &amp; mengembalikan hasil</div>
+                            <div class="text-sm text-slate-500">x × y → result</div>
+                        </li>
+                        <li class="p-5 rounded-2xl bg-slate-50 border border-slate-200 md:col-span-2">
+                            <div class="font-black text-brand-600">5</div>
+                            <div class="font-bold mt-1">Hasil ditampilkan di layar</div>
+                            <div class="text-sm text-slate-500">LabelHasil.Text</div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+        <!-- Slide 11: Finish -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Selesai! 🎉</h2>
+            <div class="slide-scroll">
+                <div class="max-w-3xl mx-auto text-center anim-2">
+                    <p class="text-xl text-slate-600 mb-10">
+                        Kamu sudah belajar membuat <b>procedure</b>, membedakan <b>Do</b> &amp; <b>Result</b>,
+                        dan memanggilnya dengan <b>call</b>.
+                    </p>
+                    <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 text-left max-w-xl mx-auto">
+                        <div class="font-bold mb-2">Checklist cepat:</div>
+                        <ul class="list-disc ml-6 text-slate-600 space-y-1">
+                            <li>Pakai procedure untuk menghindari blok berulang ✅</li>
+                            <li>Pahami input (parameter) dan output (return) ✅</li>
+                            <li>Ingat: procedure harus dipanggil agar berjalan ✅</li>
+                        </ul>
+                    </div>
+                    <button
+                        class="mt-10 bg-red-500 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-red-600 transition active:scale-95 group"
+                        onclick="localStorage.removeItem('sesi35_access'); location.reload();">
+                        <i class="fa-solid fa-power-off mr-2 group-hover:rotate-90 transition-transform"></i> LOGOUT
+                        SYSTEM
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Core Logic
+            const activeClass = 'active';
+            const slides = document.querySelectorAll('.slide');
+            const progressBar = document.getElementById('bar');
+            const counter = document.getElementById('counter');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const accessOverlay = document.getElementById('accessOverlay');
+            const accessInput = document.getElementById('accessCodeInput');
+            const accessBtn = document.getElementById('accessBtn');
+            const accessError = document.getElementById('accessError');
+
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            const totalSpan = document.getElementById('totalSlides');
+            if (totalSpan) totalSpan.innerText = totalSlides;
+            const VALID_CODE = "RGMDSMS25";
+
+            // Access Control - Overlay visibility is now controlled by CSS variable set in head
+
+            accessBtn.addEventListener('click', () => {
+                if (accessInput.value.toUpperCase().trim() === VALID_CODE) {
+                    localStorage.setItem('sesi35_access', 'true');
+                    accessOverlay.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        accessOverlay.style.display = 'none';
+                        updateSlide();
+                    }, 500);
+                } else {
+                    accessError.style.opacity = '1';
+                    accessInput.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => accessInput.classList.remove('animate-shake'), 500);
+                }
+            });
+
+            // Navigation
+            function updateSlide() {
+                slides.forEach((slide, idx) => {
+                    if (idx === currentSlide) {
+                        slide.classList.add(activeClass);
+                    } else {
+                        slide.classList.remove(activeClass);
+                    }
+                });
+
+                if (progressBar) progressBar.style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+                if (counter) counter.innerText = currentSlide + 1;
+
+                if (btnPrev) btnPrev.disabled = currentSlide === 0;
+                if (btnNext) btnNext.disabled = currentSlide === totalSlides - 1;
+            }
+
+            if (btnNext) btnNext.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlide();
+                }
+            });
+
+            if (btnPrev) btnPrev.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' && btnNext && !btnNext.disabled) btnNext.click();
+                if (e.key === 'ArrowLeft' && btnPrev && !btnPrev.disabled) btnPrev.click();
+            });
+
+            updateSlide();
+        });
+    </script>
+</body>
+
+</html>
