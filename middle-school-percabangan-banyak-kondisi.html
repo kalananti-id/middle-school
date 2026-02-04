@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul 5.2: Logika Percabangan Banyak Kondisi (App Inventor)</title>
+    <script>
+        // Check access BEFORE rendering to prevent flash
+        if(localStorage.getItem('sesi34_access') === 'true') {
+            document.documentElement.style.setProperty('--overlay-display', 'none');
+        } else {
+            document.documentElement.style.setProperty('--overlay-display', 'flex');
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6', // Violet/Purple (reusing Sesi 30/32 theme)
+                            600: '#7c3aed',
+                            900: '#4c1d95',
+                        },
+                        accent: {
+                            500: '#3b82f6', // Blue for Logic blocks
+                            600: '#2563eb',
+                        },
+                        logic: {
+                            gold: '#d97706', // Control blocks
+                            green: '#16a34a', // Logic blocks
+                            blue: '#2563eb', // Math blocks
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        popIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --overlay-display: flex;
+        }
+        body { font-family: 'Outfit', sans-serif; overflow: hidden; background-color: #f8fafc; }
+        .slide { display: none; height: 100vh; flex-direction: column; justify-content: center; padding: 2rem; }
+        .slide.active { display: flex; }
+        
+        /* Keyframe Animations - CRITICAL: These must be defined for slide content to appear */
+        @keyframes slideUp {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .animate-shake { animation: shake 0.5s; }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        .block-shape { box-shadow: 2px 4px 6px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.2); }
+        .grid-bg { background-size: 30px 30px; background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px); }
+
+        /* Staggered Animations */
+        .slide.active .anim-1 { opacity: 0; animation: slideUp 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide.active .anim-2 { opacity: 0; animation: slideUp 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide.active .anim-3 { opacity: 0; animation: slideUp 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide.active .anim-pop { opacity: 0; animation: popIn 0.5s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        /* Overlay with CSS variable control */
+        #accessOverlay {
+            display: var(--overlay-display) !important;
+        }
+    </style>
+</head>
+<body class="text-slate-800 grid-bg">
+
+    <!-- Access Overlay -->
+    <div id="accessOverlay" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4">
+        <div class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center relative">
+            <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+            <p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 34</p>
+            <input type="text" id="accessCodeInput" placeholder="Enter Class Code" class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase">
+            <button id="accessBtn" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">UNLOCK SYSTEM</button>
+            <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Modul 5.2: Percabangan Banyak Kondisi</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="btnPrev" class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition disabled:opacity-30"><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="font-mono text-sm font-bold text-slate-400"><span id="counter" class="text-brand-600">1</span>/<span id="totalSlides">0</span></span>
+            <button id="btnNext" class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+        <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[0%]"></div>
+    </div>
+
+    <main class="relative w-full h-screen overflow-hidden">
+        
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+                <div class="flex-1 anim-1">
+                    <div class="inline-block px-4 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6 tracking-widest border border-brand-200">
+                        MIDDLE SCHOOL • MODUL 5.2
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-black text-slate-900 mb-6 leading-tight">
+                        LOGIKA PERCABANGAN<br>
+                        <span class="text-brand-500">BANYAK KONDISI</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-slate-600 font-light">
+                        Membuat aplikasi bisa memilih hasil yang berbeda-beda dengan <b>Else If</b> ⚙️
+                    </p>
+                </div>
+
+                <!-- Hero Block -->
+                <div class="flex-1 flex justify-center anim-pop relative">
+                    <div class="absolute inset-0 bg-brand-200 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                    <div class="relative bg-[#d97706] p-8 rounded-lg rounded-br-3xl shadow-2xl border-l-8 border-[#b45309] block-shape animate-float w-full max-w-md">
+                        <div class="text-white font-bold font-mono text-xl">if nilai ≥ 85</div>
+                        <div class="mt-3 ml-6 bg-emerald-600 p-3 rounded text-white font-bold border-l-4 border-emerald-800 shadow-md">
+                            then "SANGAT BAIK"
+                        </div>
+                        <div class="mt-3 text-white font-bold font-mono text-xl">else if nilai ≥ 75</div>
+                        <div class="mt-3 ml-6 bg-green-600 p-3 rounded text-white font-bold border-l-4 border-green-800 shadow-md">
+                            then "LULUS"
+                        </div>
+                        <div class="mt-3 text-white font-bold font-mono text-xl">else</div>
+                        <div class="mt-3 ml-6 bg-red-600 p-3 rounded text-white font-bold border-l-4 border-red-800 shadow-md">
+                            "TIDAK LULUS"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Modul Intro -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Kenapa Butuh Banyak Kondisi? 🧠</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                    <h3 class="font-bold text-xl mb-3 text-slate-800">Di dunia nyata…</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Aplikasi sering harus mengambil keputusan berdasarkan <b>lebih dari satu kondisi</b>.
+                        Misalnya mengecek rentang nilai, menentukan status kelulusan, atau menentukan level.
+                    </p>
+                    <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                        <div class="font-mono text-sm text-slate-700">
+                            nilai ≥ 85 → <b>Sangat Baik</b><br>
+                            nilai ≥ 75 → <b>Lulus</b><br>
+                            nilai &lt; 75 → <b>Tidak Lulus</b>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                    <h3 class="font-bold text-xl mb-3 text-slate-800">Di App Inventor…</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Kita pakai blok <b>if–then–else</b> lalu menambahkan <b>else if</b> lewat ikon gear (mutator).
+                        Kondisi diperiksa <b>dari atas ke bawah</b>, dan aplikasi menjalankan aksi pertama yang benar.
+                    </p>
+                    <div class="mt-5 flex items-center gap-3 text-slate-700">
+                        <div class="w-10 h-10 rounded-full bg-brand-100 border border-brand-200 flex items-center justify-center">
+                            <i class="fa-solid fa-gear text-brand-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold">Tips</div>
+                            <div class="text-sm text-slate-500">Susun kondisi dari yang paling besar/spesifik dulu.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center mt-8 text-lg text-slate-600 anim-3">
+                Yuk kita pecah jadi: <b>blok dasar</b> → <b>else if</b> → <b>operator perbandingan</b> → <b>contoh lengkap</b>.
+            </p>
+        </section>
+
+        <!-- Slide 3: The Blocks View -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Tempatnya Logika: Blocks View 🏗️</h2>
+            <div class="max-w-5xl mx-auto flex gap-8 anim-2">
+                <div class="w-1/3 bg-slate-100 p-6 rounded-2xl border border-slate-200">
+                    <h3 class="font-bold text-slate-700 mb-4">Kategori Penting:</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 p-2 bg-[#d97706] text-white rounded shadow-sm">
+                            <i class="fa-solid fa-code-branch"></i> Control
+                            <span class="ml-auto text-[10px] opacity-75">(If-Then)</span>
+                        </li>
+                        <li class="flex items-center gap-2 p-2 bg-[#16a34a] text-white rounded shadow-sm">
+                            <i class="fa-solid fa-equals"></i> Logic
+                            <span class="ml-auto text-[10px] opacity-75">(True/False)</span>
+                        </li>
+                        <li class="flex items-center gap-2 p-2 bg-[#2563eb] text-white rounded shadow-sm">
+                            <i class="fa-solid fa-calculator"></i> Math
+                            <span class="ml-auto text-[10px] opacity-75">(Compare Numbers)</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="w-2/3 bg-slate-800 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[url('https://i.imgur.com/8Qj8j0K.png')] bg-cover opacity-20"></div>
+                    <div class="relative z-10 text-center flex flex-col items-center justify-center h-full">
+                        <i class="fa-solid fa-puzzle-piece text-6xl text-white/50 mb-4"></i>
+                        <p class="text-white font-mono">Di sini kita menyusun "Puzzle" <br>untuk membuat otak aplikasi.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: IF / ELSE IF -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 anim-1">Dari 1 Kondisi → Banyak Kondisi 🔀</h2>
+            <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 text-center anim-2">
+
+                <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-[#d97706] hover:scale-[1.02] transition">
+                    <h3 class="font-bold text-lg text-[#d97706] mb-3">1) IF - THEN</h3>
+                    <div class="bg-[#d97706] p-4 text-white text-left font-mono text-sm rounded-lg mb-4 block-shape">
+                        if <span class="bg-black/20 px-2 rounded">kondisi</span><br>
+                        then <span class="bg-black/20 px-2 rounded">aksi A</span>
+                    </div>
+                    <p class="text-sm text-slate-600">Cocok untuk keputusan sederhana (hanya saat kondisi benar).</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-brand-500 hover:scale-[1.02] transition relative">
+                    <div class="absolute top-0 right-0 bg-brand-500 text-white px-3 py-1 text-xs font-bold rounded-bl-xl uppercase">2 Jalur</div>
+                    <h3 class="font-bold text-lg text-brand-600 mb-3">2) IF - THEN - ELSE</h3>
+                    <div class="bg-[#d97706] p-4 text-white text-left font-mono text-sm rounded-lg mb-4 block-shape">
+                        if <span class="bg-black/20 px-2 rounded">kondisi</span><br>
+                        then <span class="bg-black/20 px-2 rounded">aksi A</span><br>
+                        else <span class="bg-black/20 px-2 rounded">aksi B</span>
+                    </div>
+                    <p class="text-sm text-slate-600">Cocok saat hasilnya cuma 2: lulus / tidak lulus.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-emerald-500 hover:scale-[1.02] transition relative">
+                    <div class="absolute top-0 right-0 bg-emerald-500 text-white px-3 py-1 text-xs font-bold rounded-bl-xl uppercase">Banyak Jalur</div>
+                    <h3 class="font-bold text-lg text-emerald-700 mb-3">3) IF - THEN - ELSE IF - ELSE</h3>
+                    <div class="bg-[#d97706] p-4 text-white text-left font-mono text-sm rounded-lg mb-4 block-shape">
+                        if <span class="bg-black/20 px-2 rounded">kondisi 1</span><br>
+                        then <span class="bg-black/20 px-2 rounded">aksi A</span><br>
+                        else if <span class="bg-black/20 px-2 rounded">kondisi 2</span><br>
+                        then <span class="bg-black/20 px-2 rounded">aksi B</span><br>
+                        else <span class="bg-black/20 px-2 rounded">aksi C</span>
+                    </div>
+                    <p class="text-sm text-slate-600">Dipakai untuk rentang nilai, level, kategori, dan status.</p>
+                </div>
+            </div>
+
+            <div class="max-w-4xl mx-auto mt-8 bg-slate-50 border border-slate-200 rounded-2xl p-5 anim-3">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center">
+                        <i class="fa-solid fa-check text-emerald-700"></i>
+                    </div>
+                    <p class="text-slate-700">
+                        Pada <b>else if</b>, kondisi dicek <b>berurutan dari atas ke bawah</b>. Begitu ketemu yang <b>true</b>,
+                        aplikasi menjalankan aksinya dan <b>berhenti</b> (tidak mengecek kondisi di bawahnya).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Interactive Drag -->
+        <section class="slide">
+             <h2 class="text-3xl font-bold text-center mb-8 anim-1">Game: Pasangkan Blok! 🖱️</h2>
+             <div class="max-w-4xl mx-auto flex flex-col items-center gap-8 anim-2">
+                 <div class="flex gap-4">
+                     <div draggable="true" ondragstart="drag(event)" id="drag1" class="cursor-move bg-slate-100 p-4 rounded-xl border-2 border-slate-300 font-bold hover:bg-slate-200">
+                         "Kalau Hujan, Bawa Payung. Selain itu Main Bola."
+                     </div>
+                     <div draggable="true" ondragstart="drag(event)" id="drag2" class="cursor-move bg-slate-100 p-4 rounded-xl border-2 border-slate-300 font-bold hover:bg-slate-200">
+                         "Kalau Haus, Minum."
+                     </div>
+                 </div>
+                 
+                 <div class="grid grid-cols-2 gap-8 w-full h-48">
+                     <div ondrop="drop(event, 'single')" ondragover="allowDrop(event)" class="bg-[#d97706]/10 border-4 border-dashed border-[#d97706] rounded-2xl flex flex-col items-center justify-center text-[#d97706] font-bold">
+                         <i class="fa-solid fa-arrow-down mb-2"></i> IF - THEN (Tunggal)
+                     </div>
+                     <div ondrop="drop(event, 'double')" ondragover="allowDrop(event)" class="bg-brand-500/10 border-4 border-dashed border-brand-500 rounded-2xl flex flex-col items-center justify-center text-brand-600 font-bold">
+                         <i class="fa-solid fa-code-branch mb-2"></i> IF - THEN - ELSE (Ganda)
+                     </div>
+                 </div>
+                 <p id="dragResult" class="font-bold text-xl h-8"></p>
+             </div>
+             <script>
+                 function allowDrop(ev) { ev.preventDefault(); }
+                 function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+                 function drop(ev, type) {
+                     ev.preventDefault();
+                     var data = ev.dataTransfer.getData("text");
+                     if((data === 'drag1' && type === 'double') || (data === 'drag2' && type === 'single')) {
+                         document.getElementById('dragResult').innerText = "✅ Benar!";
+                         document.getElementById('dragResult').className = "font-bold text-xl h-8 text-green-500 animate-bounce";
+                         ev.target.appendChild(document.getElementById(data));
+                     } else {
+                         document.getElementById('dragResult').innerText = "❌ Coba Lagi!";
+                         document.getElementById('dragResult').className = "font-bold text-xl h-8 text-red-500 animate-shake";
+                     }
+                 }
+             </script>
+        </section>
+
+        <!-- Slide 6: Comparisons Intro -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Jantung Logika: Perbandingan ❤️</h2>
+            <div class="max-w-4xl mx-auto text-center anim-2">
+                <p class="text-xl text-slate-600 mb-8">
+                    Bagaimana komputer tahu "Nilai Bagus" atau "Nilai Jelek"? <br>
+                    Ia membandingkan <b>ANGKA</b>.
+                </p>
+                <div class="bg-slate-900 p-8 rounded-3xl flex items-center justify-center gap-8 text-white font-mono text-3xl shadow-2xl">
+                    <div class="bg-slate-700 px-4 py-2 rounded">90</div>
+                    <div class="text-brand-400 font-black animate-pulse">>=</div>
+                    <div class="bg-slate-700 px-4 py-2 rounded">75</div>
+                </div>
+                <p class="mt-6 font-bold text-green-500 text-2xl anim-pop">TRUE (Benar) ✅</p>
+            </div>
+        </section>
+
+        <!-- Slide 7: Operators Gallery -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 anim-1">Kamus Operator 📖</h2>
+            <div class="max-w-5xl mx-auto grid grid-cols-3 gap-6 anim-2">
+                <!-- = -->
+                <div class="bg-white p-6 rounded-2xl shadow border-b-4 border-blue-500 text-center">
+                    <div class="text-4xl font-black text-blue-600 mb-2">=</div>
+                    <h3 class="font-bold">Sama Dengan</h3>
+                    <p class="text-xs text-slate-500">"Sandi = 1234"</p>
+                </div>
+                <!-- != -->
+                <div class="bg-white p-6 rounded-2xl shadow border-b-4 border-red-500 text-center">
+                    <div class="text-4xl font-black text-red-600 mb-2">≠</div>
+                    <h3 class="font-bold">Tidak Sama</h3>
+                    <p class="text-xs text-slate-500">"Warna ≠ Merah"</p>
+                </div>
+                <!-- > -->
+                <div class="bg-white p-6 rounded-2xl shadow border-b-4 border-green-500 text-center">
+                    <div class="text-4xl font-black text-green-600 mb-2">></div>
+                    <h3 class="font-bold">Lebih Besar</h3>
+                    <p class="text-xs text-slate-500">"Umur > 17"</p>
+                </div>
+                 <!-- < -->
+                 <div class="bg-white p-6 rounded-2xl shadow border-b-4 border-green-500 text-center">
+                    <div class="text-4xl font-black text-green-600 mb-2"><</div>
+                    <h3 class="font-bold">Lebih Kecil</h3>
+                    <p class="text-xs text-slate-500">"Harga < 5000"</p>
+                </div>
+                <!-- >= -->
+                 <div class="bg-white p-6 rounded-2xl shadow border-b-4 border-purple-500 text-center">
+                    <div class="text-4xl font-black text-purple-600 mb-2">≥</div>
+                    <h3 class="font-bold">Besar / Sama</h3>
+                    <p class="text-xs text-slate-500">"Minimal 10"</p>
+                </div>
+                <!-- <= -->
+                 <div class="bg-white p-6 rounded-2xl shadow border-b-4 border-purple-500 text-center">
+                    <div class="text-4xl font-black text-purple-600 mb-2">≤</div>
+                    <h3 class="font-bold">Kecil / Sama</h3>
+                    <p class="text-xs text-slate-500">"Maksimal 100"</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Operator Quiz -->
+        <section class="slide">
+             <h2 class="text-3xl font-bold text-center mb-8 anim-1">Quiz Cepat! ⚡</h2>
+             <div class="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center anim-pop">
+                 <p class="mb-6 text-xl text-slate-700">Manakah simbol untuk <b>"Minimal 17 Tahun"</b>?</p>
+                 <div class="grid grid-cols-2 gap-4">
+                     <button onclick="quiz(this, false)" class="bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-mono font-bold text-xl">Umur > 17</button>
+                     <button onclick="quiz(this, true)" class="bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-mono font-bold text-xl">Umur ≥ 17</button>
+                     <button onclick="quiz(this, false)" class="bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-mono font-bold text-xl">Umur < 17</button>
+                     <button onclick="quiz(this, false)" class="bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-mono font-bold text-xl">Umur = 17</button>
+                 </div>
+                 <p class="mt-4 text-sm text-slate-500">Tips: "Minimal" artinya 17 itu BOLEH (Jadi pakai sama dengan).</p>
+             </div>
+             <script>
+                 function quiz(btn, correct) {
+                     if(correct) {
+                         btn.classList.add('bg-green-500', 'text-white');
+                         btn.innerText += " ✅";
+                         setTimeout(() => document.getElementById('btnNext').click(), 1000);
+                     } else {
+                         btn.classList.add('bg-red-500', 'text-white');
+                         btn.classList.add('animate-shake');
+                     }
+                 }
+             </script>
+        </section>
+
+        <!-- Slide 9: Case Study 1 - Security -->
+        <section class="slide">
+             <h2 class="text-3xl font-bold text-center mb-6 anim-1">Studi Kasus 1: Kunci Pintu 🔐</h2>
+             <div class="max-w-4xl mx-auto flex items-center gap-12 anim-2">
+                 <div class="flex-1">
+                     <div class="bg-slate-900 text-white p-6 rounded-2xl font-mono text-sm leading-loose shadow-xl">
+                         <div class="mb-2 opacity-50">// Cek Password</div>
+                         <div class="flex flex-col gap-2">
+                             <div class="bg-[#d97706] p-2 rounded w-fit">if Text_Password.Text = "RGMDSMS25"</div>
+                             <div class="ml-4 bg-[#d97706] p-2 rounded w-fit">then call Screen1.Open</div>
+                             <div class="ml-4 bg-[#d97706] p-2 rounded w-fit">else set Label.Text to "Salah!"</div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="flex-1 text-center">
+                     <i class="fa-solid fa-door-closed text-8xl text-slate-300 mb-4" id="doorIcon"></i>
+                     <div class="mt-4 bg-white border rounded-lg p-2 flex gap-2">
+                         <input type="text" id="doorInput" placeholder="Password..." class="w-full text-center outline-none">
+                         <button onclick="tryDoor()" class="bg-brand-500 text-white px-4 rounded">Go</button>
+                     </div>
+                 </div>
+             </div>
+             <script>
+                 function tryDoor() {
+                     const val = document.getElementById('doorInput').value;
+                     const icon = document.getElementById('doorIcon');
+                     if(val === "RGMDSMS25") {
+                         icon.className = "fa-solid fa-door-open text-8xl text-green-500 mb-4";
+                     } else {
+                         icon.className = "fa-solid fa-door-closed text-8xl text-red-500 mb-4 animate-shake";
+                         setTimeout(()=> icon.className = "fa-solid fa-door-closed text-8xl text-slate-300 mb-4", 1000);
+                     }
+                 }
+             </script>
+        </section>
+
+        <!-- Slide 10: Case Study 2 - Grading (Else If) -->
+        <section class="slide">
+             <h2 class="text-3xl font-bold text-center mb-6 anim-1">Contoh 5.2.4: Penilaian Nilai (Else If) 📝</h2>
+             <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 anim-2">
+                 <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+                     <h3 class="text-xl font-bold mb-4">Aturan Penilaian</h3>
+                     <ul class="text-slate-700 space-y-2">
+                         <li><span class="font-mono bg-slate-100 px-2 py-1 rounded">nilai ≥ 85</span> → <b class="text-emerald-700">SANGAT BAIK</b></li>
+                         <li><span class="font-mono bg-slate-100 px-2 py-1 rounded">nilai ≥ 75</span> → <b class="text-green-700">LULUS</b></li>
+                         <li><span class="font-mono bg-slate-100 px-2 py-1 rounded">nilai &lt; 75</span> → <b class="text-red-600">TIDAK LULUS</b></li>
+                     </ul>
+
+                     <div class="mt-6 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm">
+                        <div class="opacity-60 mb-2">// Struktur logika</div>
+                        <div>if (nilai ≥ 85) then → "SANGAT BAIK"</div>
+                        <div>else if (nilai ≥ 75) then → "LULUS"</div>
+                        <div>else → "TIDAK LULUS"</div>
+                     </div>
+
+                     <p class="mt-5 text-sm text-slate-500">
+                        Tips: susun kondisi dari yang paling tinggi dulu supaya hasilnya tidak “ketangkep” lebih cepat.
+                     </p>
+                 </div>
+
+                 <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center">
+                     <div class="text-sm font-bold text-slate-400 uppercase mb-2">Simulasi</div>
+                     <input type="number" id="gradeInput3" placeholder="0-100" class="text-center text-4xl font-black w-40 bg-transparent border-b-4 border-slate-300 focus:border-brand-500 outline-none mb-4">
+                     <button onclick="checkGrade3()" class="bg-brand-600 text-white px-8 py-2 rounded-full font-bold shadow-lg hover:bg-brand-700">Cek Hasil</button>
+                     <div class="mt-6">
+                        <p id="gradeResult3" class="text-3xl font-black text-slate-300">...</p>
+                        <p id="gradeHint3" class="mt-2 text-sm text-slate-500"></p>
+                     </div>
+                 </div>
+             </div>
+
+             <script>
+                 function checkGrade3() {
+                     const val = parseInt(document.getElementById('gradeInput3').value);
+                     const res = document.getElementById('gradeResult3');
+                     const hint = document.getElementById('gradeHint3');
+                     if(isNaN(val)) return;
+
+                     if(val >= 85) {
+                         res.innerHTML = "SANGAT BAIK 🌟";
+                         res.className = "text-3xl font-black text-emerald-700 anim-pop";
+                         hint.innerText = "Karena nilai ≥ 85";
+                     } else if(val >= 75) {
+                         res.innerHTML = "LULUS ✅";
+                         res.className = "text-3xl font-black text-green-700 anim-pop";
+                         hint.innerText = "Karena nilai ≥ 75 dan kondisi pertama tidak terpenuhi";
+                     } else {
+                         res.innerHTML = "TIDAK LULUS 📚";
+                         res.className = "text-3xl font-black text-red-600 anim-pop";
+                         hint.innerText = "Karena nilai < 75 (masuk bagian else)";
+                     }
+                 }
+             </script>
+        </section>
+
+        <!-- Slide 11: The "Else" Danger -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Hati-Hati dengan ELSE! ⚠️</h2>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center anim-2">
+                 <div>
+                     <p class="text-lg text-slate-600 leading-relaxed">
+                         <b>ELSE</b> artinya "Semua yang tidak memenuhi syarat".
+                         <br><br>
+                         Jika syaratnya: <br> <span class="font-mono bg-slate-200 px-2 rounded">IF Warna = Merah</span>
+                         <br><br>
+                         Maka <span class="font-bold text-red-500">ELSE</span> akan menangkap:
+                         <ul class="list-disc ml-6 mt-2 text-sm text-slate-500">
+                             <li>Biru</li>
+                             <li>Hijau</li>
+                             <li>Hitam</li>
+                             <li>Apapun yang bukan merah!</li>
+                         </ul>
+                     </p>
+                 </div>
+                 <div class="bg-red-100 p-8 rounded-full flex items-center justify-center aspect-square border-4 border-red-200">
+                     <div class="text-center">
+                         <div class="text-5xl font-black text-red-500 mb-2">ELSE</div>
+                         <div class="text-red-800 font-bold">"Keranjang Sampah"</div>
+                         <p class="text-xs text-red-600 mt-2">Menampung sisanya.</p>
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Logic Puzzle -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 anim-1">Tebak Output 🧠</h2>
+            <div class="max-w-3xl mx-auto bg-slate-900 text-white p-8 rounded-3xl font-mono relative overflow-hidden anim-2">
+                <div class="absolute top-4 right-4 text-slate-600 text-xs text-right">
+                    var Uang = 5000 <br>
+                    var Harga = 2000
+                </div>
+                
+                <div class="space-y-4 text-lg">
+                    <p class="text-yellow-400">if (Uang < Harga) then</p>
+                    <p class="pl-8 text-green-400">Print "Mahal"</p>
+                    <p class="text-yellow-400">else</p>
+                    <p class="pl-8 text-green-400">Print "Beli"</p>
+                </div>
+                
+                <div class="mt-8 border-t border-slate-700 pt-6 text-center">
+                    <p class="mb-4 font-sans font-bold text-slate-400">Apa yang muncul di layar?</p>
+                    <div class="flex justify-center gap-4 font-sans">
+                        <button onclick="puzzle(this, false)" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-lg transition">Mahal</button>
+                        <button onclick="puzzle(this, true)" class="bg-brand-600 hover:bg-brand-500 px-6 py-2 rounded-lg transition">Beli</button>
+                    </div>
+                </div>
+            </div>
+            <script>
+                function puzzle(btn, isCorrect) {
+                     if(isCorrect) {
+                         btn.style.background = "#22c55e"; // Green
+                         btn.innerText = "BENAR! (5000 tidak lebih kecil dari 2000)";
+                     } else {
+                         btn.style.background = "#ef4444"; // Red
+                         btn.innerText = "SALAH";
+                     }
+                }
+            </script>
+        </section>
+
+        <!-- Slide 13: Mutator Tips -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Tips: Menambah ELSE & ELSE IF (Gear ⚙️) 🛠️</h2>
+            <div class="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow-lg grid md:grid-cols-2 gap-8 items-center anim-2">
+                 <div class="text-slate-700">
+                     <p class="mb-4">
+                         Di App Inventor, blok <b>if</b> bisa “di-upgrade” dengan ikon <b>gear (mutator)</b>.
+                         Dari situ kita bisa menambahkan:
+                     </p>
+                     <ul class="list-disc ml-6 space-y-2">
+                        <li><b>else</b> → untuk menangkap “selain itu”</li>
+                        <li><b>else if</b> → untuk menambah kondisi lanjutan (banyak kondisi)</li>
+                     </ul>
+
+                     <div class="mt-6 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                        <ol class="list-decimal ml-6 space-y-2 font-bold text-brand-600">
+                            <li>Klik ikon gear ⚙️ pada blok <span class="font-mono bg-white px-2 rounded border">if</span></li>
+                            <li>Tarik potongan <span class="font-mono bg-white px-2 rounded border">else</span> / <span class="font-mono bg-white px-2 rounded border">else if</span> ke dalam blok</li>
+                            <li>Susun kondisi dari atas ke bawah (yang paling besar/spesifik dulu)</li>
+                        </ol>
+                     </div>
+                 </div>
+
+                 <div class="flex justify-center">
+                     <div class="relative bg-[#d97706] w-full max-w-sm rounded-2xl p-6 text-white font-mono shadow-xl border-l-8 border-[#b45309] block-shape">
+                         <div class="absolute -top-3 -left-3 bg-white text-brand-600 rounded-full w-10 h-10 flex items-center justify-center shadow">
+                             <i class="fa-solid fa-gear"></i>
+                         </div>
+                         <div class="text-lg font-bold">if … then</div>
+                         <div class="mt-3 text-sm opacity-90">+ else if … then</div>
+                         <div class="mt-2 text-sm opacity-90">+ else</div>
+
+                         <div class="mt-5 bg-white/15 rounded-xl p-4 text-sm leading-relaxed">
+                            <div><b>Ingat:</b> App Inventor akan berhenti di kondisi pertama yang <span class="underline">true</span>.</div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Summary -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Ringkasan Modul 5.2 📝</h2>
+             <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 anim-pop">
+                 <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-[#d97706]">
+                     <h3 class="font-bold text-lg mb-2">Blok Control</h3>
+                     <p class="text-sm text-slate-500">Gunakan <b>if–then</b> dan <b>if–then–else</b> sebagai dasar.</p>
+                 </div>
+                  <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-brand-500">
+                     <h3 class="font-bold text-lg mb-2">Gear (Mutator) ⚙️</h3>
+                     <p class="text-sm text-slate-500">Tambahkan <b>else</b> dan <b>else if</b> untuk banyak kondisi.</p>
+                 </div>
+                  <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-emerald-500">
+                     <h3 class="font-bold text-lg mb-2">Urutan Kondisi</h3>
+                     <p class="text-sm text-slate-500">Dicek dari atas ke bawah; berhenti di kondisi pertama yang <b>true</b>.</p>
+                 </div>
+             </div>
+        </section>
+
+        <!-- Slide 15: Checkout Quiz -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Checkout Quiz ✅</h2>
+
+            <div class="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 anim-2">
+                <p class="text-slate-600 mb-6">
+                    Pilih jawaban yang paling tepat. Klik salah satu opsi di setiap nomor, lalu tekan <b>Submit</b>.
+                </p>
+
+                <div id="quizWrap" class="space-y-6"></div>
+
+                <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button id="quizSubmit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg active:scale-95 transition">
+                        Submit Quiz
+                    </button>
+                    <div id="quizResult" class="text-lg font-black text-slate-400">Skor: -</div>
+                </div>
+
+                <p class="mt-4 text-sm text-slate-500">
+                    Catatan: skor hanya untuk latihan. Setelah selesai, lanjut ke slide terakhir untuk logout.
+                </p>
+            </div>
+
+            <script>
+                const QUIZ = [
+                    {q:"Apa tujuan utama penggunaan percabangan banyak kondisi (else if) dalam aplikasi?",
+                     opts:["Menjalankan semua aksi sekaligus","Mengecek satu kondisi saja","Memilih satu dari beberapa kemungkinan aksi","Mengulang program dari awal"],
+                     ans:2},
+                    {q:"Struktur logika yang benar untuk percabangan banyak kondisi adalah …",
+                     opts:["if – then – if – then","if – then – else if – then – else","if – else – then","if – then – repeat"],
+                     ans:1},
+                    {q:"Pada App Inventor, bagian else if ditambahkan melalui …",
+                     opts:["Menu Variables","Menu Logic","Ikon gear (mutator) pada blok if","Komponen Designer"],
+                     ans:2},
+                    {q:"Dalam percabangan else if, kondisi diperiksa dengan urutan …",
+                     opts:["Acak","Dari bawah ke atas","Dari kondisi terakhir","Dari atas ke bawah"],
+                     ans:3},
+                    {q:"Jika kondisi pertama pada else if bernilai benar, maka …",
+                     opts:["Semua kondisi tetap dicek","Aksi pada else dijalankan","Aksi pada kondisi tersebut dijalankan dan proses berhenti","Program error"],
+                     ans:2},
+                    {q:"Jika struktur: if nilai ≥ 85, else if nilai ≥ 75, else. Nilai = 90 maka hasilnya …",
+                     opts:["Lulus","Tidak Lulus","Sangat Baik","Tidak ada output"],
+                     ans:2},
+                    {q:"Mengapa urutan kondisi pada else if harus dari yang paling besar atau spesifik?",
+                     opts:["Supaya program lebih panjang","Supaya semua kondisi dijalankan","Agar kondisi yang tepat tidak terlewat","Agar else selalu dijalankan"],
+                     ans:2},
+                    {q:"Berikut ini yang bukan ciri percabangan banyak kondisi adalah …",
+                     opts:["Menggunakan lebih dari satu kondisi","Memeriksa kondisi secara berurutan","Menjalankan lebih dari satu aksi sekaligus","Menggunakan else sebagai kondisi terakhir"],
+                     ans:2},
+                    {q:"Jika semua kondisi pada else if bernilai salah, maka aplikasi akan …",
+                     opts:["Berhenti tanpa aksi","Menjalankan aksi pada bagian else","Kembali ke awal program","Error"],
+                     ans:1},
+                    {q:"Percabangan else if paling tepat digunakan saat …",
+                     opts:["Aplikasi hanya memiliki satu kondisi","Aplikasi tidak membutuhkan keputusan","Aplikasi memiliki banyak kemungkinan hasil","Aplikasi hanya menampilkan teks"],
+                     ans:2}
+                ];
+
+                function renderQuiz(){
+                    const wrap = document.getElementById('quizWrap');
+                    if(!wrap) return;
+                    wrap.innerHTML = "";
+                    QUIZ.forEach((item, idx)=>{
+                        const card = document.createElement('div');
+                        card.className = "p-5 rounded-2xl border border-slate-200 bg-slate-50";
+                        card.innerHTML = `
+                            <div class="font-bold text-slate-800 mb-3">${idx+1}. ${item.q}</div>
+                            <div class="grid sm:grid-cols-2 gap-3" data-q="${idx}"></div>
+                        `;
+                        const grid = card.querySelector('[data-q]');
+                        item.opts.forEach((opt, oi)=>{
+                            const btn = document.createElement('button');
+                            btn.type = "button";
+                            btn.className = "text-left bg-white hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 transition flex items-start gap-3";
+                            btn.innerHTML = `<span class="font-mono text-slate-400">( )</span><span class="flex-1">${opt}</span>`;
+                            btn.addEventListener('click', ()=>{
+                                // unselect siblings
+                                [...grid.children].forEach(b=>{
+                                    b.classList.remove('ring-2','ring-brand-500','border-brand-500');
+                                    const mark = b.querySelector('span.font-mono');
+                                    if(mark) mark.textContent = "( )";
+                                });
+                                btn.classList.add('ring-2','ring-brand-500','border-brand-500');
+                                const mark = btn.querySelector('span.font-mono');
+                                if(mark) mark.textContent = "(x)";
+                                grid.dataset.sel = oi;
+                            });
+                            grid.appendChild(btn);
+                        });
+                        wrap.appendChild(card);
+                    });
+                }
+
+                function gradeQuiz(){
+                    let score = 0;
+                    QUIZ.forEach((item, idx)=>{
+                        const grid = document.querySelector(`[data-q="${idx}"]`);
+                        const sel = grid && grid.dataset.sel !== undefined ? parseInt(grid.dataset.sel) : -1;
+                        if(sel === item.ans) score++;
+                    });
+                    const res = document.getElementById('quizResult');
+                    if(res){
+                        res.textContent = `Skor: ${score}/${QUIZ.length}`;
+                        res.className = score >= 8 ? "text-lg font-black text-green-600" : (score >= 6 ? "text-lg font-black text-amber-600" : "text-lg font-black text-red-600");
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', ()=>{
+                    renderQuiz();
+                    const btn = document.getElementById('quizSubmit');
+                    if(btn) btn.addEventListener('click', gradeQuiz);
+                });
+            </script>
+        </section>
+
+
+
+        <!-- Slide 16: Finish -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Selesai! 🎉</h2>
+             <div class="max-w-3xl mx-auto text-center anim-2">
+                 <p class="text-xl text-slate-600 mb-10">
+                     Kamu sudah belajar <b>if–then–else</b>, menambahkan <b>else if</b> dengan gear ⚙️,
+                     dan mencoba contoh penilaian nilai.
+                 </p>
+
+                 <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 text-left max-w-xl mx-auto">
+                    <div class="font-bold mb-2">Checklist cepat:</div>
+                    <ul class="list-disc ml-6 text-slate-600 space-y-1">
+                        <li>Urutan kondisi dari yang paling besar/spesifik ✅</li>
+                        <li>Pakai operator perbandingan (≥, &lt;, =) ✅</li>
+                        <li>Ada else untuk menangkap “sisanya” ✅</li>
+                    </ul>
+                 </div>
+
+                 <button onclick="localStorage.removeItem('sesi34_access'); location.reload();" class="mt-10 bg-red-500 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-red-600 transition active:scale-95 group">
+                    <i class="fa-solid fa-power-off mr-2 group-hover:rotate-90 transition-transform"></i> LOGOUT SYSTEM
+                 </button>
+             </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Core Logic
+            const activeClass = 'active';
+            const slides = document.querySelectorAll('.slide');
+            const progressBar = document.getElementById('bar');
+            const counter = document.getElementById('counter');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const accessOverlay = document.getElementById('accessOverlay');
+            const accessInput = document.getElementById('accessCodeInput');
+            const accessBtn = document.getElementById('accessBtn');
+            const accessError = document.getElementById('accessError');
+
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            const totalSpan = document.getElementById('totalSlides');
+            if(totalSpan) totalSpan.innerText = totalSlides;
+            const VALID_CODE = "RGMDSMS25"; 
+
+            // Access Control - Overlay visibility is now controlled by CSS variable set in head
+
+            accessBtn.addEventListener('click', () => {
+                if(accessInput.value.toUpperCase().trim() === VALID_CODE) {
+                    localStorage.setItem('sesi34_access', 'true');
+                    accessOverlay.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        accessOverlay.style.display = 'none';
+                        updateSlide();
+                    }, 500);
+                } else {
+                    accessError.style.opacity = '1';
+                    accessInput.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => accessInput.classList.remove('animate-shake'), 500);
+                }
+            });
+
+            // Navigation
+            function updateSlide() {
+                slides.forEach((slide, idx) => {
+                    if(idx === currentSlide) {
+                        slide.classList.add(activeClass);
+                    } else {
+                        slide.classList.remove(activeClass);
+                    }
+                });
+                
+                if(progressBar) progressBar.style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+                if(counter) counter.innerText = currentSlide + 1;
+                
+                if(btnPrev) btnPrev.disabled = currentSlide === 0;
+                if(btnNext) btnNext.disabled = currentSlide === totalSlides - 1;
+            }
+
+            if(btnNext) btnNext.addEventListener('click', () => {
+                 if(currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlide();
+                 }
+            });
+
+            if(btnPrev) btnPrev.addEventListener('click', () => {
+                if(currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'ArrowRight' && btnNext && !btnNext.disabled) btnNext.click();
+                if(e.key === 'ArrowLeft' && btnPrev && !btnPrev.disabled) btnPrev.click();
+            });
+
+            updateSlide();
+        });
+    </script>
+</body>
+</html>
