@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Modul 5.4: Optimasi dan Modularisasi Kode (App Inventor)</title>
+<script>
+        // Check access BEFORE rendering to prevent flash
+        if(localStorage.getItem('sesi36_access') === 'true') {
+            document.documentElement.style.setProperty('--overlay-display', 'none');
+        } else {
+            document.documentElement.style.setProperty('--overlay-display', 'flex');
+        }
+    </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6', // Violet/Purple (reusing Sesi 30/32 theme)
+                            600: '#7c3aed',
+                            900: '#4c1d95',
+                        },
+                        accent: {
+                            500: '#3b82f6', // Blue for Logic blocks
+                            600: '#2563eb',
+                        },
+                        logic: {
+                            gold: '#d97706', // Control blocks
+                            green: '#16a34a', // Logic blocks
+                            blue: '#2563eb', // Math blocks
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        popIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        :root {
+            --overlay-display: flex;
+        }
+        body { font-family: 'Outfit', sans-serif; overflow: hidden; background-color: #f8fafc; }
+        .slide { display: none; height: 100vh; flex-direction: column; justify-content: center; padding: 2rem; }
+        .slide.active { display: flex; }
+        
+        /* Keyframe Animations - CRITICAL: These must be defined for slide content to appear */
+        @keyframes slideUp {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .animate-shake { animation: shake 0.5s; }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        .block-shape { box-shadow: 2px 4px 6px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.2); }
+        .grid-bg { background-size: 30px 30px; background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px); }
+
+        /* Staggered Animations */
+        .slide.active .anim-1 { opacity: 0; animation: slideUp 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide.active .anim-2 { opacity: 0; animation: slideUp 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide.active .anim-3 { opacity: 0; animation: slideUp 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide.active .anim-pop { opacity: 0; animation: popIn 0.5s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        /* Overlay with CSS variable control */
+        #accessOverlay {
+            display: var(--overlay-display) !important;
+        }
+    
+/* ===== Overflow support (auto-scroll inside each slide) ===== */
+.slide-scroll{
+  max-height: calc(100vh - 160px); /* space for header/progress/nav */
+  overflow-y: auto;
+  padding-right: 10px;
+  overscroll-behavior: contain;
+}
+.slide-scroll::-webkit-scrollbar{ width: 10px; }
+.slide-scroll::-webkit-scrollbar-thumb{ background: rgba(100,116,139,.35); border-radius: 999px; }
+.slide-scroll::-webkit-scrollbar-track{ background: transparent; }
+</style>
+</head>
+<body class="text-slate-800 grid-bg">
+<!-- Access Overlay -->
+<div class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4" id="accessOverlay">
+<div class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center relative">
+<h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+<p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 36</p>
+<input class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase" id="accessCodeInput" placeholder="Enter Class Code" type="text"/>
+<button class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95" id="accessBtn">UNLOCK SYSTEM</button>
+<p class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity" id="accessError">⛔ ACCESS DENIED</p>
+</div>
+</div>
+<!-- Navigation -->
+<div class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Modul 5.4: Optimasi & Modularisasi</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition disabled:opacity-30" id="btnPrev"><i class="fa-solid fa-chevron-left"></i></button>
+<span class="font-mono text-sm font-bold text-slate-400"><span class="text-brand-600" id="counter">1</span>/<span id="totalSlides">0</span></span>
+<button class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg" id="btnNext"><i class="fa-solid fa-chevron-right"></i></button>
+</div>
+</div>
+<div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+<div class="h-full bg-brand-500 transition-all duration-500 w-[0%]" id="bar"></div>
+</div>
+<main class="relative w-full h-screen overflow-hidden">
+
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <div class="slide-scroll">
+                <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+                    <div class="flex-1 anim-1">
+                        <div class="inline-block px-4 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6 tracking-widest border border-brand-200">
+                            MIDDLE SCHOOL • MODUL 5.4 • SESI 36
+                        </div>
+                        <h1 class="text-5xl md:text-6xl font-black text-slate-900 mb-6 leading-tight">
+                            OPTIMASI &amp;<br/>
+                            <span class="text-brand-500">MODULARISASI</span> KODE
+                        </h1>
+                        <p class="text-xl md:text-2xl text-slate-600 font-light">
+                            Biar blok kamu <b>tidak berulang</b>, lebih <b>rapi</b>, dan gampang di-<b>maintenance</b> 🔧✨
+                        </p>
+                        <div class="mt-6 text-sm text-slate-500">
+                            Target hari ini: paham <b>optimasi</b>, paham <b>modularisasi</b>, lalu <b>refactor</b> aplikasi.
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex justify-center anim-pop relative">
+                        <div class="absolute inset-0 bg-brand-200 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                        <div class="relative bg-[#7c3aed] p-8 rounded-3xl shadow-2xl border border-brand-200 block-shape w-full max-w-md">
+                            <div class="text-white font-bold text-lg mb-2">🧠 Inti Konsep</div>
+                            <div class="bg-white/10 rounded-2xl p-5 text-white">
+                                <div class="font-mono text-sm opacity-90">Tanpa optimasi:</div>
+                                <div class="mt-2 bg-white/15 rounded-xl p-3 font-mono text-sm">
+                                    tulis rumus yang sama <b>berkali-kali</b>
+                                </div>
+
+                                <div class="mt-4 font-mono text-sm opacity-90">Dengan optimasi:</div>
+                                <div class="mt-2 bg-white/15 rounded-xl p-3 font-mono text-sm">
+                                    simpan rumus di <b>procedure</b>, lalu <b>call</b> kapan saja
+                                </div>
+
+                                <div class="mt-4 text-sm text-white/85">
+                                    Kalau rumus berubah, cukup ubah di <b>1 tempat</b> ✅
+                                </div>
+                            </div>
+                            <div class="mt-5 text-white/80 text-sm">
+                                Hari ini kita pakai contoh <b>Tarif Parkir</b> (mobil/motor).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Learning Objectives -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Tujuan Pembelajaran 🎯</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 anim-2">
+                    <div class="bg-white p-7 rounded-3xl shadow-lg border border-slate-100">
+                        <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <div class="font-black text-xl mb-2">LO 1</div>
+                        <p class="text-slate-600 leading-relaxed">
+                            Menjelaskan konsep <b>optimasi</b> &amp; <b>modularisasi</b> beserta manfaatnya.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-7 rounded-3xl shadow-lg border border-slate-100">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <div class="font-black text-xl mb-2">LO 2</div>
+                        <p class="text-slate-600 leading-relaxed">
+                            Mengidentifikasi bagian kode yang <b>berulang</b> dan memecahnya menjadi <b>procedure</b>.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-7 rounded-3xl shadow-lg border border-slate-100">
+                        <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                        <div class="font-black text-xl mb-2">LO 3</div>
+                        <p class="text-slate-600 leading-relaxed">
+                            Menerapkan refactor (optimasi) agar aplikasi lebih <b>rapi</b> dan mudah dikembangkan.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="max-w-5xl mx-auto mt-8 bg-slate-900 text-white p-6 rounded-3xl anim-3">
+                    <div class="font-bold mb-2">Pertanyaan pemantik</div>
+                    <p class="text-white/80">
+                        “Kalau aplikasi makin besar tapi semua logika ditulis di satu tempat, apa yang terjadi?”
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: What is Optimization -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Optimasi Kode = Lebih Efisien ⚡</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3 text-slate-800">Definisi</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            <b>Optimasi kode</b> adalah proses membuat blok program lebih <b>efisien</b>, lebih cepat dijalankan,
+                            dan lebih mudah dikelola. Tujuannya juga untuk <b>meminimalkan kesalahan logika</b>.
+                        </p>
+
+                        <div class="mt-6 p-5 rounded-2xl bg-brand-50 border border-brand-200">
+                            <div class="font-bold text-brand-800 mb-2">Manfaat optimasi</div>
+                            <ul class="text-sm text-brand-900/90 list-disc ml-6 space-y-1">
+                                <li>Mengurangi blok yang berulang</li>
+                                <li>Mencegah error</li>
+                                <li>Mempercepat eksekusi aplikasi</li>
+                                <li>Mempermudah debugging</li>
+                                <li>Membuat program tampak lebih profesional</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3 text-slate-800">Contoh optimasi di App Inventor</h3>
+                        <div class="grid gap-3">
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">1) Pakai procedures</div>
+                                <div class="text-sm text-slate-600">Agar rumus/perintah yang sama tidak ditulis berkali-kali.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">2) Letakkan logika penting di satu tempat</div>
+                                <div class="text-sm text-slate-600">Kalau rumus berubah, perbaiki di procedure saja.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">3) Hapus blok yang tidak dipakai</div>
+                                <div class="text-sm text-slate-600">Biar workspace bersih dan tidak bikin bingung.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">4) Pilih variabel yang tepat</div>
+                                <div class="text-sm text-slate-600">Gunakan <b>global</b> untuk data lintas blok, <b>local</b> untuk sementara.</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm">
+                            <div class="opacity-60 mb-2">// prinsip singkat</div>
+                            <div><b>Jangan copy-paste rumus</b> → simpan di procedure</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: What is Modularization -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Modularisasi = Pecah Jadi Modul 🧱</h2>
+            <div class="slide-scroll">
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Definisi</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            <b>Modularisasi</b> berarti membagi program menjadi bagian-bagian kecil (modul) yang punya fungsi tertentu.
+                            Di App Inventor, modularisasi biasanya dilakukan dengan <b>procedures</b> dan <b>penamaan yang jelas</b>.
+                        </p>
+
+                        <div class="mt-6 p-5 rounded-2xl bg-emerald-50 border border-emerald-200">
+                            <div class="font-bold text-emerald-800 mb-2">Kenapa penting?</div>
+                            <ul class="text-sm text-emerald-900/90 list-disc ml-6 space-y-1">
+                                <li>Kode mudah dibaca</li>
+                                <li>Mudah dipelihara</li>
+                                <li>Bisa dipakai ulang (reuse)</li>
+                                <li>Memudahkan kerja kelompok</li>
+                                <li>Aplikasi lebih terstruktur</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Cara modularisasi (praktis)</h3>
+
+                        <div class="grid gap-3">
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">A) Gunakan Procedures</div>
+                                <div class="text-sm text-slate-600">Untuk perhitungan, menampilkan pesan, membersihkan input, mengatur tampilan.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">B) Gunakan Local Variable</div>
+                                <div class="text-sm text-slate-600">Kalau variabel cuma dipakai di satu procedure, jadikan local biar rapi.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">C) Gunakan penamaan jelas</div>
+                                <div class="text-sm text-slate-600">
+                                    Hindari: <span class="font-mono bg-white px-2 rounded border">x</span>,
+                                    <span class="font-mono bg-white px-2 rounded border">data1</span>.<br/>
+                                    Contoh baik: <span class="font-mono bg-white px-2 rounded border">totalBelanja</span>,
+                                    <span class="font-mono bg-white px-2 rounded border">HitungDiskon</span>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-5 rounded-2xl bg-slate-900 text-white">
+                            <div class="font-bold mb-2">Rule of thumb</div>
+                            <p class="text-white/80 text-sm">
+                                Kalau kamu melihat blok yang sama muncul <b>2 kali atau lebih</b>, itu kandidat kuat untuk dijadikan procedure.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Before vs After (Interactive Toggle) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Sebelum vs Sesudah Refactor 🔁</h2>
+            <div class="slide-scroll">
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <div class="flex items-center justify-between gap-4 mb-4 flex-wrap">
+                            <h3 class="font-bold text-xl">Bandingkan struktur blok</h3>
+                            <div class="flex gap-2">
+                                <button id="btnBefore" class="px-4 py-2 rounded-xl font-bold border border-slate-300 bg-slate-900 text-white">Tanpa Procedure</button>
+                                <button id="btnAfter" class="px-4 py-2 rounded-xl font-bold border border-slate-300 bg-white hover:bg-slate-50">Pakai Procedure</button>
+                            </div>
+                        </div>
+
+                        <div id="panelBefore" class="mt-4">
+                            <div class="text-sm text-slate-500 mb-2">Semua logika ditulis di event Button.Click</div>
+                            <div class="bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm leading-relaxed">
+                                when ButtonSubmit.Click<br/>
+                                &nbsp;&nbsp;if mobil.Checked<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;set total = durasi * 5000<br/>
+                                &nbsp;&nbsp;else if motor.Checked<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;set total = durasi * 2000<br/>
+                                &nbsp;&nbsp;set LabelHargatotal.Text = "Rp " + total
+                            </div>
+                            <div class="mt-4 p-4 rounded-2xl bg-rose-50 border border-rose-200">
+                                <div class="font-bold text-rose-800">Masalahnya</div>
+                                <div class="text-sm text-rose-700">Kalau rumus/fitur bertambah, event makin panjang dan sulit dirawat.</div>
+                            </div>
+                        </div>
+
+                        <div id="panelAfter" class="mt-4 hidden">
+                            <div class="text-sm text-slate-500 mb-2">Logika dipecah jadi procedure (lebih modular)</div>
+                            <div class="bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm leading-relaxed">
+                                to HitungBiaya(jenis, jam) result<br/>
+                                &nbsp;&nbsp;if jenis = "mobil" → jam * 5000<br/>
+                                &nbsp;&nbsp;else → jam * 2000<br/><br/>
+                                when ButtonSubmit.Click<br/>
+                                &nbsp;&nbsp;call ValidasiInput()<br/>
+                                &nbsp;&nbsp;set total = call HitungBiaya(jenis, jam)<br/>
+                                &nbsp;&nbsp;call TampilHasil(total)
+                            </div>
+                            <div class="mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                <div class="font-bold text-emerald-800">Keuntungannya</div>
+                                <div class="text-sm text-emerald-700">Kalau rumus berubah, cukup ubah di procedure HitungBiaya saja.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Checklist “Kode Sudah Optimal?”</h3>
+                        <ul class="list-disc ml-6 text-slate-600 space-y-2">
+                            <li>Ada blok yang sama ditulis berulang?</li>
+                            <li>Event Click terlalu panjang (scroll terus)?</li>
+                            <li>Kalau rumus berubah, harus edit di banyak tempat?</li>
+                            <li>Nama variabel/procedure masih membingungkan?</li>
+                        </ul>
+
+                        <div class="mt-6 p-5 rounded-2xl bg-brand-50 border border-brand-200">
+                            <div class="font-bold text-brand-800 mb-2">Kalau jawabannya “iya”…</div>
+                            <p class="text-sm text-brand-700">Waktunya <b>refactor</b>: pindahkan bagian itu jadi procedure.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    (function(){
+                        const b1 = document.getElementById('btnBefore');
+                        const b2 = document.getElementById('btnAfter');
+                        const p1 = document.getElementById('panelBefore');
+                        const p2 = document.getElementById('panelAfter');
+                        if(!b1||!b2||!p1||!p2) return;
+
+                        function setMode(mode){
+                            const before = mode === 'before';
+                            p1.classList.toggle('hidden', !before);
+                            p2.classList.toggle('hidden', before);
+
+                            b1.className = before
+                                ? "px-4 py-2 rounded-xl font-bold border border-slate-300 bg-slate-900 text-white"
+                                : "px-4 py-2 rounded-xl font-bold border border-slate-300 bg-white hover:bg-slate-50";
+                            b2.className = !before
+                                ? "px-4 py-2 rounded-xl font-bold border border-slate-300 bg-slate-900 text-white"
+                                : "px-4 py-2 rounded-xl font-bold border border-slate-300 bg-white hover:bg-slate-50";
+                        }
+                        b1.addEventListener('click', ()=>setMode('before'));
+                        b2.addEventListener('click', ()=>setMode('after'));
+                    })();
+                </script>
+            </div>
+        </section>
+
+        <!-- Slide 6: Case Study - Parking Calculator (Interactive Simulator) -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Studi Kasus: Kalkulator Tarif Parkir 🚗🏍️</h2>
+            <div class="slide-scroll">
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-4">Modul yang kita buat</h3>
+                        <div class="grid gap-3">
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">1) ValidasiInput</div>
+                                <div class="text-sm text-slate-600">Cek jam parkir tidak kosong dan berupa angka.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">2) HitungBiaya(jenis, jam)</div>
+                                <div class="text-sm text-slate-600">
+                                    Mobil: <b>jam × 5000</b> • Motor: <b>jam × 2000</b>
+                                </div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold">3) TampilHasil(total)</div>
+                                <div class="text-sm text-slate-600">Menampilkan “Rp …” ke label hasil.</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm">
+                            <div class="opacity-60 mb-2">// ide modular</div>
+                            <div>ButtonSubmit.Click →</div>
+                            <div class="ml-4">ValidasiInput()</div>
+                            <div class="ml-4">total = HitungBiaya(jenis, jam)</div>
+                            <div class="ml-4">TampilHasil(total)</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-4">Simulasi (konsep)</h3>
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                            <div class="font-black text-slate-800 text-lg mb-4 text-center">Penghitung Tarif Parkir</div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="vehBtn bg-white border border-slate-200 rounded-xl py-3 font-bold hover:bg-slate-100 transition" data-veh="mobil">
+                                    🚗 Mobil
+                                </button>
+                                <button class="vehBtn bg-white border border-slate-200 rounded-xl py-3 font-bold hover:bg-slate-100 transition" data-veh="motor">
+                                    🏍️ Motor
+                                </button>
+                            </div>
+
+                            <input id="jamParkir" type="number" min="0" class="mt-3 w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-center font-bold outline-none focus:border-brand-500"
+                                placeholder="Durasi parkir (jam)" />
+
+                            <button id="btnHitungParkir" class="mt-4 w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 transition">
+                                Submit
+                            </button>
+
+                            <div class="mt-4 text-center">
+                                <div class="text-sm text-slate-500">Nominal yang harus dibayarkan:</div>
+                                <div class="text-3xl font-black text-slate-300" id="outParkir">-</div>
+                                <div class="text-sm mt-2 text-slate-500" id="hintParkir">Pilih kendaraan dulu.</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                            <div class="font-bold text-amber-800">Catatan</div>
+                            <div class="text-sm text-amber-700">Di App Inventor, perhitungan ini sebaiknya disimpan di procedure agar tidak berulang.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    (function(){
+                        let jenis = null;
+                        const vehBtns = document.querySelectorAll('.vehBtn');
+                        const jamEl = document.getElementById('jamParkir');
+                        const outEl = document.getElementById('outParkir');
+                        const hintEl = document.getElementById('hintParkir');
+                        const btn = document.getElementById('btnHitungParkir');
+
+                        function formatRp(n){
+                            return "Rp " + String(n);
+                        }
+                        function HitungBiaya(j, jam){
+                            if(j === "mobil") return jam * 5000;
+                            return jam * 2000;
+                        }
+
+                        vehBtns.forEach(b=>{
+                            b.addEventListener('click', ()=>{
+                                jenis = b.dataset.veh;
+                                vehBtns.forEach(x=>x.classList.remove('bg-slate-900','text-white'));
+                                b.classList.add('bg-slate-900','text-white');
+                                hintEl.textContent = "✅ Kendaraan: " + (jenis === "mobil" ? "Mobil" : "Motor");
+                                hintEl.className = "text-sm mt-2 text-emerald-700 font-bold";
+                            });
+                        });
+
+                        btn.addEventListener('click', ()=>{
+                            if(!jenis){
+                                outEl.textContent = "-";
+                                outEl.className = "text-3xl font-black text-slate-300";
+                                hintEl.textContent = "⚠️ Pilih kendaraan (mobil/motor) dulu.";
+                                hintEl.className = "text-sm mt-2 text-rose-600 font-bold";
+                                return;
+                            }
+                            const jam = parseFloat(jamEl.value);
+                            if(isNaN(jam) || jam <= 0){
+                                outEl.textContent = "-";
+                                outEl.className = "text-3xl font-black text-slate-300";
+                                hintEl.textContent = "⚠️ Isi durasi parkir (jam) dengan angka > 0.";
+                                hintEl.className = "text-sm mt-2 text-rose-600 font-bold";
+                                return;
+                            }
+                            const total = HitungBiaya(jenis, jam);
+                            outEl.textContent = formatRp(total);
+                            outEl.className = "text-3xl font-black text-emerald-700";
+                            hintEl.textContent = "✅ Berhasil dihitung (logika idealnya ada di procedure).";
+                            hintEl.className = "text-sm mt-2 text-emerald-700 font-bold";
+                        });
+                    })();
+                </script>
+            </div>
+        </section>
+
+        <!-- Slide 7: Flowchart as steps -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Alur (Flowchart) Aplikasi 🧭</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow-lg border border-slate-100 anim-2">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-black text-brand-600">1</div>
+                            <div class="font-bold mt-1">Mulai aplikasi</div>
+                            <div class="text-sm text-slate-500">Screen dibuka</div>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-black text-brand-600">2</div>
+                            <div class="font-bold mt-1">Pilih kendaraan</div>
+                            <div class="text-sm text-slate-500">mobil / motor</div>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-black text-brand-600">3</div>
+                            <div class="font-bold mt-1">Isi jam parkir</div>
+                            <div class="text-sm text-slate-500">TextBox durasi</div>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="font-black text-brand-600">4</div>
+                            <div class="font-bold mt-1">Panggil ValidasiInput</div>
+                            <div class="text-sm text-slate-500">Input valid?</div>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 md:col-span-2">
+                            <div class="font-black text-brand-600">5</div>
+                            <div class="font-bold mt-1">Jika valid → HitungBiaya(jenis, jam)</div>
+                            <div class="text-sm text-slate-500">Procedure mengembalikan total</div>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 md:col-span-2">
+                            <div class="font-black text-brand-600">6</div>
+                            <div class="font-bold mt-1">Tampilkan hasil ke UI</div>
+                            <div class="text-sm text-slate-500">LabelHargatotal.Text = "Rp ..."</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-5 rounded-2xl bg-slate-900 text-white">
+                        <div class="font-bold mb-2">Kenapa flowchart membantu?</div>
+                        <p class="text-white/80 text-sm">
+                            Karena kamu bisa melihat bagian mana yang cocok dijadikan <b>procedure</b> (ValidasiInput, HitungBiaya, TampilHasil).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Guided Refactor Challenge -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Praktik: Refactor Kode ✂️</h2>
+            <div class="slide-scroll">
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Tugas kamu</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Bayangkan kamu punya event <b>ButtonSubmit.Click</b> yang panjang. Pilih bagian mana yang harus dipindah ke procedure.
+                        </p>
+
+                        <div class="mt-5 bg-slate-900 text-white p-5 rounded-2xl font-mono text-sm leading-relaxed">
+                            when ButtonSubmit.Click<br/>
+                            &nbsp;&nbsp;// (A) cek input kosong?<br/>
+                            &nbsp;&nbsp;// (B) hitung tarif berdasarkan kendaraan<br/>
+                            &nbsp;&nbsp;// (C) tampilkan teks "Rp ..."<br/>
+                            &nbsp;&nbsp;// (D) reset form
+                        </div>
+
+                        <div class="mt-5 grid gap-3">
+                            <button class="refBtn w-full text-left p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 transition" data-ref="A">
+                                <b>(A)</b> Validasi input (kosong / bukan angka)
+                            </button>
+                            <button class="refBtn w-full text-left p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 transition" data-ref="B">
+                                <b>(B)</b> Perhitungan tarif (jam × 5000 / 2000)
+                            </button>
+                            <button class="refBtn w-full text-left p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 transition" data-ref="C">
+                                <b>(C)</b> Mengubah Label menjadi "Rp ..."
+                            </button>
+                            <button class="refBtn w-full text-left p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 transition" data-ref="D">
+                                <b>(D)</b> Reset form (bersihkan input)
+                            </button>
+                        </div>
+
+                        <div id="refFeedback" class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600">
+                            Klik salah satu opsi untuk melihat jawabannya.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Jawaban ideal (modular)</h3>
+                        <div class="grid gap-3">
+                            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                <div class="font-bold text-emerald-800">ValidasiInput()</div>
+                                <div class="text-sm text-emerald-700">Berisi (A). Biar semua pengecekan input terkumpul.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                <div class="font-bold text-emerald-800">HitungBiaya(jenis, jam)</div>
+                                <div class="text-sm text-emerald-700">Berisi (B). Ini “mesin kecil” untuk perhitungan.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                <div class="font-bold text-emerald-800">TampilHasil(total)</div>
+                                <div class="text-sm text-emerald-700">Berisi (C). Biar format output konsisten.</div>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                <div class="font-bold text-emerald-800">BersihkanForm()</div>
+                                <div class="text-sm text-emerald-700">Berisi (D). Supaya reset bisa dipanggil kapan saja.</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-5 rounded-2xl bg-slate-900 text-white">
+                            <div class="font-bold mb-2">Intinya</div>
+                            <p class="text-white/80 text-sm">
+                                Event Click sebaiknya jadi “pengatur” saja: <b>cek → hitung → tampilkan</b>, bukan tempat semua rumus menumpuk.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    (function(){
+                        const fb = document.getElementById('refFeedback');
+                        const buttons = document.querySelectorAll('.refBtn');
+                        if(!fb || !buttons.length) return;
+                        const map = {
+                            A: "✅ Bagus! (A) cocok jadi procedure <b>ValidasiInput()</b> supaya semua pengecekan ada di satu tempat.",
+                            B: "✅ Bagus! (B) paling wajib jadi procedure <b>HitungBiaya(jenis, jam)</b> karena rumus sering dipakai ulang.",
+                            C: "✅ Bagus! (C) cocok jadi procedure <b>TampilHasil(total)</b> agar format “Rp ...” konsisten.",
+                            D: "✅ Bagus! (D) cocok jadi procedure <b>BersihkanForm()</b> supaya reset tinggal call."
+                        };
+                        buttons.forEach(btn=>{
+                            btn.addEventListener('click', ()=>{
+                                const k = btn.dataset.ref;
+                                fb.innerHTML = map[k] || "Coba pilih opsi lain.";
+                                fb.className = "mt-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800";
+                            });
+                        });
+                    })();
+                </script>
+            </div>
+        </section>
+
+        <!-- Slide 9: Naming mini-quiz -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Mini Quiz: Penamaan yang Jelas 🏷️</h2>
+            <div class="slide-scroll">
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-start anim-2">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Pilih nama yang lebih jelas</h3>
+                        <p class="text-slate-600">Klik jawaban terbaik untuk setiap nomor.</p>
+
+                        <div class="mt-5 space-y-5">
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold mb-2">1) Variabel untuk menyimpan total pembayaran parkir</div>
+                                <div class="flex gap-2 flex-wrap">
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="1" data-a="wrong">data1</button>
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="1" data-a="right">totalBiaya</button>
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="1" data-a="wrong">x</button>
+                                </div>
+                                <div class="text-sm mt-2 text-slate-500" id="nfb1">-</div>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold mb-2">2) Procedure untuk menghitung biaya parkir</div>
+                                <div class="flex gap-2 flex-wrap">
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="2" data-a="wrong">proses</button>
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="2" data-a="right">HitungBiayaParkir</button>
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="2" data-a="wrong">aa</button>
+                                </div>
+                                <div class="text-sm mt-2 text-slate-500" id="nfb2">-</div>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                                <div class="font-bold mb-2">3) Variabel jam parkir dari input TextBox</div>
+                                <div class="flex gap-2 flex-wrap">
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="3" data-a="right">durasiJam</button>
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="3" data-a="wrong">y</button>
+                                    <button class="nameBtn px-4 py-2 rounded-xl border border-slate-300 hover:bg-white" data-q="3" data-a="wrong">angka</button>
+                                </div>
+                                <div class="text-sm mt-2 text-slate-500" id="nfb3">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                        <h3 class="font-bold text-xl mb-3">Kenapa ini penting?</h3>
+                        <ul class="list-disc ml-6 text-slate-600 space-y-2">
+                            <li>Nama jelas = kode lebih cepat dipahami.</li>
+                            <li>Lebih mudah debugging karena kamu tahu fungsi tiap bagian.</li>
+                            <li>Mudah kerja kelompok (orang lain tidak bingung).</li>
+                            <li>Project kamu terlihat lebih profesional.</li>
+                        </ul>
+
+                        <div class="mt-6 p-5 rounded-2xl bg-slate-900 text-white font-mono text-sm">
+                            <div class="opacity-60 mb-2">// contoh jelas</div>
+                            <div>call HitungBiayaParkir(jenisKendaraan, durasiJam)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    (function(){
+                        function setFb(q, ok){
+                            const el = document.getElementById('nfb'+q);
+                            if(!el) return;
+                            if(ok){
+                                el.textContent = "✅ Benar. Nama ini jelas dan spesifik.";
+                                el.className = "text-sm mt-2 text-emerald-700 font-bold";
+                            } else {
+                                el.textContent = "❌ Kurang jelas. Coba pilih nama yang menjelaskan fungsinya.";
+                                el.className = "text-sm mt-2 text-rose-600 font-bold";
+                            }
+                        }
+                        document.addEventListener('click', (e)=>{
+                            const b = e.target.closest('.nameBtn');
+                            if(!b) return;
+                            setFb(b.dataset.q, b.dataset.a === 'right');
+                        });
+                    })();
+                </script>
+            </div>
+        </section>
+
+        <!-- Slide 10: Wrap-up + Quiz Reminder -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-8 anim-1">Penutup 🎉</h2>
+            <div class="slide-scroll">
+                <div class="max-w-4xl mx-auto text-center anim-2">
+                    <p class="text-xl text-slate-600 mb-8">
+                        Hari ini kamu belajar membuat kode lebih <b>rapi</b> dan <b>mudah dirawat</b> dengan
+                        <b>optimasi</b> dan <b>modularisasi</b>.
+                    </p>
+
+                    <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 text-left max-w-2xl mx-auto">
+                        <div class="font-bold mb-3">Ringkasan 3 poin</div>
+                        <ul class="list-disc ml-6 text-slate-600 space-y-1">
+                            <li><b>Optimasi</b> = kurangi pengulangan, cegah error, gampang debugging.</li>
+                            <li><b>Modularisasi</b> = pecah jadi procedure kecil (Validasi, Hitung, Tampil).</li>
+                            <li>Kalau rumus berubah → ubah di <b>1 procedure</b> saja.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-8 bg-brand-50 border border-brand-200 p-6 rounded-3xl max-w-2xl mx-auto">
+                        <div class="font-bold text-brand-800 mb-2">Checkout Quiz</div>
+                        <p class="text-brand-700">
+                            Setelah kelas, kerjakan <b>Checkout Quiz Modul 5.4</b> di LMS ya.
+                        </p>
+                    </div>
+
+                    <button
+                        class="mt-10 bg-red-500 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-red-600 transition active:scale-95 group"
+                        onclick="localStorage.removeItem('sesi36_access'); location.reload();">
+                        <i class="fa-solid fa-power-off mr-2 group-hover:rotate-90 transition-transform"></i> LOGOUT SYSTEM
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Core Logic
+            const activeClass = 'active';
+            const slides = document.querySelectorAll('.slide');
+            const progressBar = document.getElementById('bar');
+            const counter = document.getElementById('counter');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const accessOverlay = document.getElementById('accessOverlay');
+            const accessInput = document.getElementById('accessCodeInput');
+            const accessBtn = document.getElementById('accessBtn');
+            const accessError = document.getElementById('accessError');
+
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            const totalSpan = document.getElementById('totalSlides');
+            if(totalSpan) totalSpan.innerText = totalSlides;
+            const VALID_CODE = "RGMDSMS25"; 
+
+            // Access Control - Overlay visibility is now controlled by CSS variable set in head
+
+            accessBtn.addEventListener('click', () => {
+                if(accessInput.value.toUpperCase().trim() === VALID_CODE) {
+                    localStorage.setItem('sesi36_access', 'true');
+                    accessOverlay.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        accessOverlay.style.display = 'none';
+                        updateSlide();
+                    }, 500);
+                } else {
+                    accessError.style.opacity = '1';
+                    accessInput.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => accessInput.classList.remove('animate-shake'), 500);
+                }
+            });
+
+            // Navigation
+            function updateSlide() {
+                slides.forEach((slide, idx) => {
+                    if(idx === currentSlide) {
+                        slide.classList.add(activeClass);
+                    } else {
+                        slide.classList.remove(activeClass);
+                    }
+                });
+                
+                if(progressBar) progressBar.style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+                if(counter) counter.innerText = currentSlide + 1;
+                
+                if(btnPrev) btnPrev.disabled = currentSlide === 0;
+                if(btnNext) btnNext.disabled = currentSlide === totalSlides - 1;
+            }
+
+            if(btnNext) btnNext.addEventListener('click', () => {
+                 if(currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlide();
+                 }
+            });
+
+            if(btnPrev) btnPrev.addEventListener('click', () => {
+                if(currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'ArrowRight' && btnNext && !btnNext.disabled) btnNext.click();
+                if(e.key === 'ArrowLeft' && btnPrev && !btnPrev.disabled) btnPrev.click();
+            });
+
+            updateSlide();
+        });
+    </script>
+</body>
+</html>
