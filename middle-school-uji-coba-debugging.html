@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesi 37: Uji Coba dan Debugging</title>
+    <script>
+        // Check access BEFORE rendering to prevent flash
+        if (localStorage.getItem('sesi37_access') === 'true') {
+            document.documentElement.style.setProperty('--overlay-display', 'none');
+        } else {
+            document.documentElement.style.setProperty('--overlay-display', 'flex');
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6', // Violet/Purple
+                            600: '#7c3aed',
+                            900: '#4c1d95',
+                        },
+                        accent: {
+                            500: '#3b82f6', // Blue for Logic blocks
+                            600: '#2563eb',
+                        },
+                        logic: {
+                            gold: '#d97706', // Control blocks
+                            green: '#16a34a', // Logic blocks
+                            blue: '#2563eb', // Math blocks
+                            red: '#dc2626', // Error
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        popIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --overlay-display: flex;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        .slide {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+
+            /* OVERFLOW FIX */
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-top: 7rem;
+            padding-bottom: 7rem;
+            /* supaya konten tidak ketutup nav */
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Keyframe Animations */
+        @keyframes slideUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        .block-shape {
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .grid-bg {
+            background-size: 30px 30px;
+            background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+        }
+
+        /* Staggered Animations */
+        .slide.active .anim-1 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-2 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-3 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-pop {
+            opacity: 0;
+            animation: popIn 0.5s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Overlay with CSS variable control */
+        #accessOverlay {
+            display: var(--overlay-display) !important;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 grid-bg">
+
+    <!-- Access Overlay -->
+    <div id="accessOverlay" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4">
+        <div
+            class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center relative">
+            <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+            <p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 37</p>
+            <input type="text" id="accessCodeInput" placeholder="Enter Class Code"
+                class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase">
+            <button id="accessBtn"
+                class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">UNLOCK
+                SYSTEM</button>
+            <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED
+            </p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div
+        class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Sesi 37: Uji Coba &
+                Debugging</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="btnPrev"
+                class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition disabled:opacity-30"><i
+                    class="fa-solid fa-chevron-left"></i></button>
+            <span class="font-mono text-sm font-bold text-slate-400"><span id="counter"
+                    class="text-brand-600">1</span>/11</span>
+            <button id="btnNext"
+                class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg"><i
+                    class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+        <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[0%]"></div>
+    </div>
+
+    <main class="relative w-full h-screen overflow-hidden">
+
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+                <div class="flex-1 anim-1">
+                    <div
+                        class="inline-block px-4 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6 tracking-widest border border-brand-200">
+                        MIDDLE SCHOOL • SESSION 37
+                    </div>
+                    <h1 class="text-6xl font-black text-slate-900 mb-6 leading-tight">
+                        UJI COBA & <br><span class="text-brand-500">DEBUGGING</span> 🦟
+                    </h1>
+                    <p class="text-2xl text-slate-600 font-light">
+                        Mencari, Menemukan, dan Membasmi <br> Kesalahan (Bug) Aplikasi.
+                    </p>
+                </div>
+                <div class="flex-1 flex justify-center anim-pop relative">
+                    <div class="absolute inset-0 bg-brand-200 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                    <!-- Bug Icon -->
+                    <div class="relative animate-float text-center">
+                        <i class="fa-solid fa-bug text-9xl text-red-500 drop-shadow-2xl mb-4"></i>
+                        <div
+                            class="bg-white px-6 py-2 rounded-full font-mono text-xl font-bold border-2 border-red-200 shadow-xl">
+                            Syntax Error!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Opening Hook -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-10 anim-1">Pernah Mengalami Ini? 🤔</h2>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 items-center anim-2">
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-lg text-center h-full flex flex-col justify-center border-t-8 border-red-500">
+                    <div class="text-8xl mb-4 animate-pulse">💥</div>
+                    <h3 class="font-bold text-2xl mb-2 text-red-600">GAME TIBA-TIBA MATI</h3>
+                    <p class="text-slate-500 text-sm font-mono">(FORCE CLOSE / CRASH)</p>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                        <p class="text-lg font-bold text-blue-800">Kenapa bisa terjadi?</p>
+                        <ul class="list-disc ml-6 mt-2 text-blue-600 space-y-2">
+                            <li>Memori Penuh?</li>
+                            <li>Koneksi Putus?</li>
+                            <li class="font-bold text-red-600 bg-red-100 px-2 rounded w-fit">ADA BUG DI KODE! 🐛</li>
+                        </ul>
+                    </div>
+                    <p class="text-center text-xl text-slate-600 font-light anim-3">
+                        Tugas programmer bukan cuma membuat,<br>
+                        tapi juga <b>memastikan aplikasi AMAN.</b>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: What is Debugging -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Uji Coba (Testing) & Debugging 🧪🐛</h2>
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center anim-2">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center text-2xl">🧪
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-slate-900">Testing</h3>
+                    </div>
+                    <p class="text-slate-700 text-lg leading-relaxed">
+                        Testing adalah kegiatan <b>menjalankan aplikasi</b> untuk melihat apakah semua bagian bekerja
+                        sesuai rencana:
+                        tombol bisa ditekan, data terbaca, dan hasil tampil dengan benar.
+                    </p>
+                    <div class="mt-5 bg-blue-50 border border-blue-100 rounded-2xl p-4">
+                        <p class="font-bold text-blue-800 mb-1">Tujuan utama:</p>
+                        <p class="text-blue-700">menemukan masalah, <b>bukan</b> langsung memperbaikinya.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center text-2xl">🐛</div>
+                        <h3 class="text-2xl font-extrabold text-slate-900">Debugging</h3>
+                    </div>
+                    <p class="text-slate-700 text-lg leading-relaxed">
+                        Debugging adalah proses <b>mencari penyebab kesalahan</b> dan <b>memperbaikinya</b>.
+                        Kesalahan ini disebut <i>bug</i> dan bisa muncul karena logika salah, komponen salah, atau input
+                        pengguna tidak sesuai.
+                    </p>
+                    <div class="mt-5 bg-red-50 border border-red-100 rounded-2xl p-4">
+                        <p class="font-bold text-red-800 mb-1">Targetnya:</p>
+                        <p class="text-red-700">aplikasi lebih <b>stabil</b> dan <b>aman</b> dipakai orang lain.</p>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <div
+                        class="bg-brand-100 border border-brand-200 rounded-2xl p-5 text-center font-bold text-brand-800 anim-pop">
+                        Ringkasnya: <span class="font-black">Testing</span> menemukan bug, <span
+                            class="font-black">Debugging</span> memperbaiki bug.
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Slide 4: Testing Methods -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 anim-1">Uji Coba dengan AI Companion 📱</h2>
+            <p class="text-center text-slate-600 text-lg max-w-3xl mx-auto anim-2">
+                Di kelas, kita pakai <b>AI Companion</b> untuk menjalankan aplikasi langsung di HP. Ikuti
+                langkah-langkah berikut.
+            </p>
+
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 mt-8 anim-2">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
+                    <h3 class="font-bold text-slate-900 text-xl mb-4">Langkah Uji Coba (Scan QR / Kode)</h3>
+
+                    <ol class="space-y-3 text-slate-700">
+                        <li class="flex gap-3 items-start step-item">
+                            <span
+                                class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-extrabold flex items-center justify-center">1</span>
+                            <div><b>Buka</b> aplikasi <span class="font-mono">MIT AI2 Companion</span> di smartphone.
+                            </div>
+                        </li>
+                        <li class="flex gap-3 items-start step-item">
+                            <span
+                                class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-extrabold flex items-center justify-center">2</span>
+                            <div><b>Buka proyek</b> kamu di MIT App Inventor (di laptop/PC).</div>
+                        </li>
+                        <li class="flex gap-3 items-start step-item">
+                            <span
+                                class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-extrabold flex items-center justify-center">3</span>
+                            <div>Klik menu <b>Connect</b> lalu pilih <b>AI Companion</b>.</div>
+                        </li>
+                        <li class="flex gap-3 items-start step-item">
+                            <span
+                                class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-extrabold flex items-center justify-center">4</span>
+                            <div><b>Scan QR</b> atau <b>masukkan kode</b> di aplikasi AI2 Companion.</div>
+                        </li>
+                        <li class="flex gap-3 items-start step-item">
+                            <span
+                                class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-extrabold flex items-center justify-center">5</span>
+                            <div>Tunggu sampai aplikasi kamu <b>muncul di smartphone</b>.</div>
+                        </li>
+                        <li class="flex gap-3 items-start step-item">
+                            <span
+                                class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-extrabold flex items-center justify-center">6</span>
+                            <div><b>Testing</b> proyekmu: tekan tombol, isi input, lihat hasil.</div>
+                        </li>
+                        <li class="flex gap-3 items-start step-item">
+                            <span
+                                class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-extrabold flex items-center justify-center">7</span>
+                            <div>Kalau ada bug, <b>perbaiki di MIT App Inventor</b> lalu coba lagi.</div>
+                        </li>
+                    </ol>
+
+                    <div class="mt-6 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm text-slate-600">
+                        <b>Tip cepat:</b> kalau koneksi putus, ulangi dari langkah 3 (Connect → AI Companion).
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-brand-100 rounded-full blur-2xl opacity-70">
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-xl mb-4">Mini-Checklist Saat Testing</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-2xl bg-blue-50 border border-blue-100">
+                            <div class="font-bold text-blue-900 mb-1">Cek tombol</div>
+                            <div class="text-blue-700 text-sm">Saat ditekan, ada perubahan? (Label berubah / layar
+                                pindah / notifikasi muncul)</div>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-green-50 border border-green-100">
+                            <div class="font-bold text-green-900 mb-1">Cek input</div>
+                            <div class="text-green-700 text-sm">Coba isi angka, coba kosong, coba spasi. Aplikasi tetap
+                                aman?</div>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-100">
+                            <div class="font-bold text-amber-900 mb-1">Cek output</div>
+                            <div class="text-amber-700 text-sm">Hasilnya tampil di komponen yang benar? (Label yang
+                                benar, bukan label lain)</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <span
+                            class="inline-flex items-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-full font-bold shadow-lg">
+                            <i class="fa-solid fa-qrcode"></i> Connect → AI Companion → Scan QR
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Slide 5: The "Do It" Feature -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Fitur Rahasia: "Do It" ✨</h2>
+            <div class="max-w-4xl mx-auto flex flex-col items-center gap-8 anim-2">
+                <p class="text-center text-slate-600 text-xl">
+                    Kalian bisa mengintip isi variabel tanpa menjalankan seluruh aplikasi!
+                </p>
+                <div class="relative bg-slate-100 p-8 rounded-xl border border-slate-300 w-full max-w-2xl shadow-inner">
+                    <!-- Fake Block -->
+                    <div class="bg-orange-500 text-white font-bold p-3 rounded w-fit relative cursor-pointer group select-none shadow-md mb-20 ml-20"
+                        id="blockDemo">
+                        get <span class="bg-black/20 px-1 rounded">global Skor</span>
+
+                        <!-- Context Menu Simulation -->
+                        <div
+                            class="absolute top-10 left-10 bg-white text-slate-800 text-sm shadow-xl rounded border border-slate-200 w-40 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto z-10 text-left">
+                            <div class="px-3 py-2 hover:bg-slate-100 border-b">Duplicate</div>
+                            <div class="px-3 py-2 hover:bg-slate-100 border-b">Add Comment</div>
+                            <div class="px-3 py-2 hover:bg-blue-100 text-blue-600 font-bold cursor-pointer"
+                                onclick="showDoItResult()">Do It</div>
+                            <div class="px-3 py-2 hover:bg-slate-100">Disable Block</div>
+                        </div>
+
+                        <!-- Result Bubble -->
+                        <div id="doItResult"
+                            class="absolute -top-12 -right-20 bg-yellow-200 text-slate-900 border border-yellow-400 px-3 py-1 rounded shadow-lg text-sm font-mono opacity-0 transition-all transform translate-y-2">
+                            Result: 100
+                            <div
+                                class="absolute bottom-0 left-2 w-3 h-3 bg-yellow-200 rotate-45 transform translate-y-1.5 border-r border-b border-yellow-400">
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center text-slate-400 text-sm mt-4">Arahkan mouse ke blok di atas (Simulasi Klik
+                        Kanan)</p>
+                </div>
+                <div class="flex gap-4">
+                    <div
+                        class="bg-white px-6 py-3 rounded-full shadow border-l-4 border-purple-500 text-sm font-bold text-slate-600">
+                        1. Klik Kanan pada Blok
+                    </div>
+                    <div
+                        class="bg-white px-6 py-3 rounded-full shadow border-l-4 border-purple-500 text-sm font-bold text-slate-600">
+                        2. Pilih "Do It"
+                    </div>
+                    <div
+                        class="bg-white px-6 py-3 rounded-full shadow border-l-4 border-purple-500 text-sm font-bold text-slate-600">
+                        3. Lihat Hasilnya!
+                    </div>
+                </div>
+            </div>
+            <script>
+                function showDoItResult() {
+                    const res = document.getElementById('doItResult');
+                    res.classList.remove('opacity-0', 'translate-y-2');
+                    setTimeout(() => {
+                        res.classList.add('opacity-0', 'translate-y-2');
+                    }, 3000);
+                }
+            </script>
+        </section>
+
+        <!-- Slide 6: Common Errors -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Musuh Terbesar: Logic Error 🤯</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 anim-2">
+                <!-- Variabel Kosong -->
+                <div class="bg-red-50 p-6 rounded-2xl border border-red-200">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-2xl font-bold">
+                            1</div>
+                        <h3 class="font-bold text-lg text-red-800">Variabel Belum Di-set</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-4">Mencoba menghitung nilai yang belum ada.</p>
+                    <div class="bg-slate-900 text-white p-3 rounded font-mono text-xs">
+                        total = harga * jumlah <br>
+                        <span class="text-red-400">// Error: 'jumlah' is empty!</span>
+                    </div>
+                </div>
+
+                <!-- Logika Terbalik -->
+                <div class="bg-orange-50 p-6 rounded-2xl border border-orange-200">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-2xl font-bold">
+                            2</div>
+                        <h3 class="font-bold text-lg text-orange-800">Logika Terbalik</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-4">Maksud hati "Lulus", apa daya kodenya "Gagal".</p>
+                    <div class="bg-slate-900 text-white p-3 rounded font-mono text-xs">
+                        if (nilai < 75) then <br>
+                            &nbsp;&nbsp;print "LULUS" <br>
+                            <span class="text-orange-400">// Salah! Harusnya > 75</span>
+                    </div>
+                </div>
+
+                <!-- Salah Komponen -->
+                <div class="bg-yellow-50 p-6 rounded-2xl border border-yellow-200 md:col-span-2">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 text-2xl font-bold">
+                            3</div>
+                        <h3 class="font-bold text-lg text-yellow-800">Salah Ambil Komponen</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 text-center">
+                        Mau ubah <b>Label2</b>, tapi yang ditarik blok <b>Label1</b>. <br>
+                        <i>Selalu cek nama komponenmu!</i>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Notifier -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Jangan Diam Saja! Gunakan Notifier 📢</h2>
+            <div class="max-w-4xl mx-auto flex flex-col items-center gap-8 anim-2">
+                <p class="text-center text-slate-600 text-lg max-w-2xl">
+                    Kalau ada error, atau input salah, beri tahu pengguna. <br>
+                    Jangan biarkan pengguna bingung "Loh kok nggak bisa dipencet?".
+                </p>
+
+                <!-- Phone Mockup with Notifier -->
+                <div
+                    class="relative w-[300px] h-[580px] bg-slate-900 rounded-[40px] border-8 border-slate-800 shadow-2xl p-4 flex flex-col items-center justify-center overflow-hidden">
+                    <div class="absolute top-0 w-32 h-6 bg-slate-800 rounded-b-xl z-20"></div>
+
+                    <div
+                        class="w-full h-full bg-white rounded-2xl flex flex-col items-center justify-center p-4 relative">
+                        <h3 class="text-xl font-bold mb-4 w-full text-center">App Cek Umur</h3>
+
+                        <input id="ageInput" type="text" placeholder="Masukkan Umur"
+                            class="w-full bg-slate-100 p-3 rounded mb-4 border border-slate-300">
+
+                        <button onclick="handleCheckAge()"
+                            class="bg-blue-500 text-white w-full py-3 rounded font-bold active:scale-95 transition">
+                            CEK
+                        </button>
+
+                        <!-- The Alert Overlay -->
+                        <div id="fakeAlert"
+                            class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-30 backdrop-blur-sm">
+                            <div class="bg-white w-[80%] p-6 rounded-lg shadow-2xl transform scale-90 transition-transform duration-300"
+                                id="fakeAlertBox">
+                                <h4 class="font-bold text-lg mb-2 text-red-600">Peringatan! ⚠️</h4>
+                                <p class="text-sm text-slate-600 mb-6">Kamu belum memasukkan umur! Harap isi dulu ya.
+                                </p>
+                                <button onclick="closeFakeAlert()"
+                                    class="w-full text-blue-500 font-bold text-right uppercase tracking-wider text-sm hover:bg-blue-50 p-2 rounded">
+                                    OK, Paham
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                function showFakeAlert() {
+                    const al = document.getElementById('fakeAlert');
+                    const box = document.getElementById('fakeAlertBox');
+                    al.classList.remove('opacity-0', 'pointer-events-none');
+                    box.classList.remove('scale-90');
+                    box.classList.add('scale-100');
+                }
+
+                function closeFakeAlert() {
+                    const al = document.getElementById('fakeAlert');
+                    const box = document.getElementById('fakeAlertBox');
+                    al.classList.add('opacity-0', 'pointer-events-none');
+                    box.classList.remove('scale-100');
+                    box.classList.add('scale-90');
+                }
+
+                // ✅ VALIDASI: alert hanya muncul kalau kosong / bukan angka
+                function handleCheckAge() {
+                    const input = document.getElementById('ageInput');
+                    const val = (input.value || "").trim();
+
+                    // kosong / spasi doang
+                    if (val === "") {
+                        showFakeAlert();
+                        return;
+                    }
+
+                    // bukan angka (contoh: "abc", "12a", "@@")
+                    // NOTE: "20" valid, "20.5" juga dianggap angka
+                    if (isNaN(Number(val))) {
+                        // kalau mau, kamu bisa ganti teks alertnya jadi "Harus angka!"
+                        showFakeAlert();
+                        return;
+                    }
+
+                    // ✅ kalau angka: jangan tampilkan alert
+                    closeFakeAlert();
+                }
+            </script>
+        </section>
+
+        <!-- Slide 8: Defensive Programming -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 anim-1">Cara Menemukan & Memperbaiki Bug 🔧</h2>
+            <p class="text-center text-slate-600 text-lg max-w-4xl mx-auto anim-2">
+                Kalau aplikasi bermasalah, jangan panik. Ikuti langkah yang teratur supaya bug cepat ketemu.
+            </p>
+
+            <div class="max-w-6xl mx-auto mt-8 grid md:grid-cols-3 gap-6 anim-2">
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center">1</div>
+                        <h3 class="font-bold text-slate-900">Jalankan & amati</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Tes lewat AI Companion. Perhatikan tombol, input, dan hasil yang
+                        muncul.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center">2</div>
+                        <h3 class="font-bold text-slate-900">Tentukan jenis bug</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Masalahnya di <b>input</b>, <b>proses/logika</b>, atau
+                        <b>output/komponen</b>?
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center">3</div>
+                        <h3 class="font-bold text-slate-900">Cek nilai (Do It)</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Gunakan <b>Do It</b> untuk melihat isi variabel/hasil hitung.
+                        Kalau nilainya aneh, di situ sumbernya.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center">4</div>
+                        <h3 class="font-bold text-slate-900">Tambah Notifier</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Biar pengguna tahu kesalahan (misal: “Data belum diisi”, “Harus
+                        angka!”).</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center">5</div>
+                        <h3 class="font-bold text-slate-900">Perbaiki blok/komponen</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Pastikan IF–ELSE benar dan komponen yang diubah adalah komponen
+                        yang tampil di layar.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center">6</div>
+                        <h3 class="font-bold text-slate-900">Uji kembali</h3>
+                    </div>
+                    <p class="text-sm text-slate-600">Jalankan lagi setelah diperbaiki. Coba beberapa input berbeda
+                        untuk memastikan bug tidak muncul lagi.</p>
+                </div>
+            </div>
+
+            <div
+                class="max-w-5xl mx-auto mt-8 bg-brand-100 border border-brand-200 rounded-2xl p-5 text-center font-bold text-brand-800 anim-pop">
+                Pola aman: <span class="font-black">Temukan → Perbaiki → Coba lagi</span> (ulang sampai stabil).
+            </div>
+
+        </section>
+
+        <!-- Slide 9: Activity Project -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 anim-1">Proyek: Cek Umur Aman ✅</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 text-left anim-2">
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-brand-500">
+                        <h3 class="font-bold text-lg mb-2">Tujuan Aplikasi</h3>
+                        <p class="text-slate-600 text-sm">Aplikasi sederhana yang meminta input umur, lalu menentukan
+                            kategori (Anak/Remaja/Dewasa). Tapi harus <b>ANTI CRASH</b>.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-700 mb-2">Checklist Fitur:</h4>
+                        <ul class="space-y-2 text-sm text-slate-600">
+                            <li class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-slate-400 rounded-full"></div> Input Textbox (Hint: "Masukkan
+                                Umur")
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-slate-400 rounded-full"></div> Tombol "Cek"
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-slate-400 rounded-full"></div> Notifier (Peringatan)
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-brand-500 rounded-full"></div> Blok If-Else If-Else Logic
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div
+                    class="bg-slate-900 rounded-2xl p-6 text-white font-mono text-xs overflow-y-auto max-h-80 shadow-inner">
+                    <div class="text-green-400 mb-2">// Algoritma</div>
+                    <div class="pl-4 border-l border-slate-700 space-y-2">
+                        <p>When Button1.Click</p>
+                        <p class="text-yellow-400">If TextBox1.Text is empty then</p>
+                        <p class="pl-4 text-pink-400">Call Notifier.ShowAlert("Data belum diisi")</p>
+                        <p class="text-yellow-400">Else if isNumber(TextBox1.Text) = false then</p>
+                        <p class="pl-4 text-pink-400">Call Notifier.ShowAlert("Harus angka!")</p>
+                        <p class="text-yellow-400">Else</p>
+                        <p class="pl-4 text-blue-400">-- Proses Cek Umur Disini --</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Summary & Closing -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-6 anim-1">Aktivitas & Kesimpulan 🧩</h2>
+
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 anim-2">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-brand-100 flex items-center justify-center text-2xl">🎮
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-slate-900">Aktivitas</h3>
+                    </div>
+                    <p class="text-slate-700 mb-5">
+                        Pastikan aplikasi yang kamu buat lebih <b>aman</b> dan tidak mudah error.
+                    </p>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                        <p class="font-bold text-slate-800 mb-3">Langkah:</p>
+                        <ol class="list-decimal ml-5 space-y-2 text-slate-700">
+                            <li>Buat aplikasi <b>“Cek Umur”</b> dengan input angka.</li>
+                            <li>Tambahkan validasi:
+                                <div class="mt-2 space-y-2">
+                                    <div class="bg-white border border-slate-200 rounded-xl p-3">
+                                        <b>IF</b> input kosong → tampilkan Notifier <span class="font-mono">“Data belum
+                                            diisi”</span>.
+                                    </div>
+                                    <div class="bg-white border border-slate-200 rounded-xl p-3">
+                                        <b>IF</b> input bukan angka → tampilkan Notifier <span class="font-mono">“Harus
+                                            angka!”</span>.
+                                    </div>
+                                </div>
+                            </li>
+                            <li>Lakukan uji coba untuk melihat apakah validasi berjalan.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-8 rounded-3xl shadow-xl text-white border border-slate-800">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-2xl">📝
+                        </div>
+                        <h3 class="text-2xl font-extrabold">Kesimpulan</h3>
+                    </div>
+                    <p class="text-slate-200 leading-relaxed">
+                        Uji coba dan debugging adalah bagian penting dalam pengembangan aplikasi di MIT App Inventor.
+                        Melalui uji coba, kamu bisa melihat apakah input terbaca dengan benar, perhitungan berjalan
+                        tepat,
+                        dan tombol/komponen bekerja sesuai rencana. Sementara itu, debugging membantu menemukan sumber
+                        kesalahan yang kadang tidak terlihat saat pertama kali membuat aplikasi, seperti logika IF yang
+                        salah,
+                        variabel yang belum terisi, atau input kosong yang membuat aplikasi error.
+                    </p>
+
+                    <div class="mt-6 bg-white/10 border border-white/10 rounded-2xl p-5">
+                        <div class="font-bold mb-2">Kalimat kunci:</div>
+                        <div class="font-mono text-sm text-white/90">Testing menemukan bug. Debugging memperbaiki bug.
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm font-bold">🧪
+                            Testing</span>
+                        <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm font-bold">🐛
+                            Bug</span>
+                        <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm font-bold">🔧
+                            Debugging</span>
+                        <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm font-bold">📢
+                            Notifier</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-4 mt-10 anim-pop">
+                <button onclick="localStorage.removeItem('sesi37_access'); location.reload();"
+                    class="bg-slate-800 text-white px-8 py-3 rounded-xl font-bold shadow-xl hover:bg-slate-900 transition active:scale-95 text-sm">
+                    <i class="fa-solid fa-lock mr-2"></i> KELUAR SESI
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Core Logic
+            const activeClass = 'active';
+            const slides = document.querySelectorAll('.slide');
+            const progressBar = document.getElementById('bar');
+            const counter = document.getElementById('counter');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const accessOverlay = document.getElementById('accessOverlay');
+            const accessInput = document.getElementById('accessCodeInput');
+            const accessBtn = document.getElementById('accessBtn');
+            const accessError = document.getElementById('accessError');
+
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            const VALID_CODE = "RGMDSMS25";
+
+            // Access Control
+            accessBtn.addEventListener('click', () => {
+                const inputVal = accessInput.value.trim().toUpperCase();
+                if (inputVal === VALID_CODE) {
+                    localStorage.setItem('sesi37_access', 'true');
+                    accessOverlay.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        accessOverlay.style.display = 'none';
+                        updateSlide();
+                    }, 500);
+                } else {
+                    accessError.style.opacity = '1';
+                    accessInput.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => accessInput.classList.remove('border-red-500', 'animate-shake'), 500);
+                }
+            });
+
+            // Navigation
+            function updateSlide() {
+                slides.forEach((slide, idx) => {
+                    if (idx === currentSlide) {
+                        slide.classList.add(activeClass);
+                    } else {
+                        slide.classList.remove(activeClass);
+                    }
+                });
+
+                if (progressBar) progressBar.style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+                if (counter) counter.innerText = currentSlide + 1;
+
+                if (btnPrev) btnPrev.disabled = currentSlide === 0;
+                if (btnNext) btnNext.disabled = currentSlide === totalSlides - 1;
+            }
+
+            if (btnNext) btnNext.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlide();
+                }
+            });
+
+            if (btnPrev) btnPrev.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                // blok navigasi kalau access overlay masih tampil
+                if (accessOverlay && getComputedStyle(accessOverlay).display !== 'none') return;
+
+                if (e.key === 'ArrowRight' && btnNext && !btnNext.disabled) {
+                    btnNext.click();
+                }
+
+                if (e.key === 'ArrowLeft' && btnPrev && !btnPrev.disabled) {
+                    btnPrev.click();
+                }
+            });
+
+            updateSlide();
+        });
+    </script>
+</body>
+
+</html>
