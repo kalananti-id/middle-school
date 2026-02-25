@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sesi 40: 6.2 Perencanaan Keuangan Pribadi</title>
+
+  <script>
+    // Check access BEFORE rendering to prevent flash
+    if (localStorage.getItem("sesi40_access") === "true") {
+      document.documentElement.style.setProperty("--overlay-display", "none");
+    } else {
+      document.documentElement.style.setProperty("--overlay-display", "flex");
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Outfit", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"],
+          },
+          colors: {
+            brand: {
+              50: "#f5f3ff",
+              100: "#ede9fe",
+              500: "#8b5cf6",
+              600: "#7c3aed",
+              900: "#4c1d95",
+            },
+            budget: {
+              needs: "#f59e0b",   // 50%
+              wants: "#ec4899",   // 30%
+              savings: "#10b981", // 20%
+            },
+          },
+          animation: {
+            "slide-up": "slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            "pop-in": "popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+            "float": "float 6s ease-in-out infinite",
+          },
+          keyframes: {
+            slideUp: {
+              "0%": { transform: "translateY(20px)", opacity: "0" },
+              "100%": { transform: "translateY(0)", opacity: "1" },
+            },
+            popIn: {
+              "0%": { transform: "scale(0.9)", opacity: "0" },
+              "100%": { transform: "scale(1)", opacity: "1" },
+            },
+            float: {
+              "0%, 100%": { transform: "translateY(0)" },
+              "50%": { transform: "translateY(-10px)" },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --overlay-display: flex;
+    }
+
+    body {
+      font-family: "Outfit", sans-serif;
+      overflow: hidden;
+      background-color: #f8fafc;
+    }
+
+    .slide {
+      display: none;
+      height: 100vh;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    .grid-bg {
+      background-size: 30px 30px;
+      background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+    }
+
+    /* Staggered animations */
+    .slide.active .anim-1 {
+      opacity: 0;
+      animation: slideUp 0.6s 0.08s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .slide.active .anim-2 {
+      opacity: 0;
+      animation: slideUp 0.6s 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .slide.active .anim-3 {
+      opacity: 0;
+      animation: slideUp 0.6s 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .slide.active .anim-pop {
+      opacity: 0;
+      animation: popIn 0.5s 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* Overlay */
+    #accessOverlay {
+      display: var(--overlay-display) !important;
+    }
+
+    /* Hover */
+    .card-hover {
+      transition: all 0.25s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 25px -8px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Small helper */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .35rem .75rem;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: .75rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    @keyframes slideUp {
+      0% {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body class="text-slate-800 grid-bg">
+
+  <!-- Access Overlay -->
+  <div id="accessOverlay" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4">
+    <div
+      class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center relative">
+      <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+      <p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 40</p>
+      <input type="text" id="accessCodeInput" placeholder="Enter Class Code"
+        class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase">
+      <button id="accessBtn"
+        class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">
+        UNLOCK SYSTEM
+      </button>
+      <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED</p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div
+    class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-extrabold text-slate-500 uppercase tracking-widest">Sesi 40 • 6.2 Perencanaan Keuangan
+        Pribadi</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <button id="btnPrev"
+        class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition disabled:opacity-30">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <span class="font-mono text-sm font-bold text-slate-400">
+        <span id="counter" class="text-brand-600">1</span>/<span id="totalSlides">1</span>
+      </span>
+      <button id="btnNext"
+        class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+  <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+    <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[0%]"></div>
+  </div>
+
+  <main class="relative w-full h-screen overflow-hidden">
+
+    <!-- Slide 1: Title -->
+    <section class="slide active">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+        <div class="flex-1 anim-1">
+          <div class="pill bg-brand-100 text-brand-700 border border-brand-200 mb-6">
+            MIDDLE SCHOOL • SESSION 40
+          </div>
+          <h1 class="text-6xl font-black text-slate-900 mb-6 leading-tight">
+            6.2 <span class="text-brand-500">PERENCANAAN</span><br />KEUANGAN PRIBADI 📈
+          </h1>
+          <p class="text-2xl text-slate-600 font-light">
+            Mengatur uang dengan sadar dan terencana.
+          </p>
+        </div>
+        <div class="flex-1 flex justify-center anim-pop relative">
+          <div class="absolute inset-0 bg-blue-200 rounded-full blur-[110px] opacity-20"></div>
+          <div class="relative animate-float text-center z-10">
+            <i class="fa-solid fa-piggy-bank text-9xl text-pink-500 drop-shadow-2xl mb-4"></i>
+            <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-100 text-left w-72">
+              <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-2">Target</div>
+              <div class="font-black text-slate-800">Aman secara finansial</div>
+              <div class="text-sm text-slate-500 mt-1">Tidak boros • Bisa capai tujuan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 2: Definisi + Cakupan (PDF 6.2) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 flex items-center justify-between gap-4 mb-8">
+          <div>
+            <div class="pill bg-slate-100 text-slate-600 border border-slate-200">6.2 Perencanaan Keuangan Pribadi</div>
+            <h2 class="text-4xl font-black text-slate-900 mt-4">Apa itu Perencanaan Keuangan Pribadi?</h2>
+            <p class="text-slate-600 text-lg mt-2 max-w-3xl">
+              Perencanaan keuangan pribadi adalah proses mengatur bagaimana seseorang <b>menghasilkan</b>,
+              <b>menggunakan</b>, dan <b>menyimpan</b> uang agar kebutuhan hidup terpenuhi dan tujuan masa depan dapat
+              dicapai.
+            </p>
+          </div>
+          <div class="hidden md:block anim-pop">
+            <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-6 w-72">
+              <div class="text-4xl">🧾</div>
+              <div class="mt-3 font-black text-slate-900">Sadar & Terencana</div>
+              <div class="text-sm text-slate-500 mt-1">Bukan “jalanin aja”</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 anim-2">
+          <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100">
+            <h3 class="font-black text-xl mb-4">Meliputi:</h3>
+            <ul class="space-y-3 text-slate-700">
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Mengatur
+                  pendapatan</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Mengontrol
+                  pengeluaran</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Menentukan batas
+                  belanja</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Menyusun tabungan</span>
+              </li>
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Mempersiapkan kebutuhan
+                  di masa depan</span></li>
+            </ul>
+          </div>
+
+          <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100">
+            <h3 class="font-black text-xl mb-4">Tujuan:</h3>
+            <p class="text-slate-600 leading-relaxed">
+              Agar seseorang dapat <b>hidup aman secara finansial</b>, tidak boros, dan mampu mencapai target seperti
+              membeli barang, menabung pendidikan, atau dana darurat.
+            </p>
+            <div class="mt-5 bg-brand-50 border border-brand-100 rounded-2xl p-5">
+              <div class="text-xs font-extrabold text-brand-700 uppercase tracking-widest">Ingat</div>
+              <div class="font-black text-slate-900 mt-1">Uang yang dikelola = tujuan yang tercapai.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3: Komponen Utama (PDF 6.2.1) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Komponen Utama</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4 mb-3">Komponen Utama Perencanaan Keuangan</h2>
+          <p class="text-slate-600 text-lg">Ada 5 komponen yang perlu kamu pahami.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mt-8 anim-2">
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-green-500">
+            <i class="fa-solid fa-money-bill-wave text-3xl text-green-500 mb-3"></i>
+            <div class="font-black">a. Pendapatan</div>
+            <div class="text-sm text-slate-500 mt-1">Semua uang yang diterima (harian/mingguan/bulanan).</div>
+            <div class="text-xs text-slate-400 mt-3">Contoh: uang jajan, gaji, bonus, hasil jualan online, hadiah
+              digital (cashback).</div>
+          </div>
+
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-red-500">
+            <i class="fa-solid fa-cart-shopping text-3xl text-red-500 mb-3"></i>
+            <div class="font-black">b. Pengeluaran</div>
+            <div class="text-sm text-slate-500 mt-1">Semua uang yang dikeluarkan untuk kebutuhan & keinginan.</div>
+            <div class="text-xs text-slate-400 mt-3">Contoh: makanan, pulsa, transportasi, hiburan, top-up game.</div>
+          </div>
+
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-emerald-500">
+            <i class="fa-solid fa-piggy-bank text-3xl text-emerald-500 mb-3"></i>
+            <div class="font-black">c. Tabungan</div>
+            <div class="text-sm text-slate-500 mt-1">Bagian pendapatan yang disisihkan untuk masa depan.</div>
+            <div class="text-xs text-slate-400 mt-3">Tabungan digital (e-wallet/bank) membantu mencatat & mengamankan
+              saldo.</div>
+          </div>
+
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-blue-500">
+            <i class="fa-solid fa-chart-pie text-3xl text-blue-500 mb-3"></i>
+            <div class="font-black">d. Anggaran</div>
+            <div class="text-sm text-slate-500 mt-1">Rencana pengaturan uang: berapa boleh dibelanjakan & berapa
+              disimpan.</div>
+            <div class="text-xs text-slate-400 mt-3">Contoh: 50% kebutuhan • 30% keinginan • 20% tabungan</div>
+          </div>
+
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-violet-500">
+            <i class="fa-solid fa-bullseye text-3xl text-violet-500 mb-3"></i>
+            <div class="font-black">e. Tujuan Keuangan</div>
+            <div class="text-sm text-slate-500 mt-1">Target yang ingin dicapai.</div>
+            <div class="text-xs text-slate-400 mt-3">Contoh: menabung Rp200.000 untuk beli buku, top-up game, liburan.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Aturan 50/30/20 (di PDF sebagai contoh budgeting) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 text-center">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Contoh Anggaran</div>
+          <h2 class="text-5xl font-black mt-4">Aturan 50/30/20 ✨</h2>
+          <p class="text-slate-600 mt-2">Contoh sederhana membagi uang.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 mt-10 text-center anim-2">
+          <div
+            class="bg-budget-needs/10 p-8 rounded-3xl border border-budget-needs relative overflow-hidden card-hover">
+            <div
+              class="absolute -right-4 -top-4 bg-budget-needs text-white font-black text-2xl w-16 h-16 rounded-full flex items-center justify-center rotate-12">
+              50%</div>
+            <i class="fa-solid fa-utensils text-5xl text-budget-needs mb-5"></i>
+            <div class="font-black text-2xl text-budget-needs">KEBUTUHAN</div>
+            <div class="text-xs font-extrabold text-slate-500 uppercase tracking-widest mt-1">Needs</div>
+            <div class="text-slate-600 mt-4 text-sm">(makan, transport, pulsa belajar)</div>
+          </div>
+
+          <div
+            class="bg-budget-wants/10 p-8 rounded-3xl border border-budget-wants relative overflow-hidden card-hover">
+            <div
+              class="absolute -right-4 -top-4 bg-budget-wants text-white font-black text-2xl w-16 h-16 rounded-full flex items-center justify-center rotate-12">
+              30%</div>
+            <i class="fa-solid fa-gamepad text-5xl text-budget-wants mb-5"></i>
+            <div class="font-black text-2xl text-budget-wants">KEINGINAN</div>
+            <div class="text-xs font-extrabold text-slate-500 uppercase tracking-widest mt-1">Wants</div>
+            <div class="text-slate-600 mt-4 text-sm">(hiburan, jajan tambahan, game)</div>
+          </div>
+
+          <div
+            class="bg-budget-savings/10 p-8 rounded-3xl border border-budget-savings relative overflow-hidden card-hover">
+            <div
+              class="absolute -right-4 -top-4 bg-budget-savings text-white font-black text-2xl w-16 h-16 rounded-full flex items-center justify-center rotate-12">
+              20%</div>
+            <i class="fa-solid fa-vault text-5xl text-budget-savings mb-5"></i>
+            <div class="font-black text-2xl text-budget-savings">TABUNGAN</div>
+            <div class="text-xs font-extrabold text-slate-500 uppercase tracking-widest mt-1">Savings</div>
+            <div class="text-slate-600 mt-4 text-sm">(dana darurat, target masa depan)</div>
+          </div>
+        </div>
+
+        <div class="max-w-3xl mx-auto mt-8 anim-3">
+          <div class="bg-white border border-slate-100 rounded-2xl shadow-md p-5 text-center text-slate-600">
+            <b>Catatan:</b> Tabungan sebaiknya disisihkan di awal, bukan menunggu “sisa” di akhir.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5: Langkah-Langkah (PDF 6.2.2) -->
+    <section class="slide">
+      <div class="max-w-5xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Langkah-langkah</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Langkah-Langkah Perencanaan Keuangan Pribadi</h2>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 mt-8 anim-2">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="flex gap-4">
+              <div
+                class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 font-black flex items-center justify-center text-xl">
+                1</div>
+              <div>
+                <div class="font-black text-slate-900">Catat Pendapatan</div>
+                <div class="text-slate-600">Ketahui berapa uang yang masuk setiap periode.</div>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div
+                class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 font-black flex items-center justify-center text-xl">
+                2</div>
+              <div>
+                <div class="font-black text-slate-900">Kenali Kebiasaan Pengeluaran</div>
+                <div class="text-slate-600">Pisahkan kebutuhan (needs) dan keinginan (wants).</div>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div
+                class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 font-black flex items-center justify-center text-xl">
+                3</div>
+              <div>
+                <div class="font-black text-slate-900">Buat Anggaran</div>
+                <div class="text-slate-600">Tentukan batas belanja dan target tabungan.</div>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div
+                class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 font-black flex items-center justify-center text-xl">
+                4</div>
+              <div>
+                <div class="font-black text-slate-900">Lakukan Pencatatan</div>
+                <div class="text-slate-600">Gunakan: buku catatan, Google Sheet, atau riwayat transaksi e-wallet.</div>
+              </div>
+            </div>
+
+            <div class="flex gap-4 md:col-span-2">
+              <div
+                class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 font-black flex items-center justify-center text-xl">
+                5</div>
+              <div>
+                <div class="font-black text-slate-900">Evaluasi Setiap Minggu/Bulan</div>
+                <div class="text-slate-600">Periksa apakah anggaran sudah sesuai atau perlu diperbaiki.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 bg-slate-50 border border-slate-200 rounded-2xl p-6">
+            <div class="font-extrabold text-slate-700 uppercase tracking-widest text-xs">Mini reminder</div>
+            <div class="text-slate-600 mt-2">Kalau kamu rutin mencatat dan evaluasi, kamu jadi tahu: uangmu “pergi” ke
+              mana.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: Identifikasi Needs vs Wants (PDF 6.2.3 - definisi + contoh) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">Kebutuhan vs Keinginan</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Identifikasi Kebutuhan vs Keinginan</h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-8 anim-2">
+          <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100">
+            <div class="flex items-center gap-3 mb-3">
+              <span
+                class="w-10 h-10 rounded-2xl bg-budget-needs/15 flex items-center justify-center text-budget-needs font-black">N</span>
+              <div class="font-black text-2xl text-budget-needs">Kebutuhan</div>
+            </div>
+            <p class="text-slate-600 leading-relaxed">
+              Kebutuhan adalah hal-hal yang <b>penting</b> dan <b>wajib</b> dipenuhi untuk hidup sehari-hari agar tetap
+              sehat, nyaman, dan produktif.
+            </p>
+            <div class="mt-4 text-sm text-slate-500">
+              Contoh: makanan, minuman, tempat tinggal, transportasi ke sekolah/kerja, listrik & air.
+            </div>
+          </div>
+
+          <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100">
+            <div class="flex items-center gap-3 mb-3">
+              <span
+                class="w-10 h-10 rounded-2xl bg-budget-wants/15 flex items-center justify-center text-budget-wants font-black">W</span>
+              <div class="font-black text-2xl text-budget-wants">Keinginan</div>
+            </div>
+            <p class="text-slate-600 leading-relaxed">
+              Keinginan adalah hal-hal yang <b>tidak wajib</b>, tetapi diinginkan untuk meningkatkan kenyamanan atau
+              kesenangan.
+            </p>
+            <div class="mt-4 text-sm text-slate-500">
+              Contoh: gadget terbaru, nonton bioskop, pakaian branded, liburan ke tempat mahal.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: Kenapa penting? (PDF 6.2.3 - alasan) -->
+    <section class="slide">
+      <div class="max-w-5xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Beda</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Kenapa Harus Bisa Bedakan?</h2>
+          <p class="text-slate-600 text-lg mt-2">Karena ini membantu kamu mengatur uang dengan lebih bijak.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 mt-8 anim-2">
+          <ol class="space-y-4 text-slate-700">
+            <li class="flex gap-4">
+              <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center font-black">1</div>
+              <div><b>Membantu mengatur prioritas pengeluaran</b> agar pendapatan tidak habis untuk hal yang tidak
+                penting.</div>
+            </li>
+            <li class="flex gap-4">
+              <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center font-black">2</div>
+              <div><b>Memastikan kebutuhan pokok terpenuhi</b> sebelum memenuhi keinginan.</div>
+            </li>
+            <li class="flex gap-4">
+              <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center font-black">3</div>
+              <div><b>Membantu tabungan & investasi lebih konsisten</b>.</div>
+            </li>
+            <li class="flex gap-4">
+              <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center font-black">4</div>
+              <div><b>Mencegah utang yang tidak perlu</b> karena membeli hal yang diinginkan tapi tidak mendesak.</div>
+            </li>
+          </ol>
+
+          <div class="mt-8 grid md:grid-cols-2 gap-5">
+            <div class="bg-budget-needs/10 border border-budget-needs/40 rounded-2xl p-6">
+              <div class="font-black text-budget-needs">Pertanyaan cepat</div>
+              <div class="text-slate-600 mt-2">Kalau uang terbatas, mana yang harus didahulukan?</div>
+            </div>
+            <div class="bg-budget-wants/10 border border-budget-wants/40 rounded-2xl p-6">
+              <div class="font-black text-budget-wants">Hint</div>
+              <div class="text-slate-600 mt-2">Kalau bisa ditunda, biasanya itu “wants”.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 8: Tabel Contoh (PDF hal. 146) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Contoh Tabel</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Contoh Kebutuhan vs Keinginan</h2>
+          <p class="text-slate-600 mt-2">Gunakan tabel seperti ini untuk mencatat.</p>
+        </div>
+
+        <div class="mt-8 anim-2 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-left">
+              <thead class="bg-slate-900 text-white">
+                <tr>
+                  <th class="px-6 py-4 text-sm font-black">Pengeluaran</th>
+                  <th class="px-6 py-4 text-sm font-black">Kebutuhan/Keinginan</th>
+                  <th class="px-6 py-4 text-sm font-black">Catatan</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                <tr>
+                  <td class="px-6 py-4 font-bold">Makanan sehari-hari</td>
+                  <td class="px-6 py-4"><span
+                      class="inline-flex px-3 py-1 rounded-full text-xs font-black bg-budget-needs/15 text-budget-needs">Kebutuhan</span>
+                  </td>
+                  <td class="px-6 py-4 text-slate-600">Penting untuk hidup</td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 font-bold">Transportasi sekolah</td>
+                  <td class="px-6 py-4"><span
+                      class="inline-flex px-3 py-1 rounded-full text-xs font-black bg-budget-needs/15 text-budget-needs">Kebutuhan</span>
+                  </td>
+                  <td class="px-6 py-4 text-slate-600">Wajib untuk aktivitas</td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 font-bold">Nonton bioskop</td>
+                  <td class="px-6 py-4"><span
+                      class="inline-flex px-3 py-1 rounded-full text-xs font-black bg-budget-wants/15 text-budget-wants">Keinginan</span>
+                  </td>
+                  <td class="px-6 py-4 text-slate-600">Bisa ditunda</td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 font-bold">Pakaian baru</td>
+                  <td class="px-6 py-4"><span
+                      class="inline-flex px-3 py-1 rounded-full text-xs font-black bg-budget-wants/15 text-budget-wants">Keinginan</span>
+                  </td>
+                  <td class="px-6 py-4 text-slate-600">Bisa beli jika ada sisa</td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 font-bold">Listrik & air</td>
+                  <td class="px-6 py-4"><span
+                      class="inline-flex px-3 py-1 rounded-full text-xs font-black bg-budget-needs/15 text-budget-needs">Kebutuhan</span>
+                  </td>
+                  <td class="px-6 py-4 text-slate-600">Tidak bisa ditunda</td>
+                </tr>
+                <tr>
+                  <td class="px-6 py-4 font-bold">Tabungan</td>
+                  <td class="px-6 py-4"><span
+                      class="inline-flex px-3 py-1 rounded-full text-xs font-black bg-budget-needs/15 text-budget-needs">Kebutuhan</span>
+                  </td>
+                  <td class="px-6 py-4 text-slate-600">Penting untuk masa depan</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="max-w-3xl mx-auto mt-6 anim-3">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-slate-600 text-center">
+            Kamu boleh pakai tabel ini di buku, Google Sheet, atau catatan HP.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 9: Aktivitas - Sortir Prioritas (selaras dengan 6.2.3) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 text-center">
+          <div class="pill bg-brand-100 text-brand-700 border border-brand-200">Aktivitas</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Studi Kasus: Sortir Prioritas ⚖️</h2>
+          <p class="text-slate-600 mt-2">Klik item di bawah ini untuk mengkategorikan.</p>
+        </div>
+
+        <div class="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 mt-8 anim-2">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="priorityItems"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-slate-200 pt-8">
+            <div class="bg-budget-needs/10 p-5 rounded-2xl min-h-[160px] border border-budget-needs/40">
+              <h4 class="font-black text-budget-needs text-center mb-3">KEBUTUHAN (Wajib)</h4>
+              <ul id="listNeeds" class="text-sm space-y-2 text-slate-700"></ul>
+            </div>
+            <div class="bg-budget-wants/10 p-5 rounded-2xl min-h-[160px] border border-budget-wants/40">
+              <h4 class="font-black text-budget-wants text-center mb-3">KEINGINAN (Bisa Ditunda)</h4>
+              <ul id="listWants" class="text-sm space-y-2 text-slate-700"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        const items = [
+          { name: "Makanan sehari-hari", type: "needs" },
+          { name: "Transportasi sekolah", type: "needs" },
+          { name: "Nonton bioskop", type: "wants" },
+          { name: "Pakaian baru", type: "wants" },
+          { name: "Listrik & air", type: "needs" },
+          { name: "Top-up game", type: "wants" },
+          { name: "Pulsa belajar", type: "needs" },
+          { name: "Mainan viral", type: "wants" },
+        ];
+
+        const container = document.getElementById("priorityItems");
+
+        function shuffle(arr) {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
+        }
+
+        shuffle(items).forEach((item) => {
+          const btn = document.createElement("button");
+          btn.className = "bg-slate-100 hover:bg-slate-200 p-3 rounded-xl text-sm font-extrabold text-slate-700 transition";
+          btn.innerText = item.name;
+          btn.onclick = () => {
+            const targetList = item.type === "needs" ? document.getElementById("listNeeds") : document.getElementById("listWants");
+            const li = document.createElement("li");
+            li.className = "flex items-center gap-2";
+            li.innerHTML = `<i class="fa-solid fa-check text-xs ${item.type === "needs" ? "text-budget-needs" : "text-budget-wants"}"></i> ${item.name}`;
+            targetList.appendChild(li);
+            btn.remove();
+          };
+          container.appendChild(btn);
+        });
+      </script>
+    </section>
+
+    <!-- Slide 10: Dunia Digital (PDF 6.2.4) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Perencanaan Keuangan</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Perencanaan Keuangan di Dunia Digital</h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-8 anim-2">
+          <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center">
+                <i class="fa-solid fa-circle-check text-green-600 text-xl"></i>
+              </div>
+              <h3 class="font-black text-xl">Teknologi mempermudah</h3>
+            </div>
+            <ul class="space-y-3 text-slate-700">
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Riwayat transaksi
+                  otomatis tersedia</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>E-wallet menyediakan
+                  laporan pengeluaran</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Aplikasi dapat
+                  mengingatkan untuk menabung</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Pembayaran cashless
+                  lebih aman dan praktis</span></li>
+            </ul>
+          </div>
+
+          <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
+              </div>
+              <h3 class="font-black text-xl">Tapi harus hati-hati</h3>
+            </div>
+            <ul class="space-y-3 text-slate-700">
+              <li class="flex gap-3"><i class="fa-solid fa-xmark text-red-500 mt-1"></i><span>Belanja online sangat
+                  menggoda</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-xmark text-red-500 mt-1"></i><span>Banyak promo membuat mudah
+                  boros</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-xmark text-red-500 mt-1"></i><span>Risiko penipuan
+                  digital</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-xmark text-red-500 mt-1"></i><span>Data akun harus
+                  dijaga</span></li>
+            </ul>
+
+            <div class="mt-6 bg-slate-900 text-white rounded-2xl p-5">
+              <div class="font-black">Tips cepat</div>
+              <div class="text-white/80 text-sm mt-1">Jangan asal klik link, jaga PIN/OTP, dan pikir dulu sebelum
+                checkout.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 11: Proyek Anggaran (selaras dengan budgeting + pencatatan 6.2.2) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 text-center">
+          <div class="pill bg-brand-100 text-brand-700 border border-brand-200">Proyek</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Rencana Anggaran Saya 🧮</h2>
+          <p class="text-slate-600 mt-2">Masukkan total uangmu, lalu lihat pembagiannya.</p>
+        </div>
+
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 mt-8 anim-2">
+          <div class="mb-8">
+            <label class="block text-slate-500 text-sm font-extrabold mb-2 uppercase tracking-wide">Total Pendapatan
+              (Income)</label>
+            <div class="flex items-center gap-4">
+              <span class="text-2xl font-black text-slate-400">Rp</span>
+              <input type="number" id="incomeInput" value="100000"
+                class="w-full text-4xl font-black text-brand-600 border-b-2 border-slate-200 focus:border-brand-500 outline-none pb-2 bg-transparent transition"
+                placeholder="0">
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div>
+              <div class="flex justify-between mb-2">
+                <span class="font-black text-budget-needs">Kebutuhan (50%)</span>
+                <span id="valNeeds" class="font-mono font-black">Rp 50.000</span>
+              </div>
+              <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
+                <div id="barNeeds" class="h-full bg-budget-needs w-1/2"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-2">
+                <span class="font-black text-budget-wants">Keinginan (30%)</span>
+                <span id="valWants" class="font-mono font-black">Rp 30.000</span>
+              </div>
+              <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
+                <div id="barWants" class="h-full bg-budget-wants w-[30%]"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-2">
+                <span class="font-black text-budget-savings">Tabungan (20%)</span>
+                <span id="valSavings" class="font-mono font-black">Rp 20.000</span>
+              </div>
+              <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
+                <div id="barSavings" class="h-full bg-budget-savings w-[20%]"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-600 text-sm">
+            <b>Pencatatan itu penting:</b> kamu bisa pakai buku catatan, Google Sheet, atau riwayat transaksi e-wallet.
+          </div>
+        </div>
+      </div>
+
+      <script>
+        const incomeInput = document.getElementById("incomeInput");
+        const valNeeds = document.getElementById("valNeeds");
+        const valWants = document.getElementById("valWants");
+        const valSavings = document.getElementById("valSavings");
+
+        function formatRupiah(num) {
+          const n = Math.floor(num || 0);
+          return "Rp " + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function updateBudget() {
+          const income = parseInt(incomeInput.value) || 0;
+          valNeeds.innerText = formatRupiah(income * 0.5);
+          valWants.innerText = formatRupiah(income * 0.3);
+          valSavings.innerText = formatRupiah(income * 0.2);
+        }
+
+        incomeInput && incomeInput.addEventListener("input", updateBudget);
+        updateBudget();
+      </script>
+    </section>
+
+    <!-- Slide 12: Checkout Quiz (ringkas) -->
+    <section class="slide">
+      <div class="max-w-5xl mx-auto text-center">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Quiz</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Mini Quiz 📝</h2>
+        </div>
+
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 mt-8 anim-pop">
+          <p class="text-xl text-slate-700 mb-8">
+            Contoh <b>keinginan</b> adalah…
+          </p>
+
+          <div class="space-y-4">
+            <button onclick="quiz40(this,false)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-2xl font-black text-slate-700 transition">Transportasi
+              sekolah</button>
+            <button onclick="quiz40(this,true)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-2xl font-black text-slate-700 transition">Nonton
+              bioskop</button>
+            <button onclick="quiz40(this,false)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-2xl font-black text-slate-700 transition">Listrik
+              & air</button>
+          </div>
+
+          <p id="quizResult40" class="mt-6 font-black text-xl h-8"></p>
+
+          <div class="mt-6 text-sm text-slate-500">
+            Bonus: Sebutkan 1 contoh <b>kebutuhan</b> dan 1 contoh <b>keinginan</b> dari hidupmu sendiri.
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function quiz40(btn, correct) {
+          const res = document.getElementById("quizResult40");
+          if (correct) {
+            btn.className =
+              "w-full bg-green-500 text-white py-4 rounded-2xl font-black shadow-lg transform scale-[1.02] transition";
+            res.innerText = "BENAR ✅ Keinginan bisa ditunda.";
+            res.className = "mt-6 font-black text-xl h-8 text-green-600";
+          } else {
+            btn.className =
+              "w-full bg-red-500 text-white py-4 rounded-2xl font-black shadow-lg transition";
+            res.innerText = "Belum tepat ❌ Coba lagi.";
+            res.className = "mt-6 font-black text-xl h-8 text-red-600";
+          }
+        }
+      </script>
+    </section>
+
+    <!-- Slide 13: Closing -->
+    <section class="slide">
+      <div class="max-w-5xl mx-auto text-center anim-1 flex flex-col items-center justify-center h-full">
+        <i class="fa-solid fa-umbrella text-9xl text-brand-500 mb-8 animate-float"></i>
+        <h2 class="text-5xl font-black text-slate-800 mb-6">RINGKASAN</h2>
+
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 w-full max-w-4xl text-left">
+          <ul class="space-y-3 text-slate-700">
+            <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Perencanaan keuangan =
+                mengatur uang untuk kebutuhan & tujuan masa depan.</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Komponen: pendapatan,
+                pengeluaran, tabungan, anggaran, tujuan keuangan.</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Langkah: catat → kenali
+                kebiasaan → buat anggaran → catat transaksi → evaluasi.</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Bedakan kebutuhan vs
+                keinginan agar tidak boros.</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-green-500 mt-1"></i><span>Dunia digital membantu,
+                tapi harus hati-hati (promo, penipuan, data akun).</span></li>
+          </ul>
+        </div>
+
+        <button onclick="localStorage.removeItem('sesi40_access'); location.reload();"
+          class="mt-12 text-slate-400 hover:text-red-500 transition text-sm font-black uppercase tracking-widest group">
+          <i class="fa-solid fa-power-off mr-2 group-hover:scale-125 transition-transform"></i> End Session
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const activeClass = "active";
+      const slides = document.querySelectorAll(".slide");
+      const progressBar = document.getElementById("bar");
+      const counter = document.getElementById("counter");
+      const totalSlidesEl = document.getElementById("totalSlides");
+      const btnPrev = document.getElementById("btnPrev");
+      const btnNext = document.getElementById("btnNext");
+
+      const accessOverlay = document.getElementById("accessOverlay");
+      const accessInput = document.getElementById("accessCodeInput");
+      const accessBtn = document.getElementById("accessBtn");
+      const accessError = document.getElementById("accessError");
+
+      let currentSlide = 0;
+      const totalSlides = slides.length;
+
+      // IMPORTANT: keep class code unchanged
+      const VALID_CODE = "RGMDSMS25";
+
+      if (totalSlidesEl) totalSlidesEl.innerText = totalSlides;
+
+      // Access Control
+      accessBtn.addEventListener("click", () => {
+        const inputVal = accessInput.value.trim().toUpperCase();
+        if (inputVal === VALID_CODE) {
+          localStorage.setItem("sesi40_access", "true");
+          accessOverlay.classList.add("opacity-0", "pointer-events-none");
+          setTimeout(() => {
+            accessOverlay.style.display = "none";
+            updateSlide();
+          }, 450);
+        } else {
+          accessError.style.opacity = "1";
+          accessInput.classList.add("border-red-500");
+          setTimeout(() => accessInput.classList.remove("border-red-500"), 450);
+        }
+      });
+
+      function updateSlide() {
+        slides.forEach((slide, idx) => {
+          slide.classList.toggle(activeClass, idx === currentSlide);
+        });
+
+        if (progressBar) progressBar.style.width = ((currentSlide + 1) / totalSlides) * 100 + "%";
+        if (counter) counter.innerText = currentSlide + 1;
+
+        if (btnPrev) btnPrev.disabled = currentSlide === 0;
+        if (btnNext) btnNext.disabled = currentSlide === totalSlides - 1;
+      }
+
+      if (btnNext) btnNext.addEventListener("click", () => {
+        if (currentSlide < totalSlides - 1) {
+          currentSlide++;
+          updateSlide();
+        }
+      });
+
+      if (btnPrev) btnPrev.addEventListener("click", () => {
+        if (currentSlide > 0) {
+          currentSlide--;
+          updateSlide();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (accessOverlay && getComputedStyle(accessOverlay).display !== "none") return;
+        if (e.key === "ArrowRight" && btnNext && !btnNext.disabled) btnNext.click();
+        if (e.key === "ArrowLeft" && btnPrev && !btnPrev.disabled) btnPrev.click();
+      });
+
+      updateSlide();
+    });
+  </script>
+</body>
+
+</html>
