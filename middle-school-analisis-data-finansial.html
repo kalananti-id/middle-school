@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sesi 41: 6.3 Menganalisis Data untuk Keputusan Finansial</title>
+
+  <script>
+    // Check access BEFORE rendering to prevent flash
+    if (localStorage.getItem('sesi41_access') === 'true') {
+      document.documentElement.style.setProperty('--overlay-display', 'none');
+    } else {
+      document.documentElement.style.setProperty('--overlay-display', 'flex');
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
+            },
+            ok: { 500: '#10b981' },
+            warn: { 500: '#f59e0b' },
+            bad: { 500: '#ef4444' },
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%,100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --overlay-display: flex;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    .slide {
+      display: none;
+      height: calc(100vh - 64px - 4px);
+      /* 64 nav + 4 progress bar */
+      flex-direction: column;
+      justify-content: flex-start;
+      /* penting: jangan center */
+      padding: 2rem;
+      padding-bottom: 6rem;
+      /* ruang agar gak ketutup nav */
+      overflow-y: auto;
+      /* INI kuncinya */
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    /* Background grid (soft) */
+    .grid-bg {
+      background-size: 30px 30px;
+      background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+    }
+
+    /* Animations */
+    @keyframes slideUp {
+      0% {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0.92);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .slide.active .anim-1 {
+      opacity: 0;
+      animation: slideUp .6s .08s cubic-bezier(.16, 1, .3, 1) forwards;
+    }
+
+    .slide.active .anim-2 {
+      opacity: 0;
+      animation: slideUp .6s .18s cubic-bezier(.16, 1, .3, 1) forwards;
+    }
+
+    .slide.active .anim-3 {
+      opacity: 0;
+      animation: slideUp .6s .28s cubic-bezier(.16, 1, .3, 1) forwards;
+    }
+
+    .slide.active .anim-pop {
+      opacity: 0;
+      animation: popIn .5s .20s cubic-bezier(.175, .885, .32, 1.275) forwards;
+    }
+
+    /* Overlay */
+    #accessOverlay {
+      display: var(--overlay-display) !important;
+    }
+
+    /* Small UI */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .35rem .75rem;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: .75rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .card-hover {
+      transition: all .25s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 25px -8px rgba(0, 0, 0, .12);
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Range */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 999px;
+      background: #8b5cf6;
+      cursor: pointer;
+      margin-top: -9px;
+      box-shadow: 0 0 12px rgba(139, 92, 246, .45);
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body class="text-slate-800 grid-bg">
+
+  <!-- Access Overlay -->
+  <div id="accessOverlay" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4">
+    <div
+      class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center relative">
+      <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+      <p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 41</p>
+      <input type="text" id="accessCodeInput" placeholder="Enter Class Code"
+        class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase">
+      <button id="accessBtn"
+        class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">
+        UNLOCK SYSTEM
+      </button>
+      <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED</p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div
+    class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-extrabold text-slate-500 uppercase tracking-widest">
+        Sesi 41 • 6.3 Analisis Data Finansial
+      </span>
+    </div>
+    <div class="flex items-center gap-4">
+      <button id="btnPrev"
+        class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition disabled:opacity-30">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <span class="mono text-sm font-bold text-slate-400">
+        <span id="counter" class="text-brand-600">1</span>/<span id="totalSlides">1</span>
+      </span>
+      <button id="btnNext"
+        class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+  <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+    <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[0%]"></div>
+  </div>
+
+  <main class="relative w-full h-screen overflow-hidden">
+
+    <!-- Slide 1: Title -->
+    <section class="slide active">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-14">
+        <div class="flex-1 anim-1">
+          <div class="pill bg-brand-100 text-brand-700 border border-brand-200 mb-6">
+            MIDDLE SCHOOL • SESSION 41
+          </div>
+          <h1 class="text-6xl font-black text-slate-900 leading-tight">
+            6.3 <span class="text-brand-500">MENGANALISIS DATA</span><br />UNTUK KEPUTUSAN FINANSIAL 📊
+          </h1>
+          <p class="text-2xl text-slate-600 font-light mt-5">
+            Data kecil → keputusan besar.
+          </p>
+
+          <div class="mt-8 bg-white rounded-2xl border border-slate-100 shadow-md p-5">
+            <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-2">Tujuan Pembelajaran</div>
+            <ul class="text-slate-700 space-y-2">
+              <li class="flex gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span>Menganalisis data
+                  keuangan sederhana untuk keputusan yang efisien & bertanggung jawab.</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span>Mengenali pola dan
+                  hubungan antar data.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flex-1 flex justify-center anim-pop relative">
+          <div class="absolute inset-0 bg-blue-200 rounded-full blur-[120px] opacity-20"></div>
+          <div class="relative text-center z-10 animate-float">
+            <div class="text-8xl">🧠📈</div>
+            <div class="mt-4 bg-white p-6 rounded-2xl shadow-lg border border-slate-100 w-80 text-left">
+              <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Today</div>
+              <div class="font-black text-slate-900 mt-1">Baca angka, cari pola, ambil keputusan.</div>
+              <div class="text-sm text-slate-500 mt-2">Bukan “feeling” doang 🙂</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 2: Definisi (6.3) -->
+    <section class="slide">
+      <div class="max-w-5xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">6.3 Topik</div>
+          <h2 class="text-5xl font-black text-slate-900 mt-4">Apa itu Analisis Data Finansial?</h2>
+          <p class="text-slate-600 text-xl mt-3 leading-relaxed">
+            Analisis data finansial adalah proses <b>mengumpulkan</b>, <b>memeriksa</b>, dan <b>mengevaluasi</b>
+            informasi keuangan untuk membuat keputusan yang bijak—untuk kebutuhan harian maupun tujuan jangka panjang.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 mt-10 anim-2">
+          <div class="bg-white p-7 rounded-3xl shadow-md border border-slate-100 card-hover">
+            <div class="text-3xl mb-3">📥</div>
+            <div class="font-black text-lg">Kumpulkan</div>
+            <div class="text-slate-500 text-sm mt-2">Cari datanya dulu: uang masuk & keluar.</div>
+          </div>
+          <div class="bg-white p-7 rounded-3xl shadow-md border border-slate-100 card-hover">
+            <div class="text-3xl mb-3">🔍</div>
+            <div class="font-black text-lg">Periksa</div>
+            <div class="text-slate-500 text-sm mt-2">Bener nggak angkanya? Ada yang janggal?</div>
+          </div>
+          <div class="bg-white p-7 rounded-3xl shadow-md border border-slate-100 card-hover">
+            <div class="text-3xl mb-3">✅</div>
+            <div class="font-black text-lg">Ambil Keputusan</div>
+            <div class="text-slate-500 text-sm mt-2">Kurangi yang nggak perlu, tambah yang penting.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3: Data Finansial (6.3.1) - click reveal -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 text-center">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">6.3.1 Data Finansial</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Data apa saja yang bisa dianalisis?</h2>
+          <p class="text-slate-600 mt-2">Klik kartu untuk lihat contoh.</p>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-5 mt-10 anim-2" id="dataCards">
+          <!-- generated -->
+        </div>
+
+        <div class="max-w-4xl mx-auto mt-8 anim-3">
+          <div id="dataHint" class="bg-white border border-slate-100 rounded-2xl shadow-md p-6 text-slate-600">
+            <b>Catatan:</b> Data finansial bisa berbentuk angka, grafik, atau catatan digital yang menunjukkan arus uang
+            masuk & keluar.
+          </div>
+        </div>
+      </div>
+      <script>
+        const dataItems = [
+          { icon: "fa-money-bill-wave", title: "Pendapatan", ex: "Contoh: gaji, uang saku, hadiah", color: "text-emerald-600", bg: "bg-emerald-50" },
+          { icon: "fa-cart-shopping", title: "Pengeluaran", ex: "Contoh: makanan, transportasi, hiburan", color: "text-rose-600", bg: "bg-rose-50" },
+          { icon: "fa-piggy-bank", title: "Tabungan & Investasi", ex: "Contoh: saldo tabungan, reksadana, dll.", color: "text-sky-600", bg: "bg-sky-50" },
+          { icon: "fa-receipt", title: "Hutang / Cicilan", ex: "Contoh: cicilan barang, pinjam teman/keluarga", color: "text-amber-600", bg: "bg-amber-50" },
+        ];
+        const wrap = document.getElementById('dataCards');
+        const hint = document.getElementById('dataHint');
+
+        dataItems.forEach((it) => {
+          const btn = document.createElement('button');
+          btn.className = "text-left bg-white p-7 rounded-3xl shadow-md border border-slate-100 card-hover";
+          btn.innerHTML = `
+            <div class="w-12 h-12 rounded-2xl ${it.bg} flex items-center justify-center mb-4">
+              <i class="fa-solid ${it.icon} ${it.color} text-xl"></i>
+            </div>
+            <div class="font-black text-lg">${it.title}</div>
+            <div class="text-slate-500 text-sm mt-2">Klik untuk lihat contoh</div>
+          `;
+          btn.onclick = () => {
+            hint.innerHTML = `<b>${it.title}:</b> ${it.ex}`;
+            hint.classList.remove('border-slate-100');
+            hint.classList.add('border-brand-200');
+          };
+          wrap.appendChild(btn);
+        });
+      </script>
+    </section>
+
+    <!-- Slide 4: Pentingnya Analisis (6.3.2) - checklist toggle -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">6.3.2 Kenapa Penting?</div>
+          <h2 class="text-5xl font-black text-slate-900 mt-4">Analisis itu bikin keputusan lebih masuk akal.</h2>
+          <p class="text-slate-600 text-lg mt-2">Centang manfaat yang paling “kena” buat kamu.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-10 anim-2" id="benefits">
+          <!-- generated -->
+        </div>
+
+        <div class="mt-8 anim-3 max-w-4xl mx-auto">
+          <div id="benefitScore" class="bg-white border border-slate-100 rounded-2xl shadow-md p-6 text-slate-700">
+            Kamu sudah memilih <b class="text-brand-600">0</b> manfaat.
+          </div>
+        </div>
+      </div>
+
+      <script>
+        const benefits = [
+          { t: "Mengetahui pola pengeluaran", d: "Memudahkan menemukan pengeluaran yang tidak perlu." },
+          { t: "Membuat keputusan cerdas", d: "Tahu kapan bisa beli sekarang atau harus menunggu." },
+          { t: "Mengatur prioritas", d: "Kebutuhan pokok dulu, baru keinginan." },
+          { t: "Mencegah utang", d: "Tidak boros → tidak perlu meminjam uang." },
+          { t: "Perencanaan jangka panjang", d: "Bisa set target tabungan / investasi sesuai tujuan." },
+        ];
+        const benefitWrap = document.getElementById('benefits');
+        const benefitScore = document.getElementById('benefitScore');
+        let picked = 0;
+
+        benefits.forEach((b) => {
+          const card = document.createElement('button');
+          card.className = "bg-white p-7 rounded-3xl shadow-md border border-slate-100 text-left card-hover";
+          card.dataset.on = "0";
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="font-black text-xl">${b.t}</div>
+                <div class="text-slate-500 mt-2">${b.d}</div>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center">
+                <i class="fa-solid fa-check text-slate-300"></i>
+              </div>
+            </div>
+          `;
+          card.onclick = () => {
+            const isOn = card.dataset.on === "1";
+            card.dataset.on = isOn ? "0" : "1";
+            if (!isOn) {
+              picked++;
+              card.classList.add("border-brand-200");
+              card.querySelector("i").className = "fa-solid fa-check text-emerald-500";
+              card.querySelector("div.w-10").className = "w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center";
+            } else {
+              picked--;
+              card.classList.remove("border-brand-200");
+              card.querySelector("i").className = "fa-solid fa-check text-slate-300";
+              card.querySelector("div.w-10").className = "w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center";
+            }
+            benefitScore.innerHTML = `Kamu sudah memilih <b class="text-brand-600">${picked}</b> manfaat.`;
+          };
+          benefitWrap.appendChild(card);
+        });
+      </script>
+    </section>
+
+    <!-- Slide 5: Langkah Analisis (6.3.3) - stepper -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">6.3.3 Langkah</div>
+          <h2 class="text-5xl font-black text-slate-900 mt-4">5 Langkah Menganalisis Data Finansial</h2>
+          <p class="text-slate-600 mt-2">Klik langkah untuk melihat “kenapa” itu penting.</p>
+        </div>
+
+        <div class="grid md:grid-cols-5 gap-4 mt-10 anim-2" id="steps"></div>
+
+        <div class="max-w-4xl mx-auto mt-8 anim-3">
+          <div id="stepDetail" class="bg-white border border-slate-100 rounded-2xl shadow-md p-6 text-slate-700">
+            Pilih satu langkah di atas.
+          </div>
+        </div>
+      </div>
+
+      <script>
+        const steps = [
+          { n: 1, t: "Kumpulkan data", d: "Catat pendapatan, pengeluaran, tabungan, dan utang." },
+          { n: 2, t: "Kategorikan", d: "Pisahkan pengeluaran: kebutuhan vs keinginan." },
+          { n: 3, t: "Hitung total", d: "Jumlahkan pendapatan & pengeluaran untuk tahu sisa uang." },
+          { n: 4, t: "Analisis pola", d: "Cari pengeluaran terbesar dan area yang bisa dikurangi." },
+          { n: 5, t: "Buat keputusan", d: "Tetapkan anggaran, target tabungan, atau rencana investasi." },
+        ];
+        const stepsWrap = document.getElementById('steps');
+        const stepDetail = document.getElementById('stepDetail');
+
+        steps.forEach((s) => {
+          const b = document.createElement('button');
+          b.className = "bg-white p-5 rounded-2xl border border-slate-100 shadow-sm card-hover text-left";
+          b.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="mono font-black text-brand-600">STEP ${s.n}</div>
+              <i class="fa-solid fa-arrow-right text-slate-300"></i>
+            </div>
+            <div class="font-black text-slate-900 mt-2">${s.t}</div>
+          `;
+          b.onclick = () => {
+            stepDetail.innerHTML = `<div class="mono text-xs font-extrabold text-slate-400 uppercase tracking-widest">Step ${s.n}</div>
+              <div class="font-black text-2xl mt-1">${s.t}</div>
+              <div class="text-slate-600 mt-3">${s.d}</div>`;
+            stepDetail.classList.add("border-brand-200");
+          };
+          stepsWrap.appendChild(b);
+        });
+      </script>
+    </section>
+
+    <!-- Slide 6: Contoh Data (6.3.4) - table + compute -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">6.3.4 Contoh</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Baca Datanya Dulu</h2>
+          <p class="text-slate-600 mt-2">Contoh: pendapatan bulanan <b>Rp 3.500.000</b>. Pengeluaran per kategori:</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-8 anim-2">
+          <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-4 font-black">Tabel Pengeluaran</div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-left">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-6 py-4 text-sm font-black text-slate-700">Kategori</th>
+                    <th class="px-6 py-4 text-sm font-black text-slate-700">Jumlah (Rp)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200" id="expenseRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-white p-7 rounded-3xl shadow-xl border border-slate-100">
+            <div class="font-black text-xl">Klik untuk Analisis</div>
+            <p class="text-slate-500 mt-2">Kita cari total pengeluaran, sisa uang, dan pengeluaran terbesar.</p>
+
+            <button id="btnAnalyze"
+              class="mt-6 w-full bg-brand-500 hover:bg-brand-600 text-white font-black py-4 rounded-2xl transition shadow-lg shadow-brand-500/25 active:scale-[0.99]">
+              ANALYZE DATA 🔎
+            </button>
+
+            <div class="mt-6 space-y-3">
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Total Pengeluaran</div>
+                <div id="outTotal" class="mono text-2xl font-black text-slate-400 mt-1">Rp -</div>
+              </div>
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Sisa Uang</div>
+                <div id="outLeft" class="mono text-2xl font-black text-slate-400 mt-1">Rp -</div>
+              </div>
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Pengeluaran Terbesar</div>
+                <div id="outBig" class="text-xl font-black text-slate-400 mt-1">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 anim-3 max-w-6xl mx-auto">
+          <div id="barWrap" class="bg-white border border-slate-100 rounded-3xl shadow-md p-6 hidden">
+            <div class="font-black text-lg mb-3">Visual cepat (bar)</div>
+            <div id="bars" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        const INCOME = 3500000;
+        const expenses = [
+          { k: "Makanan", v: 1200000 },
+          { k: "Transportasi", v: 500000 },
+          { k: "Hiburan", v: 400000 },
+          { k: "Tabungan", v: 600000 },
+          { k: "Lain-lain", v: 300000 },
+        ];
+
+        const rows = document.getElementById('expenseRows');
+        const fmt = (n) => "Rp " + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        expenses.forEach(e => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-6 py-4 font-bold">${e.k}</td>
+            <td class="px-6 py-4 mono font-bold">${fmt(e.v)}</td>
+          `;
+          rows.appendChild(tr);
+        });
+
+        document.getElementById('btnAnalyze').addEventListener('click', () => {
+          const total = expenses.reduce((a, b) => a + b.v, 0);
+          const left = INCOME - total;
+
+          let big = expenses[0];
+          expenses.forEach(e => { if (e.v > big.v) big = e; });
+
+          const outTotal = document.getElementById('outTotal');
+          const outLeft = document.getElementById('outLeft');
+          const outBig = document.getElementById('outBig');
+
+          outTotal.innerText = fmt(total);
+          outLeft.innerText = fmt(left);
+          outBig.innerText = `${big.k} (${fmt(big.v)})`;
+
+          outTotal.className = "mono text-2xl font-black text-slate-800 mt-1";
+          outLeft.className = "mono text-2xl font-black " + (left >= 0 ? "text-emerald-600" : "text-red-600") + " mt-1";
+          outBig.className = "text-xl font-black text-slate-800 mt-1";
+
+          // bars
+          const wrap = document.getElementById('barWrap');
+          const bars = document.getElementById('bars');
+          bars.innerHTML = "";
+          const max = Math.max(...expenses.map(e => e.v));
+          expenses.forEach(e => {
+            const pct = Math.round((e.v / max) * 100);
+            const line = document.createElement('div');
+            line.innerHTML = `
+              <div class="flex justify-between text-sm font-bold">
+                <span>${e.k}</span><span class="mono">${fmt(e.v)}</span>
+              </div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden mt-2">
+                <div class="h-full bg-brand-500" style="width:${pct}%"></div>
+              </div>
+            `;
+            bars.appendChild(line);
+          });
+          wrap.classList.remove('hidden');
+        });
+      </script>
+    </section>
+
+    <!-- Slide 7: Pola & Hubungan - “What if” slider -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Pola & Hubungan</div>
+          <h2 class="text-5xl font-black text-slate-900 mt-4">Kalau satu kategori naik… apa yang terjadi?</h2>
+          <p class="text-slate-600 mt-2">Coba ubah “Hiburan” untuk melihat dampaknya ke sisa uang.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-10 anim-2">
+          <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+            <div class="font-black text-xl">Atur Hiburan (Rp)</div>
+            <p class="text-slate-500 mt-2">Semakin besar hiburan → semakin kecil sisa uang.</p>
+
+            <div class="mt-6">
+              <input id="rngFun" type="range" min="0" max="1000000" step="50000" value="400000" />
+              <div class="flex justify-between text-xs text-slate-400 font-bold mt-2">
+                <span>0</span><span>1.000.000</span>
+              </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-4">
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Hiburan</div>
+                <div id="funVal" class="mono text-2xl font-black text-slate-800 mt-1">Rp -</div>
+              </div>
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Sisa Uang</div>
+                <div id="funLeft" class="mono text-2xl font-black mt-1">Rp -</div>
+              </div>
+            </div>
+
+            <div id="funMsg" class="mt-5 bg-brand-50 border border-brand-100 rounded-2xl p-5 text-slate-700">
+              Geser slider untuk mulai.
+            </div>
+          </div>
+
+          <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+            <div class="font-black text-xl">Arah Keputusan</div>
+            <p class="text-slate-500 mt-2">Kalau sisa uang menipis, biasanya kita perlu…</p>
+
+            <div class="mt-6 space-y-3">
+              <div class="flex gap-3 items-start">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center"><i
+                    class="fa-solid fa-scissors text-emerald-600"></i></div>
+                <div>
+                  <div class="font-black">Mengurangi yang tidak perlu</div>
+                  <div class="text-slate-500 text-sm">Contoh: hiburan / lain-lain</div>
+                </div>
+              </div>
+
+              <div class="flex gap-3 items-start">
+                <div class="w-10 h-10 rounded-2xl bg-sky-50 flex items-center justify-center"><i
+                    class="fa-solid fa-piggy-bank text-sky-600"></i></div>
+                <div>
+                  <div class="font-black">Menambah tabungan</div>
+                  <div class="text-slate-500 text-sm">Supaya target lebih cepat tercapai</div>
+                </div>
+              </div>
+
+              <div class="flex gap-3 items-start">
+                <div class="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center"><i
+                    class="fa-solid fa-shield-heart text-amber-600"></i></div>
+                <div>
+                  <div class="font-black">Lebih bertanggung jawab</div>
+                  <div class="text-slate-500 text-sm">Tidak impulsif karena promo</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 bg-slate-900 text-white rounded-2xl p-6">
+              <div class="font-black">Kunci</div>
+              <div class="text-white/80 text-sm mt-1">Data membantu kamu memilih “yang paling penting” dulu.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        const base = {
+          income: 3500000,
+          makanan: 1200000,
+          transport: 500000,
+          tabungan: 600000,
+          lain: 300000,
+        };
+
+        const rng = document.getElementById('rngFun');
+        const funVal = document.getElementById('funVal');
+        const funLeft = document.getElementById('funLeft');
+        const funMsg = document.getElementById('funMsg');
+
+        const rupiah = (n) => "Rp " + Math.floor(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        function updateFun() {
+          const fun = parseInt(rng.value || 0);
+          const total = base.makanan + base.transport + fun + base.tabungan + base.lain;
+          const left = base.income - total;
+
+          funVal.innerText = rupiah(fun);
+          funLeft.innerText = rupiah(left);
+
+          funLeft.className = "mono text-2xl font-black mt-1 " + (left >= 0 ? "text-emerald-600" : "text-red-600");
+
+          if (left >= 500000) {
+            funMsg.className = "mt-5 bg-emerald-50 border border-emerald-100 rounded-2xl p-5 text-slate-700";
+            funMsg.innerHTML = `<b>Nice!</b> Sisanya masih aman. Kamu bisa tetap menabung dengan stabil.`;
+          } else if (left >= 0) {
+            funMsg.className = "mt-5 bg-amber-50 border border-amber-100 rounded-2xl p-5 text-slate-700";
+            funMsg.innerHTML = `<b>Hati-hati.</b> Sisa uang makin kecil. Coba kurangi hiburan atau lain-lain.`;
+          } else {
+            funMsg.className = "mt-5 bg-rose-50 border border-rose-100 rounded-2xl p-5 text-slate-700";
+            funMsg.innerHTML = `<b>Over budget!</b> Pengeluaran lebih besar dari pendapatan. Perlu keputusan cepat: kurangi pengeluaran.`;
+          }
+        }
+        rng.addEventListener('input', updateFun);
+        updateFun();
+      </script>
+    </section>
+
+    <!-- Slide 8: Mini Decision Game -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 text-center">
+          <div class="pill bg-brand-100 text-brand-700 border border-brand-200">Decision Game</div>
+          <h2 class="text-5xl font-black text-slate-900 mt-4">Ambil Keputusan dari Data</h2>
+          <p class="text-slate-600 mt-2">Pilih 1 keputusan paling masuk akal berdasarkan contoh data.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 mt-10 anim-2">
+          <button class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-left card-hover"
+            onclick="pickDecision(this,false)">
+            <div class="text-3xl mb-4">🎮</div>
+            <div class="font-black text-xl">Tambah hiburan</div>
+            <div class="text-slate-500 mt-2">Karena pengeluaran makanan sudah besar.</div>
+          </button>
+
+          <button class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-left card-hover"
+            onclick="pickDecision(this,true)">
+            <div class="text-3xl mb-4">✂️</div>
+            <div class="font-black text-xl">Kurangi hiburan / lain-lain</div>
+            <div class="text-slate-500 mt-2">Untuk menambah tabungan atau investasi.</div>
+          </button>
+
+          <button class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-left card-hover"
+            onclick="pickDecision(this,false)">
+            <div class="text-3xl mb-4">🛒</div>
+            <div class="font-black text-xl">Belanja karena promo</div>
+            <div class="text-slate-500 mt-2">Supaya “mumpung murah”.</div>
+          </button>
+        </div>
+
+        <div class="max-w-4xl mx-auto mt-8 anim-3">
+          <div id="decisionRes"
+            class="bg-white border border-slate-100 rounded-2xl shadow-md p-6 text-slate-700 text-center">
+            Pilih satu keputusan.
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function pickDecision(btn, correct) {
+          const res = document.getElementById('decisionRes');
+          const all = btn.parentElement.querySelectorAll('button');
+          all.forEach(b => b.classList.remove('ring-4', 'ring-emerald-300', 'ring-rose-300'));
+
+          if (correct) {
+            btn.classList.add('ring-4', 'ring-emerald-300');
+            res.className = "bg-emerald-50 border border-emerald-100 rounded-2xl shadow-md p-6 text-slate-700 text-center";
+            res.innerHTML = "<b>BENAR ✅</b> Keputusan berbasis data: kurangi pengeluaran yang bisa ditunda, lalu tambah tabungan/investasi.";
+          } else {
+            btn.classList.add('ring-4', 'ring-rose-300');
+            res.className = "bg-rose-50 border border-rose-100 rounded-2xl shadow-md p-6 text-slate-700 text-center";
+            res.innerHTML = "<b>Kurang tepat ❌</b> Keputusan harus mempertimbangkan sisa uang & prioritas.";
+          }
+        }
+      </script>
+    </section>
+
+    <!-- Slide 9: Checkout Quiz -->
+    <section class="slide">
+      <div class="max-w-5xl mx-auto text-center">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Checkout Quiz</div>
+          <h2 class="text-5xl font-black text-slate-900 mt-4">Cek Pemahaman 📝</h2>
+        </div>
+
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 mt-10 anim-pop">
+          <p class="text-xl text-slate-700 mb-8">
+            Tujuan utama menganalisis data keuangan adalah…
+          </p>
+
+          <div class="space-y-4">
+            <button onclick="quiz63(this,false)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-2xl font-black text-slate-700 transition">
+              Biar bisa belanja lebih banyak tanpa catatan
+            </button>
+            <button onclick="quiz63(this,true)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-2xl font-black text-slate-700 transition">
+              Membuat keputusan finansial yang bijak & bertanggung jawab
+            </button>
+            <button onclick="quiz63(this,false)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-2xl font-black text-slate-700 transition">
+              Supaya semua kategori pengeluaran sama besar
+            </button>
+          </div>
+
+          <p id="quizRes63" class="mt-6 font-black text-xl h-8"></p>
+
+          <div class="mt-6 text-sm text-slate-500">
+            Bonus: Sebutkan 1 pola dari data contoh (kategori terbesar apa?).
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function quiz63(btn, correct) {
+          const res = document.getElementById('quizRes63');
+          if (correct) {
+            btn.className = "w-full bg-emerald-500 text-white py-4 rounded-2xl font-black shadow-lg transition";
+            res.className = "mt-6 font-black text-xl h-8 text-emerald-600";
+            res.innerText = "BENAR ✅ Data → keputusan lebih masuk akal.";
+          } else {
+            btn.className = "w-full bg-rose-500 text-white py-4 rounded-2xl font-black shadow-lg transition";
+            res.className = "mt-6 font-black text-xl h-8 text-rose-600";
+            res.innerText = "Belum tepat ❌ Coba lagi.";
+          }
+        }
+      </script>
+    </section>
+
+    <!-- Slide 10: Closing -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto text-center anim-1 flex flex-col items-center justify-center h-full">
+        <div class="text-8xl mb-6 animate-float">🧾🔍✅</div>
+        <h2 class="text-5xl font-black text-slate-800 mb-4">RINGKASAN</h2>
+
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 w-full max-w-5xl text-left">
+          <ul class="space-y-3 text-slate-700">
+            <li class="flex gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span>Data finansial:
+                pendapatan, pengeluaran, tabungan/investasi, hutang/cicilan.</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span>Analisis membantu cari
+                pola pengeluaran, menentukan prioritas, dan mencegah utang.</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span>Langkah: kumpulkan →
+                kategorikan → hitung total → analisis pola → buat keputusan.</span></li>
+            <li class="flex gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i><span>Pola & hubungan: kalau
+                satu kategori naik, sisa uang biasanya turun.</span></li>
+          </ul>
+        </div>
+
+        <button onclick="localStorage.removeItem('sesi41_access'); location.reload();"
+          class="mt-10 text-slate-400 hover:text-red-500 transition text-sm font-black uppercase tracking-widest group">
+          <i class="fa-solid fa-power-off mr-2 group-hover:scale-125 transition-transform"></i> End Session
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const slides = document.querySelectorAll('.slide');
+      const progressBar = document.getElementById('bar');
+      const counter = document.getElementById('counter');
+      const totalSlidesEl = document.getElementById('totalSlides');
+      const btnPrev = document.getElementById('btnPrev');
+      const btnNext = document.getElementById('btnNext');
+
+      const accessOverlay = document.getElementById('accessOverlay');
+      const accessInput = document.getElementById('accessCodeInput');
+      const accessBtn = document.getElementById('accessBtn');
+      const accessError = document.getElementById('accessError');
+
+      let currentSlide = 0;
+      const totalSlides = slides.length;
+      if (totalSlidesEl) totalSlidesEl.innerText = totalSlides;
+
+      // NOTE: keep consistent with your MS code system
+      const VALID_CODE = "RGMDSMS25";
+
+      function updateSlide() {
+        slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+        if (progressBar) progressBar.style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+        if (counter) counter.innerText = currentSlide + 1;
+        if (btnPrev) btnPrev.disabled = currentSlide === 0;
+        if (btnNext) btnNext.disabled = currentSlide === totalSlides - 1;
+      }
+
+      // Access
+      accessBtn.addEventListener('click', () => {
+        const v = accessInput.value.trim().toUpperCase();
+        if (v === VALID_CODE) {
+          localStorage.setItem('sesi41_access', 'true');
+          accessOverlay.classList.add('opacity-0', 'pointer-events-none');
+          setTimeout(() => {
+            accessOverlay.style.display = 'none';
+            updateSlide();
+          }, 450);
+        } else {
+          accessError.style.opacity = '1';
+          accessInput.classList.add('border-red-500');
+          setTimeout(() => accessInput.classList.remove('border-red-500'), 450);
+        }
+      });
+
+      // Nav
+      btnNext.addEventListener('click', () => { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } });
+      btnPrev.addEventListener('click', () => { if (currentSlide > 0) { currentSlide--; updateSlide(); } });
+
+      document.addEventListener('keydown', (e) => {
+        if (accessOverlay && getComputedStyle(accessOverlay).display !== 'none') return;
+        if (e.key === 'ArrowRight' && !btnNext.disabled) btnNext.click();
+        if (e.key === 'ArrowLeft' && !btnPrev.disabled) btnPrev.click();
+      });
+
+      updateSlide();
+    });
+  </script>
+
+</body>
+
+</html>
