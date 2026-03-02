@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesi 38: Debugging Challenge & Menjelaskan Solusi</title>
+    <script>
+        // Check access BEFORE rendering to prevent flash
+        if (localStorage.getItem('sesi38_access') === 'true') {
+            document.documentElement.style.setProperty('--overlay-display', 'none');
+        } else {
+            document.documentElement.style.setProperty('--overlay-display', 'flex');
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6', // Violet/Purple theme
+                            600: '#7c3aed',
+                            900: '#4c1d95',
+                        },
+                        presentation: {
+                            gold: '#fbbf24', // Spotlight
+                            blue: '#3b82f6', // Communication
+                            teal: '#14b8a6', // Feedback
+                            pink: '#ec4899', // Heart/Empathy
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'spotlight': 'spotlight 4s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        popIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        spotlight: {
+                            '0%': { opacity: '0.3', transform: 'scale(0.9)' },
+                            '100%': { opacity: '0.6', transform: 'scale(1.1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --overlay-display: flex;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        .slide {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+
+            /* OVERFLOW FIX */
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-top: 7rem;
+            padding-bottom: 7rem;
+            /* supaya konten tidak ketutup nav */
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Keyframe Animations */
+        @keyframes slideUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        .block-card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .block-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .grid-bg {
+            background-size: 30px 30px;
+            background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+        }
+
+        /* Staggered Animations */
+        .slide.active .anim-1 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-2 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-3 {
+            opacity: 0;
+            animation: slideUp 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active .anim-pop {
+            opacity: 0;
+            animation: popIn 0.5s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Overlay */
+        #accessOverlay {
+            display: var(--overlay-display) !important;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 grid-bg">
+
+    <!-- Access Overlay -->
+    <div id="accessOverlay" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-4">
+        <div
+            class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl w-full max-w-md text-center relative">
+            <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+            <p class="text-slate-300 mb-6 font-mono text-sm">Masuk untuk memulai Sesi 38</p>
+            <input type="text" id="accessCodeInput" placeholder="Enter Class Code"
+                class="w-full bg-slate-800/50 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition shadow-inner uppercase">
+            <button id="accessBtn"
+                class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">UNLOCK
+                SYSTEM</button>
+            <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED
+            </p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div
+        class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Sesi 38: Debugging Challenge &
+                Menjelaskan Solusi</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="btnPrev"
+                class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition disabled:opacity-30"><i
+                    class="fa-solid fa-chevron-left"></i></button>
+            <span class="font-mono text-sm font-bold text-slate-400"><span id="counter"
+                    class="text-brand-600">1</span>/9</span>
+            <button id="btnNext"
+                class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg"><i
+                    class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+        <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[0%]"></div>
+    </div>
+
+    <main class="relative w-full h-screen overflow-hidden">
+
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+                <div class="flex-1 anim-1">
+                    <div
+                        class="inline-block px-4 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6 tracking-widest border border-brand-200">
+                        MIDDLE SCHOOL • SESSION 38
+                    </div>
+                    <h1 class="text-6xl font-black text-slate-900 mb-6 leading-tight">
+                        DEBUGGING <br><span class="text-brand-500">CHALLENGE</span> 🐞
+                    </h1>
+                    <p class="text-2xl text-slate-600 font-light">
+                        Perbaiki bug. Jelaskan solusinya.
+                    </p>
+                </div>
+                <div class="flex-1 flex justify-center anim-pop relative">
+                    <!-- Spotlight Effect -->
+                    <div class="absolute inset-0 bg-brand-500 rounded-full blur-[110px] opacity-15 animate-spotlight">
+                    </div>
+                    <div class="relative animate-float text-center z-10">
+                        <i
+                            class="fa-solid fa-bug text-9xl text-slate-800 drop-shadow-2xl mb-4 bg-white p-8 rounded-full border-4 border-slate-100"></i>
+                        <div class="mt-3 text-sm font-mono text-slate-500">bug → fix → explain</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Transition from Session 37 -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-10 anim-1">
+                Sesi 37 → 38: Dari Debugging ke Penjelasan 🐞➡️🗣️
+            </h2>
+
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-stretch anim-2">
+
+                <!-- Left: What we did in Session 37 -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-lg border-t-8 border-slate-800 h-full flex flex-col justify-between text-center">
+                    <div>
+                        <div class="text-6xl mb-4">🛠️</div>
+                        <h3 class="font-bold text-2xl mb-2">Kemarin (Sesi 37)</h3>
+                        <p class="text-slate-600 text-sm">
+                            Kita fokus bikin aplikasi <b>tidak crash</b> lewat <b>debugging</b>.
+                        </p>
+
+                        <div class="mt-6 text-left bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                            <p class="font-bold text-slate-800 mb-2">Yang kamu lakukan:</p>
+                            <ul class="text-slate-600 text-sm space-y-2">
+                                <li>• Coba input “sampah” (kosong, huruf, simbol)</li>
+                                <li>• Tambah <b>if–else</b> untuk validasi input</li>
+                                <li>• Pakai <b>Notifier</b> supaya user tidak bingung</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 bg-slate-100 rounded-full h-4 overflow-hidden w-full">
+                        <div class="bg-slate-800 w-[60%] h-full"></div>
+                    </div>
+                    <p class="mt-2 text-xs font-bold text-slate-400">PROYEK SUDAH LEBIH AMAN ✅</p>
+                </div>
+
+                <!-- Right: What we do today in Session 38 -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-lg border-t-8 border-brand-500 h-full flex flex-col justify-between text-center">
+                    <div>
+                        <div class="text-6xl mb-4">🎤</div>
+                        <h3 class="font-bold text-2xl mb-2 text-brand-600">Hari Ini (Sesi 38)</h3>
+                        <p class="text-slate-600 text-sm">
+                            Kamu akan <b>mendebug proyek baru</b>, lalu <b>menjelaskan solusimu</b> dengan runtut.
+                        </p>
+
+                        <div class="mt-6 text-left bg-brand-50 p-5 rounded-2xl border border-brand-100">
+                            <p class="font-bold text-slate-800 mb-2">Format penjelasan:</p>
+                            <ol class="text-slate-600 text-sm space-y-2">
+                                <li>1) Bug yang ditemukan</li>
+                                <li>2) Penyebab bug</li>
+                                <li>3) Solusi (blok yang ditambah/diubah)</li>
+                                <li>4) Bukti (demo: tidak crash + Notifier muncul)</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 bg-slate-100 rounded-full h-4 overflow-hidden w-full">
+                        <div class="bg-brand-500 w-[40%] h-full"></div>
+                    </div>
+                    <p class="mt-2 text-xs font-bold text-slate-400">BISA JELASIN = BENERAN PAHAM 💡</p>
+                </div>
+
+            </div>
+
+            <p class="text-center mt-10 text-lg text-slate-600 anim-3 max-w-3xl mx-auto">
+                “Programmer yang hebat bukan cuma bisa memperbaiki bug, tapi juga bisa
+                <b>menjelaskan</b> bug itu terjadi dan <b>membuktikan</b> solusinya.”
+            </p>
+        </section>
+
+        <!-- Slide 3: Debugging Challenge -->
+<section class="slide">
+  <h2 class="text-4xl font-bold text-center mb-8 anim-1">
+    Debugging Challenge 🔨🐞
+  </h2>
+
+  <div class="max-w-4xl mx-auto text-center anim-2">
+    <p class="text-xl text-slate-600 mb-8">
+      Kamu akan mendapat <b>proyek baru</b> yang masih bermasalah.  
+      Tugasmu adalah <b>menemukan bug</b> dan <b>membuat aplikasi aman</b>.
+    </p>
+
+    <div class="grid md:grid-cols-2 gap-6 text-left">
+      
+      <!-- What students get -->
+      <div class="bg-white p-6 rounded-2xl shadow border-l-8 border-slate-800">
+        <h3 class="font-bold text-lg mb-3">📦 Yang Kamu Dapatkan</h3>
+        <ul class="space-y-2 text-slate-600">
+          <li>• Proyek App Inventor yang <b>belum aman</b></li>
+          <li>• Input belum dicek</li>
+          <li>• Bisa error / crash</li>
+        </ul>
+      </div>
+
+      <!-- What students must do -->
+      <div class="bg-white p-6 rounded-2xl shadow border-l-8 border-brand-500">
+        <h3 class="font-bold text-lg mb-3 text-brand-600">🎯 Tugasmu</h3>
+        <ul class="space-y-2 text-slate-600">
+          <li>• Jalankan aplikasi dengan AI Companion</li>
+          <li>• Coba input “sampah”</li>
+          <li>• Perbaiki bug dengan <b>if–else</b> & <b>Notifier</b></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="mt-10 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-center font-bold">
+      ❗ Ingat: Jangan pakai kode proyek lamamu.
+      <br>Gunakan logikamu sendiri.
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Slide 3: Presentation Ingredients -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Resep Presentasi Juara 🏆</h2>
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-4 anim-2">
+                <!-- 1. Title -->
+                <div class="block-card bg-white p-6 rounded-2xl border-b-4 border-yellow-400">
+                    <div class="text-4xl mb-4 text-center">🏷️</div>
+                    <h3 class="font-bold text-center mb-2">Judul & Tujuan</h3>
+                    <p class="text-xs text-slate-500 text-center">Apa nama aplikasimu dan untuk apa dibuat?</p>
+                </div>
+                <!-- 2. UI -->
+                <div class="block-card bg-white p-6 rounded-2xl border-b-4 border-purple-400">
+                    <div class="text-4xl mb-4 text-center">🎨</div>
+                    <h3 class="font-bold text-center mb-2">Tampilan (UI)</h3>
+                    <p class="text-xs text-slate-500 text-center">Desain tombol, warna, dan layout.</p>
+                </div>
+                <!-- 3. Logic -->
+                <div class="block-card bg-white p-6 rounded-2xl border-b-4 border-blue-400">
+                    <div class="text-4xl mb-4 text-center">🧠</div>
+                    <h3 class="font-bold text-center mb-2">Logika</h3>
+                    <p class="text-xs text-slate-500 text-center">Bagaimana cara kerjanya? (If-Else, Math).</p>
+                </div>
+                <!-- 4. Demo -->
+                <div class="block-card bg-white p-6 rounded-2xl border-b-4 border-green-400">
+                    <div class="text-4xl mb-4 text-center">▶️</div>
+                    <h3 class="font-bold text-center mb-2">Live Demo</h3>
+                    <p class="text-xs text-slate-500 text-center">Tunjukkan aplikasinya berjalan!</p>
+                </div>
+                <!-- 5. Benefit -->
+                <div class="block-card bg-white p-6 rounded-2xl border-b-4 border-pink-400">
+                    <div class="text-4xl mb-4 text-center">❤️</div>
+                    <h3 class="font-bold text-center mb-2">Manfaat</h3>
+                    <p class="text-xs text-slate-500 text-center">Siapa yang terbantu dengan aplikasi ini?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Structure of Reflection -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Cermin Diri (Refleksi) 🪞</h2>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 anim-2">
+                <div class="bg-green-50 p-8 rounded-3xl border border-green-100 flex flex-col items-center text-center">
+                    <i class="fa-solid fa-thumbs-up text-5xl text-green-500 mb-6"></i>
+                    <h3 class="font-bold text-green-800 text-xl mb-2">Apa yang Berhasil?</h3>
+                    <p class="text-green-700 text-sm">
+                        "Logika validasi saya berjalan mulus!" <br>
+                        "Desain tombolnya rapi."
+                    </p>
+                </div>
+                <div
+                    class="bg-orange-50 p-8 rounded-3xl border border-orange-100 flex flex-col items-center text-center">
+                    <i class="fa-solid fa-screwdriver-wrench text-5xl text-orange-500 mb-6"></i>
+                    <h3 class="font-bold text-orange-800 text-xl mb-2">Apa yang Perlu Diperbaiki?</h3>
+                    <p class="text-orange-700 text-sm">
+                        "Masih kadang agak lag." <br>
+                        "Warna background terlalu gelap."
+                    </p>
+                </div>
+            </div>
+            <p class="text-center mt-8 text-slate-400 italic text-sm anim-pop">"Jujur pada diri sendiri adalah kunci
+                menjadi Master."</p>
+        </section>
+
+        <!-- Slide 5: Feedback Ethics -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Memberi Masukan (Feedback) 🎁</h2>
+            <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-xl anim-2">
+                <div class="flex items-center justify-center gap-4 mb-8">
+                    <div class="bg-slate-100 px-4 py-2 rounded-full font-bold text-slate-600">Metode Sandwich 🥪</div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Top Bun -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-2xl">🍞
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-xl flex-1 border border-green-100">
+                            <span class="font-bold text-green-700">Pujian (Positive)</span>
+                            <p class="text-sm text-slate-600">"Tampilan aplikasimu keren banget!"</p>
+                        </div>
+                    </div>
+
+                    <!-- Meat -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-2xl">🥩
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-xl flex-1 border border-red-100">
+                            <span class="font-bold text-red-700">Masukan (Constructive)</span>
+                            <p class="text-sm text-slate-600">"Tapi tombol 'Keluar' agak kekecilan, susah dipencet."</p>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Bun -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-2xl">🍞
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-xl flex-1 border border-green-100">
+                            <span class="font-bold text-green-700">Dukungan (Encouragement)</span>
+                            <p class="text-sm text-slate-600">"Semangat! Idenya udah oke banget."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Phase 1 - Prep -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-6 anim-1">Fase 1: Persiapan 📝</h2>
+            <div class="max-w-4xl mx-auto flex flex-col items-center text-center anim-2">
+                <div class="bg-white p-8 rounded-3xl shadow-lg border-2 border-slate-100 w-full mb-8">
+                    <ul class="text-left space-y-4 text-lg">
+                        <li class="flex items-center gap-4">
+                            <input type="checkbox" class="w-6 h-6 accent-brand-500">
+                            <span>Siapkan HP / Emulator (Connect AI Companion).</span>
+                        </li>
+                        <li class="flex items-center gap-4">
+                            <input type="checkbox" class="w-6 h-6 accent-brand-500">
+                            <span>Cek apakah semua tombol berfungsi.</span>
+                        </li>
+                        <li class="flex items-center gap-4">
+                            <input type="checkbox" class="w-6 h-6 accent-brand-500">
+                            <span>Siapkan 1 Fitur Unggulan untuk dijelaskan.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="text-6xl animate-bounce">⏳</div>
+                <p class="font-bold text-slate-500 mt-2">Waktu: 10 Menit</p>
+            </div>
+        </section>
+
+        <!-- Slide 7: Phase 2 - Showcase -->
+        <section class="slide">
+            <h2 class="text-4xl font-bold text-center mb-6 anim-1">Fase 2: SHOWTIME! ✨</h2>
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 anim-2 h-[60vh]">
+                <!-- Presenter Area -->
+                <div
+                    class="flex-1 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-8 flex flex-col justify-center items-center relative overflow-hidden shadow-2xl">
+                    <div
+                        class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
+                    </div>
+                    <div class="z-10 text-center">
+                        <h3 class="text-3xl font-black mb-4 text-yellow-400">PRESENTER</h3>
+                        <p class="mb-8 text-slate-300">Jelaskan dengan percaya diri.</p>
+                        <ul class="text-left space-y-2 text-sm font-mono">
+                            <li>> Salam Pembuka</li>
+                            <li>> Judul Aplikasi</li>
+                            <li>> Demo Langsung</li>
+                            <li>> Penutup</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Audience Area -->
+                <div
+                    class="flex-1 bg-white rounded-3xl p-8 flex flex-col justify-center items-center shadow-2xl border border-slate-100">
+                    <h3 class="text-3xl font-black mb-4 text-brand-600">AUDIENS</h3>
+                    <p class="mb-8 text-slate-500 text-center">Menyimak & Mencatat.</p>
+                    <div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200 w-full max-w-sm">
+                        <div class="font-bold text-yellow-800 mb-2 text-center">Lembar Feedback</div>
+                        <div class="h-2 bg-slate-200 rounded mb-2 w-3/4 mx-auto"></div>
+                        <div class="h-2 bg-slate-200 rounded mb-2 w-1/2 mx-auto"></div>
+                        <div class="h-2 bg-slate-200 rounded w-2/3 mx-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Checkout Quiz Reflection -->
+        <section class="slide">
+            <h2 class="text-3xl font-bold text-center mb-8 anim-1">Checkout: Refleksi Semester 🏁</h2>
+            <div class="max-w-3xl mx-auto text-center anim-2">
+                <p class="text-xl text-slate-600 mb-8">
+                    Sebelum kita tutup lembaran semester ini, mari kita lihat seberapa jauh kita melangkah.
+                </p>
+                <div
+                    class="bg-gradient-to-r from-brand-500 to-pink-500 p-1 rounded-2xl shadow-xl hover:scale-105 transition duration-300">
+                    <div class="bg-white rounded-xl p-8">
+                        <h3 class="font-bold text-2xl mb-4">Quiz Refleksi</h3>
+                        <p class="text-slate-500 mb-6">Ceritakan pengalamanmu. Tidak ada jawaban salah.</p>
+                        <button
+                            class="bg-slate-900 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-slate-700 transition">
+                            <i class="fa-solid fa-pencil mr-2"></i> Mulai Mengerjakan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Closing -->
+        <section class="slide">
+            <div class="max-w-4xl mx-auto text-center anim-1 flex flex-col items-center justify-center h-full">
+                <i class="fa-solid fa-rocket text-8xl text-brand-500 mb-8 animate-float"></i>
+                <h2 class="text-5xl font-black text-slate-800 mb-6">TERIMA KASIH!</h2>
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-xl border-l-8 border-yellow-400 rotate-2 hover:rotate-0 transition duration-500">
+                    <p class="text-2xl italic font-serif text-slate-600">
+                        "Setiap <span class="text-red-500 font-bold">Bug</span> adalah pelajaran,<br>
+                        Setiap <span class="text-green-500 font-bold">Aplikasi</span> adalah solusi."
+                    </p>
+                </div>
+
+                <button onclick="localStorage.removeItem('sesi38_access'); location.reload();"
+                    class="mt-12 text-slate-400 hover:text-red-500 transition text-sm font-bold uppercase tracking-widest group">
+                    <i class="fa-solid fa-power-off mr-2 group-hover:scale-125 transition-transform"></i> End Session
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Core Logic
+            const activeClass = 'active';
+            const slides = document.querySelectorAll('.slide');
+            const progressBar = document.getElementById('bar');
+            const counter = document.getElementById('counter');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const accessOverlay = document.getElementById('accessOverlay');
+            const accessInput = document.getElementById('accessCodeInput');
+            const accessBtn = document.getElementById('accessBtn');
+            const accessError = document.getElementById('accessError');
+
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            const VALID_CODE = "RGMDSMS25";
+
+            // Access Control
+            accessBtn.addEventListener('click', () => {
+                const inputVal = accessInput.value.trim().toUpperCase();
+                if (inputVal === VALID_CODE) {
+                    localStorage.setItem('sesi38_access', 'true');
+                    accessOverlay.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        accessOverlay.style.display = 'none';
+                        updateSlide();
+                    }, 500);
+                } else {
+                    accessError.style.opacity = '1';
+                    accessInput.classList.add('border-red-500', 'animate-shake');
+                    setTimeout(() => accessInput.classList.remove('border-red-500', 'animate-shake'), 500);
+                }
+            });
+
+            // Navigation
+            function updateSlide() {
+                slides.forEach((slide, idx) => {
+                    if (idx === currentSlide) {
+                        slide.classList.add(activeClass);
+                    } else {
+                        slide.classList.remove(activeClass);
+                    }
+                });
+
+                if (progressBar) progressBar.style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+                if (counter) counter.innerText = currentSlide + 1;
+
+                if (btnPrev) btnPrev.disabled = currentSlide === 0;
+                if (btnNext) btnNext.disabled = currentSlide === totalSlides - 1;
+            }
+
+            if (btnNext) btnNext.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlide();
+                }
+            });
+
+            if (btnPrev) btnPrev.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                // blok navigasi kalau access overlay masih tampil
+                if (accessOverlay && getComputedStyle(accessOverlay).display !== 'none') return;
+
+                if (e.key === 'ArrowRight' && btnNext && !btnNext.disabled) {
+                    btnNext.click();
+                }
+
+                if (e.key === 'ArrowLeft' && btnPrev && !btnPrev.disabled) {
+                    btnPrev.click();
+                }
+            });
+
+            updateSlide();
+        });
+    </script>
+</body>
+
+</html>
