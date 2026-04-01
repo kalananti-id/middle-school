@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>UOB MDS – Lower Primary – Coding Festival Stage 1</title>
+    <title>UOB MDS – Middle School – Coding Festival Stage 1</title>
     <style>
         :root {
             --bg1: #F7FAFF;
@@ -27,7 +27,7 @@
         }
 
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
@@ -60,6 +60,7 @@
             background: rgba(255, 255, 255, .72);
             backdrop-filter: blur(10px);
             box-shadow: var(--shadow2);
+            flex-wrap: wrap;
         }
 
         .brand {
@@ -114,11 +115,11 @@
         }
 
         .btn:hover {
-            transform: translateY(-1px)
+            transform: translateY(-1px);
         }
 
         .btn:active {
-            transform: translateY(0px)
+            transform: translateY(0px);
         }
 
         .btn.primary {
@@ -128,7 +129,7 @@
 
         .btn.ghost {
             background: transparent;
-            box-shadow: none
+            box-shadow: none;
         }
 
         .btn:focus {
@@ -216,19 +217,19 @@
         h2 {
             margin: 6px 0 10px;
             font-size: 30px;
-            letter-spacing: -.3px
+            letter-spacing: -.3px;
         }
 
         h3 {
             margin: 0 0 8px;
-            font-size: 18px
+            font-size: 18px;
         }
 
         p {
             margin: 0 0 10px;
             color: var(--muted);
             font-weight: 800;
-            line-height: 1.55
+            line-height: 1.55;
         }
 
         .kicker {
@@ -247,35 +248,15 @@
 
         .grid {
             display: grid;
-            gap: 14px
+            gap: 14px;
         }
 
         .cols2 {
-            grid-template-columns: 1fr 1fr
+            grid-template-columns: 1fr 1fr;
         }
 
         .cols3 {
-            grid-template-columns: repeat(3, 1fr)
-        }
-
-        @media (max-width: 860px) {
-
-            .cols2,
-            .cols3 {
-                grid-template-columns: 1fr
-            }
-
-            .progressWrap {
-                min-width: unset
-            }
-
-            .progress {
-                width: 130px
-            }
-
-            h2 {
-                font-size: 26px
-            }
+            grid-template-columns: repeat(3, 1fr);
         }
 
         .card {
@@ -290,7 +271,7 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            align-items: center
+            align-items: center;
         }
 
         .tag {
@@ -309,13 +290,13 @@
             margin: 8px 0 0 18px;
             color: var(--muted);
             font-weight: 850;
-            line-height: 1.55
+            line-height: 1.55;
         }
 
         .choices {
             display: grid;
             gap: 10px;
-            margin-top: 10px
+            margin-top: 10px;
         }
 
         .choice {
@@ -331,22 +312,22 @@
         }
 
         .choice:hover {
-            transform: translateY(-1px)
+            transform: translateY(-1px);
         }
 
         .choice.active {
             border-color: rgba(79, 70, 229, .35);
-            background: rgba(79, 70, 229, .06)
+            background: rgba(79, 70, 229, .06);
         }
 
         .choice.ok {
             border-color: rgba(22, 163, 74, .35);
-            background: rgba(22, 163, 74, .08)
+            background: rgba(22, 163, 74, .08);
         }
 
         .choice.bad {
             border-color: rgba(220, 38, 38, .35);
-            background: rgba(220, 38, 38, .08)
+            background: rgba(220, 38, 38, .08);
         }
 
         .feedback {
@@ -362,19 +343,19 @@
         }
 
         .feedback.show {
-            display: block
+            display: block;
         }
 
         .fbOk {
             border-color: rgba(22, 163, 74, .35);
             background: rgba(22, 163, 74, .08);
-            color: rgba(15, 23, 42, .92)
+            color: rgba(15, 23, 42, .92);
         }
 
         .fbBad {
             border-color: rgba(220, 38, 38, .35);
             background: rgba(220, 38, 38, .08);
-            color: rgba(15, 23, 42, .92)
+            color: rgba(15, 23, 42, .92);
         }
 
         .input {
@@ -385,6 +366,8 @@
             padding: 12px 14px;
             font-weight: 950;
             color: rgba(30, 41, 59, .96);
+            resize: vertical;
+            min-height: 54px;
         }
 
         .emojiBig {
@@ -392,62 +375,140 @@
             line-height: 1;
         }
 
-        .timelineCard {
-            position: relative;
-            padding-left: 18px;
-        }
-
-        .timelineCard::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 6px;
-            bottom: 6px;
-            width: 4px;
-            border-radius: 999px;
-            background: linear-gradient(180deg, rgba(79, 70, 229, .75), rgba(6, 182, 212, .7));
-        }
-
-        .pitchStep {
-            border: 1px dashed rgba(79, 70, 229, .28);
-            background: linear-gradient(180deg, rgba(79, 70, 229, .04), rgba(6, 182, 212, .04));
-        }
-
-        .checkPill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 12px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, .9);
-            border: 1px solid rgba(226, 232, 240, .95);
-            font-weight: 950;
-            color: rgba(30, 41, 59, .95);
-        }
-
-        .twoBig {
+        .checklist {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkItem {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 18px;
+            border: 1px solid rgba(226, 232, 240, .95);
+            background: rgba(255, 255, 255, .96);
+            cursor: pointer;
+            user-select: none;
+            transition: transform .06s ease, border-color .12s ease, background .12s ease;
+            font-weight: 950;
+            color: rgba(30, 41, 59, .96);
+        }
+
+        .checkItem:hover {
+            transform: translateY(-1px);
+        }
+
+        .checkItem.done {
+            border-color: rgba(79, 70, 229, .30);
+            background: rgba(79, 70, 229, .06);
+        }
+
+        .checkBox {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(148, 163, 184, .8);
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+            font-weight: 1000;
+            color: transparent;
+            background: #fff;
+            flex: 0 0 auto;
+        }
+
+        .checkItem.done .checkBox {
+            background: linear-gradient(135deg, rgba(79, 70, 229, .9), rgba(6, 182, 212, .85));
+            border-color: transparent;
+            color: white;
+        }
+
+        .meterWrap {
+            margin-top: 12px;
+        }
+
+        .meter {
+            width: 100%;
+            height: 12px;
+            background: rgba(226, 232, 240, .9);
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, .95);
+        }
+
+        .meterBar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(79, 70, 229, .85), rgba(6, 182, 212, .85));
+            border-radius: 999px;
+            transition: width .25s ease;
+        }
+
+        .meterText {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 900;
+        }
+
+        .ideaTags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .ideaTag {
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(226, 232, 240, .95);
+            background: rgba(255, 255, 255, .96);
+            font-weight: 950;
+            color: rgba(30, 41, 59, .96);
+            cursor: pointer;
+            transition: transform .06s ease, border-color .12s ease, background .12s ease;
+            user-select: none;
+        }
+
+        .ideaTag:hover {
+            transform: translateY(-1px);
+        }
+
+        .ideaTag.active {
+            border-color: rgba(79, 70, 229, .35);
+            background: rgba(79, 70, 229, .08);
+        }
+
+        .resultBox {
+            margin-top: 14px;
+            border-radius: 18px;
+            padding: 14px;
+            border: 1px solid rgba(226, 232, 240, .95);
+            background: rgba(255, 255, 255, .92);
+            color: var(--muted);
+            font-weight: 900;
+            line-height: 1.5;
         }
 
         @media (max-width: 860px) {
-            .twoBig {
+            .cols2,
+            .cols3 {
                 grid-template-columns: 1fr;
             }
-        }
 
-        .bigNum {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
-            display: grid;
-            place-items: center;
-            font-weight: 1000;
-            background: linear-gradient(135deg, rgba(79, 70, 229, .16), rgba(6, 182, 212, .16));
-            border: 1px solid rgba(79, 70, 229, .18);
-            color: rgba(79, 70, 229, 1);
-            flex: 0 0 auto;
+            .progressWrap {
+                min-width: unset;
+            }
+
+            .progress {
+                width: 130px;
+            }
+
+            h2 {
+                font-size: 26px;
+            }
         }
     </style>
 </head>
@@ -459,7 +520,7 @@
             <h2>🔐 Kode Akses</h2>
             <p>Masukkan kode untuk memulai sesi.</p>
             <input id="accessInput" class="input" placeholder="MASUKKAN KODE" autocomplete="off"
-                style="text-align:center;font-weight:900;letter-spacing:2px" />
+                style="text-align:center;font-weight:900;letter-spacing:2px;min-height:auto" />
             <button class="btn primary" id="accessBtn" style="margin-top:12px">Masuk</button>
             <div class="feedback" id="accessFb" style="margin-top:10px"></div>
             <div class="card" style="margin-top:10px;background:rgba(79,70,229,.05)">
@@ -471,9 +532,9 @@
     <div class="app">
         <div class="topbar">
             <div class="brand">
-                <div class="logo">LP</div>
+                <div class="logo">MS</div>
                 <div>
-                    <h1>Lower Primary</h1>
+                    <h1>Middle School</h1>
                     <div class="sub">Coding Festival – Stage 1</div>
                 </div>
             </div>
@@ -505,289 +566,295 @@
             {
                 title: "Pembuka",
                 html: `
-<h2>🚀 Coding Festival Dimulai</h2>
-<p>Kali ini kamu tidak hanya belajar coding, tapi juga membuat <b>solusi digital</b> untuk masalah keuangan sederhana.</p>
+                <div class="kicker">Middle School • MIT App Inventor • Stage 1</div>
+                <h2>🚀 Coding Festival Dimulai</h2>
+                <p>Kali ini kamu tidak hanya belajar coding, tapi juga membuat <b>solusi digital</b> untuk membantu pengguna memahami pengelolaan uang dengan lebih baik.</p>
 
-<div class="card" style="margin-top:12px;text-align:center">
-<div class="emojiBig">📱💰</div>
-<p style="margin-top:10px"><b>Kamu akan merancang aplikasi sederhana dengan App Inventor</b></p>
-</div>
-`
+                <div class="card" style="margin-top:12px;text-align:center">
+                    <div class="emojiBig">📱💰</div>
+                    <p style="margin-top:10px"><b>Kamu akan merancang aplikasi sederhana dengan MIT App Inventor</b></p>
+                </div>
+                `
             },
 
             {
                 title: "Apa itu Coding Festival",
                 html: `
-<h2>Coding Festival</h2>
-<p>Coding Festival adalah kegiatan pembelajaran berbasis proyek.</p>
+                <h2>Coding Festival</h2>
+                <p>Coding Festival adalah kegiatan pembelajaran berbasis proyek. Kamu akan belajar dari ide, perancangan, pembuatan aplikasi, sampai presentasi.</p>
 
-<div class="card">
-<ul class="list">
-<li>Kamu membuat solusi dari sebuah masalah</li>
-<li>Solusi dibuat dalam bentuk proyek coding</li>
-<li>Kamu belajar dari ide sampai presentasi</li>
-</ul>
-</div>
-`
+                <div class="card">
+                    <ul class="list">
+                        <li>Kamu membuat solusi dari sebuah masalah</li>
+                        <li>Solusi dibuat dalam bentuk proyek coding</li>
+                        <li>Kamu belajar dari ide sampai presentasi</li>
+                    </ul>
+                </div>
+                `
             },
 
             {
                 title: "Stage 1",
                 html: `
-<h2>🎯 Stage 1: Build Your Project</h2>
+                <h2>🎯 Stage 1: Build Your Project</h2>
+                <p>Di tahap ini, kamu akan mulai membangun fondasi proyekmu.</p>
 
-<div class="checklist" data-checklist="stage1">
-<div class="checkItem"><div class="checkBox">✓</div><div>Menentukan problem</div></div>
-<div class="checkItem"><div class="checkBox">✓</div><div>Merancang aplikasi</div></div>
-<div class="checkItem"><div class="checkBox">✓</div><div>Membangun logic & fitur</div></div>
-<div class="checkItem"><div class="checkBox">✓</div><div>Menyiapkan pitching</div></div>
-</div>
+                <div class="checklist" data-checklist="stage1">
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Menentukan problem</div></div>
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Merancang aplikasi</div></div>
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Membangun logic dan fitur</div></div>
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Menyiapkan pitching</div></div>
+                </div>
 
-<div class="meterWrap">
-<div class="meter"><div class="meterBar" id="stage1Meter"></div></div>
-<div class="meterText" id="stage1MeterText">0 dari 4</div>
-</div>
-`
+                <div class="meterWrap">
+                    <div class="meter"><div class="meterBar" id="stage1Meter"></div></div>
+                    <div class="meterText" id="stage1MeterText">0 dari 4 langkah dipahami</div>
+                </div>
+                `
             },
 
             {
                 title: "Tema",
                 html: `
-<h2>💰 Tema: Financial Literacy</h2>
-<p>Proyekmu harus membantu pengguna memahami pengelolaan uang dengan lebih baik.</p>
+                <h2>💰 Tema: Financial Literacy</h2>
+                <p>Proyekmu perlu membantu pengguna memahami pengelolaan uang dengan lebih baik.</p>
 
-<div class="ideaTags" data-select-group="tema">
-<div class="ideaTag">Pemasukan dan pengeluaran</div>
-<div class="ideaTag">Saldo tabungan otomatis</div>
-<div class="ideaTag">Target tabungan</div>
-<div class="ideaTag">Kategori pengeluaran</div>
-<div class="ideaTag">Simulasi rekening tabungan</div>
-</div>
+                <div class="ideaTags" data-select-group="tema">
+                    <div class="ideaTag">Pemasukan dan pengeluaran</div>
+                    <div class="ideaTag">Saldo tabungan otomatis</div>
+                    <div class="ideaTag">Target tabungan</div>
+                    <div class="ideaTag">Kategori pengeluaran</div>
+                    <div class="ideaTag">Simulasi rekening tabungan</div>
+                </div>
 
-<div class="resultBox" id="temaResult">Pilih satu topik yang menurutmu paling menarik.</div>
-`
+                <div class="resultBox" id="temaResult">Pilih satu topik yang menurutmu paling menarik untuk dijadikan aplikasi.</div>
+                `
             },
 
             {
                 title: "Khusus SMP",
                 html: `
-<h2>📱 Untuk SMP: Bukan Game, tapi Aplikasi</h2>
-<p>Untuk jenjang SMP, guidebook mengarahkan proyek ke bentuk <b>aplikasi pengelola tabungan pelajar</b> atau simulasi yang lebih kompleks.</p>
+                <h2>📱 Untuk SMP: Aplikasi Smartphone</h2>
+                <p>Untuk jenjang Middle School, memfokuskan proyek pada pembuatan aplikasi untuk smartphone.</p>
 
-<div class="card">
-<div class="kicker">Contoh bentuk proyek</div>
-<ul class="list">
-<li>Aplikasi pencatatan pemasukan dan pengeluaran</li>
-<li>Aplikasi target tabungan</li>
-<li>Aplikasi saldo otomatis</li>
-<li>Simulasi penggunaan rekening tabungan</li>
-</ul>
-</div>
-`
+                <div class="card">
+                    <div class="kicker">Contoh bentuk proyek</div>
+                    <ul class="list">
+                        <li>Aplikasi pencatatan pemasukan dan pengeluaran</li>
+                        <li>Aplikasi target tabungan</li>
+                        <li>Aplikasi saldo otomatis</li>
+                        <li>Simulasi penggunaan rekening tabungan</li>
+                    </ul>
+                </div>
+                `
             },
 
             {
                 title: "Problem yang Tepat",
                 html: `
-<h2>🧠 Problem yang Tepat</h2>
-<p>Proyek yang baik dimulai dari masalah yang nyata.</p>
+                <h2>🧠 Problem yang Tepat</h2>
+                <p>Proyek yang kuat dimulai dari masalah yang nyata dan relevan.</p>
 
-<div class="choices" data-quiz="problem">
-<div class="choice" data-answer="right">Siswa sering tidak tahu uangnya habis untuk apa</div>
-<div class="choice" data-answer="wrong">Karakter ingin balapan lebih cepat</div>
-<div class="choice" data-answer="wrong">Aplikasi tentang ganti wallpaper HP</div>
-</div>
+                <div class="choices" data-quiz="problem">
+                    <div class="choice" data-answer="right">Siswa sering tidak tahu uangnya habis untuk apa</div>
+                    <div class="choice" data-answer="wrong">Karakter ingin balapan lebih cepat</div>
+                    <div class="choice" data-answer="wrong">Aplikasi tentang ganti wallpaper HP</div>
+                </div>
 
-<div class="feedback" data-quiz-feedback="problem"></div>
-`
+                <div class="feedback" data-quiz-feedback="problem"></div>
+                `
             },
 
             {
                 title: "Struktur Project",
                 html: `
-<h2>🧩 Struktur Project yang Baik</h2>
+                <h2>🧩 Struktur Project yang Baik</h2>
 
-<div class="card">
-<ul class="list">
-<li><b>Problem</b> → masalah yang ingin diselesaikan</li>
-<li><b>Input</b> → data yang dimasukkan pengguna</li>
-<li><b>Process / Logic</b> → perhitungan atau pengolahan data</li>
-<li><b>Output</b> → hasil yang ditampilkan aplikasi</li>
-</ul>
-</div>
-`
+                <div class="card">
+                    <ul class="list">
+                        <li><b>Problem</b> → masalah yang ingin diselesaikan</li>
+                        <li><b>Input</b> → data yang dimasukkan pengguna</li>
+                        <li><b>Process / Logic</b> → perhitungan atau pengolahan data</li>
+                        <li><b>Output</b> → hasil yang ditampilkan aplikasi</li>
+                    </ul>
+                </div>
+                `
             },
 
             {
                 title: "Logic Thinking",
                 html: `
-<h2>🔀 Coba Pikirkan Logic Aplikasi</h2>
-<p>Jika pengguna memasukkan data, apa yang dilakukan aplikasi?</p>
+                <h2>🔀 Coba Pikirkan Logic Aplikasi</h2>
+                <p>Jika pengguna memasukkan data, apa yang seharusnya dilakukan aplikasi?</p>
 
-<div class="choices" data-quiz="logic">
-<div class="choice" data-answer="wrong">Aplikasi hanya menampilkan gambar</div>
-<div class="choice" data-answer="right">Aplikasi menghitung, mengelompokkan, lalu menampilkan hasil</div>
-<div class="choice" data-answer="wrong">Semua tombol menghasilkan tampilan yang sama</div>
-</div>
+                <div class="choices" data-quiz="logic">
+                    <div class="choice" data-answer="wrong">Aplikasi hanya menampilkan gambar</div>
+                    <div class="choice" data-answer="right">Aplikasi menghitung, mengelompokkan, lalu menampilkan hasil</div>
+                    <div class="choice" data-answer="wrong">Semua tombol menghasilkan tampilan yang sama</div>
+                </div>
 
-<div class="feedback" data-quiz-feedback="logic"></div>
-`
+                <div class="feedback" data-quiz-feedback="logic"></div>
+                `
             },
 
             {
                 title: "Contoh Ide",
                 html: `
-<h2>💡 Contoh Ide Aplikasi</h2>
+                <h2>💡 Contoh Ide Aplikasi</h2>
 
-<div class="grid cols2" style="margin-top:12px">
-<div class="card">
-<div class="kicker">Ide 1</div>
-<p style="margin:8px 0 0"><b>TabunganKu</b></p>
-<p style="margin:8px 0 0">Pengguna mencatat setoran dan penarikan, lalu aplikasi menghitung saldo otomatis.</p>
-</div>
+                <div class="grid cols2" style="margin-top:12px">
+                    <div class="card">
+                        <div class="kicker">Ide 1</div>
+                        <p style="margin:8px 0 0"><b>TabunganKu</b></p>
+                        <p style="margin:8px 0 0">Pengguna mencatat setoran dan penarikan, lalu aplikasi menghitung saldo otomatis.</p>
+                    </div>
 
-<div class="card">
-<div class="kicker">Ide 2</div>
-<p style="margin:8px 0 0"><b>Budget Harian</b></p>
-<p style="margin:8px 0 0">Pengguna memasukkan pengeluaran, lalu aplikasi mengelompokkan mana yang paling sering dibeli.</p>
-</div>
-</div>
-`
+                    <div class="card">
+                        <div class="kicker">Ide 2</div>
+                        <p style="margin:8px 0 0"><b>Budget Harian</b></p>
+                        <p style="margin:8px 0 0">Pengguna memasukkan pengeluaran, lalu aplikasi mengelompokkan mana yang paling sering dibeli.</p>
+                    </div>
+                </div>
+                `
             },
 
             {
                 title: "Ciri Proyek Bagus",
                 html: `
-<h2>✅ Pilih Ciri Proyek Bagus</h2>
+                <h2>✅ Pilih Ciri Proyek Bagus</h2>
+                <p>Pilih semua pernyataan yang menunjukkan proyekmu sudah kuat.</p>
 
-<div class="choices" data-multi="good">
-<div class="choice" data-correct="true">Ada problem yang jelas</div>
-<div class="choice" data-correct="true">Ada input, proses, dan output</div>
-<div class="choice" data-correct="true">Sesuai tema financial literacy</div>
-<div class="choice" data-correct="false">Tidak perlu fungsi yang berjalan</div>
-</div>
+                <div class="choices" data-multi="good">
+                    <div class="choice" data-correct="true">Ada problem yang jelas</div>
+                    <div class="choice" data-correct="true">Ada input, proses, dan output</div>
+                    <div class="choice" data-correct="true">Sesuai tema financial literacy</div>
+                    <div class="choice" data-correct="false">Tidak perlu fungsi yang berjalan</div>
+                </div>
 
-<button class="btn primary" id="checkGood">Cek</button>
-<div class="feedback" id="goodFb"></div>
-`
+                <button class="btn primary" id="checkGood">Cek</button>
+                <div class="feedback" id="goodFb"></div>
+                `
             },
 
             {
                 title: "Pengembangan Fitur",
                 html: `
-<h2>⚙️ Mengembangkan Fitur dan Logic</h2>
-<p>Setelah aplikasi dasar jadi, kamu bisa menambahkan fitur baru.</p>
+                <h2>⚙️ Mengembangkan Fitur dan Logic</h2>
+                <p>Setelah aplikasi dasar jadi, kamu bisa mengembangkan fitur agar lebih bermanfaat.</p>
 
-<div class="card">
-<ul class="list">
-<li>Perhitungan saldo otomatis</li>
-<li>Kategori pengeluaran</li>
-<li>Target tabungan</li>
-<li>Analisis kebiasaan pengeluaran</li>
-<li>Perbaikan error (debugging)</li>
-</ul>
-</div>
-`
+                <div class="card">
+                    <ul class="list">
+                        <li>Perhitungan saldo otomatis</li>
+                        <li>Kategori pengeluaran</li>
+                        <li>Target tabungan</li>
+                        <li>Analisis kebiasaan pengeluaran</li>
+                        <li>Perbaikan error (debugging)</li>
+                    </ul>
+                </div>
+                `
             },
 
             {
                 title: "Pitching",
                 html: `
-<h2>🗣️ Pitching App Kamu</h2>
-<p>Kamu juga harus menjelaskan aplikasi yang kamu buat.</p>
+                <h2>🗣️ Pitching App Kamu</h2>
+                <p>Selain membuat aplikasi, kamu juga harus bisa menjelaskan idenya dengan jelas.</p>
 
-<div class="card">
-<ul class="list">
-<li><b>Problem</b> → masalah yang diangkat</li>
-<li><b>Solution</b> → aplikasi yang dibuat</li>
-<li><b>How it works</b> → cara kerja aplikasi</li>
-<li><b>Impact</b> → manfaat bagi pengguna</li>
-</ul>
-</div>
-`
+                <div class="card">
+                    <ul class="list">
+                        <li><b>Problem</b> → masalah yang diangkat</li>
+                        <li><b>Solution</b> → aplikasi yang dibuat</li>
+                        <li><b>How it works</b> → cara kerja aplikasi</li>
+                        <li><b>Impact</b> → manfaat bagi pengguna</li>
+                    </ul>
+                </div>
+                `
             },
 
             {
                 title: "Latihan Pitch",
                 html: `
-<h2>🎤 Coba Buat Draft Pitch</h2>
+                <h2>🎤 Coba Buat Draft Pitch</h2>
+                <p>Isi draft singkat ini untuk membantu kamu menyiapkan presentasi.</p>
 
-<input class="input" id="p1" placeholder="Problem..." />
-<textarea class="input" id="p2" placeholder="Solution / nama aplikasi..." style="margin-top:10px"></textarea>
-<textarea class="input" id="p3" placeholder="How it works..." style="margin-top:10px"></textarea>
-<textarea class="input" id="p4" placeholder="Impact / manfaat..." style="margin-top:10px"></textarea>
+                <textarea class="input" id="p1" placeholder="Problem..."></textarea>
+                <textarea class="input" id="p2" placeholder="Solution / nama aplikasi..." style="margin-top:10px"></textarea>
+                <textarea class="input" id="p3" placeholder="How it works..." style="margin-top:10px"></textarea>
+                <textarea class="input" id="p4" placeholder="Impact / manfaat..." style="margin-top:10px"></textarea>
 
-<button class="btn primary" id="preview">Preview</button>
-<div class="feedback" id="previewFb"></div>
-`
+                <button class="btn primary" id="preview" style="margin-top:10px">Preview</button>
+                <div class="feedback" id="previewFb"></div>
+                `
             },
 
             {
                 title: "Submission SMP",
                 html: `
-<h2>📦 Submission untuk SMP</h2>
+                <h2>📦 Submission untuk SMP</h2>
+                <p>Pastikan semua komponen ini sudah siap sebelum dikumpulkan.</p>
 
-<div class="checklist" data-checklist="submit">
-<div class="checkItem"><div class="checkBox">✓</div><div>Link Gallery MIT App Inventor</div></div>
-<div class="checkItem"><div class="checkBox">✓</div><div>Video demo aplikasi</div></div>
-<div class="checkItem"><div class="checkBox">✓</div><div>Deskripsi proyek</div></div>
-<div class="checkItem"><div class="checkBox">✓</div><div>Screenshot proyek</div></div>
-<div class="checkItem"><div class="checkBox">✓</div><div>Foto profil</div></div>
-<div class="checkItem"><div class="checkBox">✓</div><div>Pitch deck</div></div>
-</div>
+                <div class="checklist" data-checklist="submit">
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Link Gallery MIT App Inventor</div></div>
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Video demo aplikasi</div></div>
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Deskripsi proyek</div></div>
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Screenshot proyek</div></div>
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Foto profil</div></div>
+                    <div class="checkItem"><div class="checkBox">✓</div><div>Pitch deck</div></div>
+                </div>
 
-<div class="meterWrap">
-<div class="meter"><div class="meterBar" id="submitMeter"></div></div>
-<div class="meterText" id="submitMeterText">0 dari 6</div>
-</div>
-`
+                <div class="meterWrap">
+                    <div class="meter"><div class="meterBar" id="submitMeter"></div></div>
+                    <div class="meterText" id="submitMeterText">0 dari 6 komponen siap</div>
+                </div>
+                `
             },
 
             {
                 title: "Checklist Akhir",
                 html: `
-<h2>🧪 Cek Sebelum Submit</h2>
+                <h2>🧪 Cek Sebelum Submit</h2>
 
-<div class="choices" data-quiz="check">
-<div class="choice" data-answer="wrong">Yang penting desainnya bagus</div>
-<div class="choice" data-answer="right">Aplikasi berjalan, mudah dipahami, dan link bisa dibuka</div>
-<div class="choice" data-answer="wrong">Cukup kirim screenshot saja</div>
-</div>
+                <div class="choices" data-quiz="check">
+                    <div class="choice" data-answer="wrong">Yang penting desainnya bagus</div>
+                    <div class="choice" data-answer="right">Aplikasi berjalan, mudah dipahami, dan link bisa dibuka</div>
+                    <div class="choice" data-answer="wrong">Cukup kirim screenshot saja</div>
+                </div>
 
-<div class="feedback" data-quiz-feedback="check"></div>
-`
+                <div class="feedback" data-quiz-feedback="check"></div>
+                `
             },
 
             {
                 title: "Brainstorm",
                 html: `
-<h2>💡 Brainstorm Aplikasi</h2>
+                <h2>💡 Brainstorm Aplikasi</h2>
+                <p>Tuliskan ide awal proyekmu di sini.</p>
 
-<textarea class="input" id="idea1" placeholder="Problem"></textarea>
-<textarea class="input" id="idea2" placeholder="Input & fitur utama"></textarea>
-<textarea class="input" id="idea3" placeholder="Output / hasil yang ditampilkan"></textarea>
+                <textarea class="input" id="idea1" placeholder="Problem"></textarea>
+                <textarea class="input" id="idea2" placeholder="Input & fitur utama" style="margin-top:10px"></textarea>
+                <textarea class="input" id="idea3" placeholder="Output / hasil yang ditampilkan" style="margin-top:10px"></textarea>
 
-<button class="btn primary" id="saveIdea">Simpan</button>
-<div class="feedback" id="ideaFb"></div>
-`
+                <button class="btn primary" id="saveIdea" style="margin-top:10px">Simpan</button>
+                <div class="feedback" id="ideaFb"></div>
+                `
             },
 
             {
                 title: "Penutup",
                 html: `
-<h2>🔥 Kamu Siap</h2>
+                <h2>🔥 Kamu Siap</h2>
 
-<div class="card">
-<ul class="list">
-<li>Kamu punya problem</li>
-<li>Kamu tahu bentuk proyek SMP adalah aplikasi</li>
-<li>Kamu tahu logic dasarnya</li>
-<li>Kamu siap mulai merancang project</li>
-</ul>
-</div>
+                <div class="card">
+                    <ul class="list">
+                        <li>Kamu sudah punya arah problem</li>
+                        <li>Kamu tahu bentuk proyek SMP adalah aplikasi</li>
+                        <li>Kamu memahami logic dasarnya</li>
+                        <li>Kamu siap mulai merancang project</li>
+                    </ul>
+                </div>
 
-<button class="btn primary" data-goto="0">Restart</button>
-`
+                <button class="btn primary" data-goto="0">Restart</button>
+                `
             }
 
         ];
@@ -800,7 +867,9 @@
         const btnNext = document.getElementById("btnNext");
         const btnHome = document.getElementById("btnHome");
 
-        function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+        function clamp(n, a, b) {
+            return Math.max(a, Math.min(b, n));
+        }
 
         const ACCESS_CODE = "RGMDSMS25";
         const gate = document.getElementById("accessGate");
@@ -808,9 +877,14 @@
         const btn = document.getElementById("accessBtn");
         const fb = document.getElementById("accessFb");
 
-        input.addEventListener("input", () => { input.value = input.value.toUpperCase(); });
+        input.addEventListener("input", () => {
+            input.value = input.value.toUpperCase();
+        });
+
         btn.addEventListener("click", checkAccess);
-        input.addEventListener("keydown", (e) => { if (e.key === "Enter") checkAccess(); });
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") checkAccess();
+        });
 
         function checkAccess() {
             if (input.value.trim() === ACCESS_CODE) {
@@ -821,18 +895,27 @@
             }
         }
 
+        function showFeedback(el, html, type) {
+            if (!el) return;
+            el.classList.add("show");
+            el.classList.remove("fbOk", "fbBad");
+            if (type === "ok") el.classList.add("fbOk");
+            if (type === "bad") el.classList.add("fbBad");
+            el.innerHTML = html;
+        }
+
         function getQuizMsg(id, ok) {
             const msgs = {
                 problem: {
-                    ok: "✅ Betul! Problem yang baik harus nyata dan masih berhubungan dengan pengelolaan uang.",
-                    bad: "⚠️ Coba lagi. Untuk SMP, problem sebaiknya masih terkait tabungan, pengeluaran, atau kebiasaan finansial."
+                    ok: "✅ Betul! Problem yang baik harus nyata dan berhubungan dengan pengelolaan uang.",
+                    bad: "⚠️ Coba lagi. Untuk SMP, masalah proyek sebaiknya tetap terkait tabungan, pengeluaran, atau kebiasaan finansial."
                 },
                 logic: {
-                    ok: "✅ Betul! Aplikasi biasanya menerima input, memproses data, lalu menampilkan hasil.",
+                    ok: "✅ Betul! Aplikasi yang baik menerima input, memproses data, lalu menampilkan hasil.",
                     bad: "⚠️ Belum tepat. Coba pilih jawaban yang menunjukkan ada proses atau logic di dalam aplikasi."
                 },
                 check: {
-                    ok: "✅ Benar! Sebelum submit, proyek harus bisa dibuka, berjalan, dan mudah dipahami.",
+                    ok: "✅ Benar! Sebelum submit, aplikasi harus bisa dibuka, berjalan, dan mudah dipahami.",
                     bad: "⚠️ Belum tepat. Submission yang baik bukan hanya desain, tapi juga fungsi dan akses link."
                 }
             };
@@ -841,20 +924,11 @@
             return ok ? m.ok : m.bad;
         }
 
-        function showFeedback(el, html, type) {
-            if (!el) return;
-            el.classList.add("show");
-            el.style.display = "block";
-            el.classList.remove("fbOk", "fbBad");
-            if (type === "ok") el.classList.add("fbOk");
-            if (type === "bad") el.classList.add("fbBad");
-            el.innerHTML = html;
-        }
-
         function wireQuiz(group) {
             const id = group.getAttribute("data-quiz");
             const fb = content.querySelector(`[data-quiz-feedback="${id}"]`);
             const items = [...group.querySelectorAll(".choice")];
+
             items.forEach(ch => {
                 ch.addEventListener("click", () => {
                     items.forEach(x => x.classList.remove("active", "ok", "bad"));
@@ -866,18 +940,203 @@
             });
         }
 
+        function wireChecklist(group) {
+            const items = [...group.querySelectorAll(".checkItem")];
+            const parentId = group.getAttribute("data-checklist");
+
+            let meterId = "";
+            let textId = "";
+
+            if (parentId === "stage1") {
+                meterId = "stage1Meter";
+                textId = "stage1MeterText";
+            } else if (parentId === "submit") {
+                meterId = "submitMeter";
+                textId = "submitMeterText";
+            }
+
+            const meterBar = content.querySelector(`#${meterId}`);
+            const meterText = content.querySelector(`#${textId}`);
+
+            const refresh = () => {
+                const done = items.filter(item => item.classList.contains("done")).length;
+                const total = items.length;
+                const pct = total ? (done / total) * 100 : 0;
+
+                if (meterBar) meterBar.style.width = `${pct}%`;
+                if (meterText) {
+                    if (parentId === "stage1") {
+                        meterText.textContent = `${done} dari ${total} langkah dipahami`;
+                    } else if (parentId === "submit") {
+                        meterText.textContent = `${done} dari ${total} komponen siap`;
+                    }
+                }
+            };
+
+            items.forEach(item => {
+                item.addEventListener("click", () => {
+                    item.classList.toggle("done");
+                    refresh();
+                });
+            });
+
+            refresh();
+        }
+
+        function wireSelectGroup(group) {
+            const id = group.getAttribute("data-select-group");
+            const items = [...group.querySelectorAll(".ideaTag")];
+            const resultBox = content.querySelector(`#${id}Result`);
+
+            const mapping = {
+                "Pemasukan dan pengeluaran": "Arah proyek: aplikasi yang mencatat pemasukan dan pengeluaran agar pengguna tahu kondisi uangnya.",
+                "Saldo tabungan otomatis": "Arah proyek: aplikasi yang menghitung perubahan saldo secara otomatis setelah setoran atau penarikan.",
+                "Target tabungan": "Arah proyek: aplikasi yang membantu pengguna memantau progres menuju target tabungan.",
+                "Kategori pengeluaran": "Arah proyek: aplikasi yang mengelompokkan jenis pengeluaran agar kebiasaan belanja lebih terlihat.",
+                "Simulasi rekening tabungan": "Arah proyek: aplikasi yang mensimulasikan cara kerja rekening sederhana, seperti setoran, penarikan, dan saldo."
+            };
+
+            items.forEach(item => {
+                item.addEventListener("click", () => {
+                    items.forEach(x => x.classList.remove("active"));
+                    item.classList.add("active");
+                    resultBox.innerHTML = `<b>${item.textContent}</b><br>${mapping[item.textContent] || "Gunakan topik ini sebagai dasar ide aplikasimu."}`;
+                });
+            });
+        }
+
+        function wireMulti(group) {
+            const id = group.getAttribute("data-multi");
+            const items = [...group.querySelectorAll(".choice")];
+
+            items.forEach(item => {
+                item.addEventListener("click", () => {
+                    item.classList.toggle("active");
+                });
+            });
+
+            if (id === "good") {
+                const btnCheck = content.querySelector("#checkGood");
+                const fb = content.querySelector("#goodFb");
+
+                if (btnCheck) {
+                    btnCheck.addEventListener("click", () => {
+                        let allCorrect = true;
+                        let selectedAny = false;
+
+                        items.forEach(item => {
+                            const isActive = item.classList.contains("active");
+                            const isCorrect = item.getAttribute("data-correct") === "true";
+
+                            item.classList.remove("ok", "bad");
+
+                            if (isActive) {
+                                selectedAny = true;
+                                item.classList.add(isCorrect ? "ok" : "bad");
+                            }
+
+                            if ((isCorrect && !isActive) || (!isCorrect && isActive)) {
+                                allCorrect = false;
+                            }
+                        });
+
+                        if (!selectedAny) {
+                            showFeedback(fb, "⚠️ Pilih dulu jawaban yang menurutmu benar.", "bad");
+                            return;
+                        }
+
+                        if (allCorrect) {
+                            showFeedback(fb, "✅ Tepat! Proyek yang bagus punya problem yang jelas, alur input-process-output, dan sesuai tema financial literacy.", "ok");
+                        } else {
+                            showFeedback(fb, "⚠️ Masih belum tepat. Ingat, proyek yang baik tetap harus punya fungsi yang berjalan, bukan hanya ide atau tampilan.", "bad");
+                        }
+                    });
+                }
+            }
+        }
+
+        function wirePitchPreview() {
+            const btnPreview = content.querySelector("#preview");
+            const fbPreview = content.querySelector("#previewFb");
+            const p1 = content.querySelector("#p1");
+            const p2 = content.querySelector("#p2");
+            const p3 = content.querySelector("#p3");
+            const p4 = content.querySelector("#p4");
+
+            if (!btnPreview || !fbPreview) return;
+
+            btnPreview.addEventListener("click", () => {
+                const v1 = p1?.value.trim() || "";
+                const v2 = p2?.value.trim() || "";
+                const v3 = p3?.value.trim() || "";
+                const v4 = p4?.value.trim() || "";
+
+                if (!v1 && !v2 && !v3 && !v4) {
+                    showFeedback(fbPreview, "⚠️ Isi dulu draft pitch-mu sebelum melihat preview.", "bad");
+                    return;
+                }
+
+                showFeedback(
+                    fbPreview,
+                    `<b>Preview Pitch</b><br><br>
+                    <b>Problem:</b> ${v1 || "-"}<br>
+                    <b>Solution:</b> ${v2 || "-"}<br>
+                    <b>How it works:</b> ${v3 || "-"}<br>
+                    <b>Impact:</b> ${v4 || "-"}`,
+                    "ok"
+                );
+            });
+        }
+
+        function wireIdeaSave() {
+            const btnSave = content.querySelector("#saveIdea");
+            const fbIdea = content.querySelector("#ideaFb");
+            const i1 = content.querySelector("#idea1");
+            const i2 = content.querySelector("#idea2");
+            const i3 = content.querySelector("#idea3");
+
+            if (!btnSave || !fbIdea) return;
+
+            btnSave.addEventListener("click", () => {
+                const v1 = i1?.value.trim() || "";
+                const v2 = i2?.value.trim() || "";
+                const v3 = i3?.value.trim() || "";
+
+                if (!v1 && !v2 && !v3) {
+                    showFeedback(fbIdea, "⚠️ Tuliskan dulu ide aplikasimu sebelum disimpan.", "bad");
+                    return;
+                }
+
+                showFeedback(
+                    fbIdea,
+                    `✅ Ide awalmu sudah tersimpan di slide ini.<br><br>
+                    <b>Problem:</b> ${v1 || "-"}<br>
+                    <b>Input & fitur utama:</b> ${v2 || "-"}<br>
+                    <b>Output:</b> ${v3 || "-"}`,
+                    "ok"
+                );
+            });
+        }
+
         function render() {
             const s = slides[idx];
             content.innerHTML = s.html;
+
             const pct = ((idx + 1) / slides.length) * 100;
             bar.style.width = pct + "%";
             count.textContent = `${idx + 1}/${slides.length}`;
 
-            content.querySelectorAll('[data-quiz]').forEach(wireQuiz);
+            content.querySelectorAll("[data-quiz]").forEach(wireQuiz);
+            content.querySelectorAll("[data-checklist]").forEach(wireChecklist);
+            content.querySelectorAll("[data-select-group]").forEach(wireSelectGroup);
+            content.querySelectorAll("[data-multi]").forEach(wireMulti);
 
-            content.querySelectorAll('[data-goto]').forEach(b => {
-                b.addEventListener('click', () => {
-                    const to = Number(b.getAttribute('data-goto'));
+            wirePitchPreview();
+            wireIdeaSave();
+
+            content.querySelectorAll("[data-goto]").forEach(b => {
+                b.addEventListener("click", () => {
+                    const to = Number(b.getAttribute("data-goto"));
                     idx = clamp(to, 0, slides.length - 1);
                     render();
                     content.scrollTop = 0;
