@@ -458,6 +458,7 @@
         }
 
         @media (max-width: 860px) {
+
             .cols2,
             .cols3 {
                 grid-template-columns: 1fr;
@@ -479,6 +480,21 @@
 </head>
 
 <body>
+    <div id="accessGate"
+        style="position:fixed;inset:0;background:linear-gradient(135deg,#eef2ff,#ecfeff);display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div class="card" style="max-width:420px;width:92%;text-align:center">
+            <h2>🔐 Masukkan Kode</h2>
+            <p>Masukkan kode untuk memulai sesi.</p>
+            <input id="accessInput"
+                style="width:100%;padding:12px;border-radius:12px;border:1px solid #cbd5e1;text-align:center;font-weight:900;letter-spacing:2px" />
+            <button class="btn primary" id="accessBtn" style="margin-top:12px">Masuk</button>
+            <div class="feedback" id="accessFb" style="margin-top:10px"></div>
+            <div class="card" style="margin-top:10px;background:rgba(79,70,229,.05)">
+                <p style="margin:0">Kode diberikan oleh guru.</p>
+            </div>
+        </div>
+    </div>
+
     <div class="app">
         <div class="topbar">
             <div class="brand">
@@ -511,6 +527,8 @@
     </div>
 
     <script>
+        const ACCESS_CODE = "RGMDSMS25";
+
         const slides = [
 
             {
@@ -747,45 +765,76 @@
             },
 
             {
-                title: "Pitch Focus",
+                title: "Waktunya Membuat Pitch Deck!",
                 html: `
-                <h2>🎤 Saat Pitching, Jelaskan Ini</h2>
-
-                <div class="grid cols2">
-                    <div class="card">
-                        <h3>Isi pitching</h3>
-                        <ul class="list">
-                            <li>Masalah yang dipilih</li>
-                            <li>Solusi berupa aplikasi</li>
-                            <li>Cara kerja aplikasi</li>
-                            <li>Manfaat aplikasi</li>
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h3>Yang harus terlihat</h3>
-                        <ul class="list">
-                            <li>Kamu paham aplikasi yang dibuat</li>
-                            <li>Fitur utama berjalan</li>
-                            <li>Solusi sesuai tema financial literacy</li>
-                        </ul>
-                    </div>
-                </div>
-                `
+      <h2>📢 Pamerkan Karyamu dengan Pitch Deck!</h2>
+      <p>Proyekmu sudah selesai dan berjalan dengan baik? Keren! Sekarang saatnya membuat <b>Pitch Deck</b> (Presentasi singkat 4-5 halaman menggunakan PPT, Google Slides, atau Canva) agar juri dan pengunjung pameran mengerti seberapa hebat karyamu.</p>
+      <div class="card" style="text-align:center; padding: 20px;">
+        <div style="font-size: 3rem;">🖼️🗣️✨</div>
+        <p style="margin-top:10px; font-weight: 500;">Pitch deck membantu orang lain memahami masalah apa yang kamu selesaikan dan bagaimana cara kerja proyekmu secara visual!</p>
+      </div>
+    `
             },
-
             {
-                title: "Latihan Penjelasan",
+                title: "Isi Pitch Deck",
                 html: `
-                <h2>🗣️ Latihan Menjelaskan App</h2>
-                <p>Isi bagian ini sebagai latihan sebelum presentasi.</p>
+      <h2>🧩 4 Komponen Wajib di Pitch Deck-mu</h2>
+      <p>Jangan buat presentasi yang terlalu panjang. Cukup pastikan 4 hal ini ada di dalamnya:</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+        <div class="card" style="padding: 15px;">
+          <h3 style="margin-top: 0; color: var(--brand);">1. Judul & Perkenalan</h3>
+          <p style="font-size: 0.9em; margin-bottom: 0;">Tuliskan nama proyekmu, nama lengkap, asal sekolah, dan jenjang kategori-mu.</p>
+        </div>
+        <div class="card" style="padding: 15px;">
+          <h3 style="margin-top: 0; color: var(--brand);">2. Masalah</h3>
+          <p style="font-size: 0.9em; margin-bottom: 0;">Ceritakan masalah sehari-hari yang menginspirasimu untuk membuat proyek ini.</p>
+        </div>
+        <div class="card" style="padding: 15px;">
+          <h3 style="margin-top: 0; color: var(--brand);">3. Solusi & Cara Kerja</h3>
+          <p style="font-size: 0.9em; margin-bottom: 0;">Masukkan <i>screenshot</i> proyekmu dan jelaskan langkah-langkah memainkannya/menggunakannya.</p>
+        </div>
+        <div class="card" style="padding: 15px;">
+          <h3 style="margin-top: 0; color: var(--brand);">4. Literasi Keuangan</h3>
+          <p style="font-size: 0.9em; margin-bottom: 0;">Jelaskan manfaat proyekmu dan pesan apa yang ingin kamu sampaikan soal uang atau menabung.</p>
+        </div>
+      </div>
+    `
+            },
+            {
+                title: "Kuis Pitch Deck",
+                html: `
+    <h2>💡 Pitch Deck Aplikasi yang Baik Itu Seperti Apa?</h2>
+    <p>Pilih jawaban yang paling menunjukkan pitch deck yang jelas dan mudah dipahami.</p>
 
-                <div class="grid">
-                    <textarea class="input" placeholder="Masalah: masalah apa yang ingin kamu selesaikan?"></textarea>
-                    <textarea class="input" placeholder="Fitur utama: apa fungsi utama aplikasi kamu?"></textarea>
-                    <textarea class="input" placeholder="Cara kerja: user input apa, app memproses apa, dan output-nya seperti apa?"></textarea>
-                    <textarea class="input" placeholder="Manfaat: apa yang dibantu oleh aplikasi ini?"></textarea>
-                </div>
-                `
+    <div class="choices" data-quiz="deck">
+      <div class="choice" data-answer="wrong">
+        Menjelaskan semua blok App Inventor satu per satu dengan teks panjang di setiap slide
+      </div>
+
+      <div class="choice" data-answer="right">
+        Menjelaskan masalah, fitur utama, cara kerja aplikasi, dan manfaatnya dengan visual yang jelas dan ringkas
+      </div>
+
+      <div class="choice" data-answer="wrong">
+        Memenuhi slide dengan semua screenshot layar tanpa penjelasan fungsi aplikasi
+      </div>
+    </div>
+
+    <div class="feedback" data-quiz-feedback="deck"></div>
+  `
+            },
+            {
+                title: "Checklist Pengumpulan",
+                html: `
+      <h2>✅ Checklist Sebelum Mengumpulkan Karya</h2>
+      <p>Pastikan semua komponen ini sudah siap sebelum kamu mengirimkannya ke sistem (LMS):</p>
+      <div class="checklist" data-checklist="submission">
+        <div class="checkItem"><div class="checkBox"></div><div>Proyek sudah selesai, dites, dan berjalan tanpa <i>error/bug</i>.</div></div>
+        <div class="checkItem"><div class="checkBox"></div><div>Deskripsi singkat proyek sudah ditulis (Masalah, Cara Kerja, Manfaat).</div></div>
+        <div class="checkItem"><div class="checkBox"></div><div>Pitch Deck (PDF/PPT/Canva) maksimal 5 halaman sudah selesai dibuat.</div></div>
+        <div class="checkItem"><div class="checkBox"></div><div>Video demo singkat sudah direkam (Jika diwajibkan oleh panitia).</div></div>
+      </div>
+    `
             },
 
             {
@@ -865,6 +914,10 @@
                 bug: {
                     ok: "✅ Benar! Saat ada error, cek blok, tombol, input, dan urutan alur aplikasimu.",
                     bad: "⚠️ Belum tepat. Error adalah bagian dari proses belajar membuat aplikasi."
+                },
+                deck: {
+                    ok: "✅ Tepat! Pitch deck aplikasi yang baik menjelaskan masalah, solusi, cara kerja, dan manfaat dengan ringkas dan jelas.",
+                    bad: "⚠️ Belum tepat. Pitch deck bukan tempat menaruh semua detail, tetapi menyampaikan inti aplikasi secara visual dan mudah dipahami."
                 }
             };
             const m = msgs[id];
@@ -1026,6 +1079,25 @@
                 content.scrollTop = 0;
             }
         });
+
+        accessBtn.addEventListener("click", checkAccess);
+        accessInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") checkAccess();
+        });
+        accessInput.addEventListener("input", e => {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        function checkAccess() {
+            const val = accessInput.value.toUpperCase().trim();
+            if (val === ACCESS_CODE) {
+                accessGate.style.display = "none";
+                render();
+            } else {
+                accessFb.classList.add("show");
+                accessFb.innerText = "Kode salah. Coba lagi.";
+            }
+        }
 
         render();
     </script>
