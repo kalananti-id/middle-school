@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>6.5 Keamanan dan Tanggung Jawab dalam Transaksi Digital</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Outfit", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"],
+          },
+          colors: {
+            brand: {
+              50: "#eef2ff",
+              100: "#e0e7ff",
+              500: "#6366f1",
+              600: "#4f46e5",
+              700: "#4338ca",
+              900: "#312e81",
+            },
+            safe: "#10b981",
+            warn: "#f59e0b",
+            danger: "#ef4444",
+            skyx: "#0ea5e9",
+            violetx: "#8b5cf6"
+          },
+          animation: {
+            "slide-up": "slideUp .6s cubic-bezier(0.16,1,0.3,1) forwards",
+            "pop-in": "popIn .45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+            "float": "float 6s ease-in-out infinite",
+            "pulse-soft": "pulseSoft 2.6s ease-in-out infinite",
+          },
+          keyframes: {
+            slideUp: {
+              "0%": { transform: "translateY(24px)", opacity: "0" },
+              "100%": { transform: "translateY(0)", opacity: "1" },
+            },
+            popIn: {
+              "0%": { transform: "scale(.92)", opacity: "0" },
+              "100%": { transform: "scale(1)", opacity: "1" },
+            },
+            float: {
+              "0%,100%": { transform: "translateY(0)" },
+              "50%": { transform: "translateY(-12px)" },
+            },
+            pulseSoft: {
+              "0%,100%": { boxShadow: "0 0 0 0 rgba(99,102,241,0.18)" },
+              "50%": { boxShadow: "0 0 0 16px rgba(99,102,241,0)" },
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+  :root {
+    --nav-height: 64px;
+    --progress-height: 4px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: "Outfit", sans-serif;
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  }
+
+  .grid-bg {
+    background-size: 32px 32px;
+    background-image: radial-gradient(circle, rgba(148, 163, 184, 0.28) 1px, transparent 1px);
+  }
+
+  main {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .slide {
+    display: none;
+    width: 100%;
+    height: calc(100vh - var(--nav-height) - var(--progress-height));
+    padding: 1.5rem 2rem 1.5rem;
+    overflow: hidden;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  .slide.active {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .slide > div {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  #accessOverlay {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.3s ease;
+  }
+
+  .anim-1,
+  .anim-2,
+  .anim-3,
+  .anim-pop {
+    opacity: 1;
+    will-change: transform, opacity;
+  }
+
+  .slide.active .anim-1 {
+    animation: slideUp 0.6s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .slide.active .anim-2 {
+    animation: slideUp 0.6s 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .slide.active .anim-3 {
+    animation: slideUp 0.6s 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .slide.active .anim-pop {
+    animation: popIn 0.5s 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+
+  .card-hover {
+    transition: all 0.25s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 30px -10px rgba(15, 23, 42, 0.16);
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.38rem 0.86rem;
+    border-radius: 9999px;
+    font-weight: 800;
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .icon-bubble {
+    width: 72px;
+    height: 72px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+  }
+
+  .case-card {
+    background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+    border: 1px solid #dbeafe;
+    border-radius: 28px;
+    padding: 1.4rem;
+    box-shadow: 0 12px 30px -16px rgba(30, 41, 59, 0.18);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  img,
+  svg,
+  video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  @keyframes slideUp {
+    0% {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes popIn {
+    0% {
+      transform: scale(0.92);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes pulseSoft {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.18);
+    }
+    50% {
+      box-shadow: 0 0 0 16px rgba(99, 102, 241, 0);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .slide {
+      padding: 1.25rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    html,
+    body {
+      overflow: auto;
+    }
+
+    main {
+      overflow: hidden;
+    }
+
+    .slide {
+      height: calc(100vh - var(--nav-height) - var(--progress-height));
+      justify-content: flex-start;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .pill {
+      font-size: 0.68rem;
+    }
+  }
+</style>
+
+</head>
+
+<body class="text-slate-800 grid-bg">
+
+  <!-- ACCESS OVERLAY -->
+  <div id="accessOverlay" class="fixed inset-0 z-[100] bg-slate-950/95 flex flex-col items-center justify-center p-4">
+    <div
+      class="bg-white/10 backdrop-blur-xl p-8 rounded-[2rem] border border-white/20 shadow-2xl w-full max-w-md text-center relative">
+      <div
+        class="w-20 h-20 mx-auto mb-5 rounded-[1.5rem] bg-brand-500/20 border border-brand-100/30 flex items-center justify-center text-white text-4xl animate-pulse-soft">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h1 class="text-3xl font-black text-white mb-2">ACCESS LOCKED 🔒</h1>
+      <p class="text-slate-300 mb-6 font-mono text-sm">Masukkan kode akses untuk membuka materi 6.5</p>
+      <input type="text" id="accessCodeInput" placeholder="Enter Class Code"
+        class="w-full bg-slate-800/60 border border-slate-600 text-white px-4 py-3 rounded-xl mb-4 text-center font-mono tracking-widest outline-none focus:border-brand-500 transition uppercase">
+      <button id="accessBtn"
+        class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95">
+        UNLOCK SYSTEM
+      </button>
+      <p id="accessError" class="text-red-400 mt-4 text-sm font-bold opacity-0 transition-opacity">⛔ ACCESS DENIED</p>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <div
+    class="fixed bottom-0 left-0 right-0 h-16 bg-white/82 backdrop-blur-md border-t border-slate-200 flex items-center justify-between px-6 z-40">
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-extrabold text-slate-500 uppercase tracking-widest">Middle School • 6.5 Keamanan &
+        Tanggung Jawab Transaksi Digital</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <button id="btnPrev"
+        class="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition disabled:opacity-30">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <span class="font-mono text-sm font-bold text-slate-400">
+        <span id="counter" class="text-brand-600">1</span>/<span id="totalSlides">1</span>
+      </span>
+      <button id="btnNext"
+        class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-brand-600 transition shadow-lg">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+  <div class="fixed bottom-16 left-0 h-1 bg-slate-200 w-full z-40">
+    <div id="bar" class="h-full bg-brand-500 transition-all duration-500 w-[0%]"></div>
+  </div>
+
+  <main class="relative w-full h-screen overflow-hidden">
+
+    <!-- SLIDE 1 -->
+    <section class="slide active">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-14">
+        <div class="flex-1 anim-1">
+          <div class="pill bg-brand-100 text-brand-700 border border-brand-200 mb-6">
+            MIDDLE SCHOOL • TOPIK 6.5
+          </div>
+          <h1 class="text-5xl md:text-6xl font-black text-slate-900 leading-tight mb-6">
+            KEAMANAN &<br>
+            <span class="text-brand-500">TANGGUNG JAWAB</span><br>
+            DALAM TRANSAKSI DIGITAL
+          </h1>
+          <p class="text-xl md:text-2xl text-slate-600 font-light max-w-2xl">
+            Belanja online, transfer, dan e-wallet itu memudahkan hidup. Tapi kalau tidak hati-hati, ada risiko
+            penipuan, pencurian data, sampai kehilangan uang.
+          </p>
+        </div>
+
+        <div class="flex-1 flex justify-center anim-pop relative">
+          <div class="absolute inset-0 bg-indigo-200 rounded-full blur-[120px] opacity-30"></div>
+          <div class="relative z-10 text-center">
+            <div
+              class="w-72 h-72 rounded-full bg-white shadow-2xl border border-slate-100 flex items-center justify-center animate-float">
+              <i class="fa-solid fa-mobile-screen-button text-[7rem] text-brand-500"></i>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-100 text-left w-80 mt-6">
+              <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-2">Fokus Belajar</div>
+              <div class="font-black text-slate-800">Aman saat bertransaksi digital</div>
+              <div class="text-sm text-slate-500 mt-1">Kenali risiko • lindungi akun • bertindak bijak</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 mb-8">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Pengantar</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Apa itu transaksi digital?</h2>
+          <p class="text-slate-600 text-lg mt-2 max-w-4xl">
+            Transaksi digital adalah kegiatan pembelian, pembayaran, atau pertukaran data yang dilakukan lewat perangkat
+            elektronik seperti smartphone, laptop, atau komputer.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 anim-2">
+          <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100">
+            <h3 class="font-black text-xl mb-4">Contoh transaksi digital</h3>
+            <ul class="space-y-3 text-slate-700">
+              <li class="flex gap-3"><i class="fa-solid fa-cart-shopping text-brand-500 mt-1"></i><span>Belanja
+                  online</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-building-columns text-brand-500 mt-1"></i><span>Transfer bank
+                  lewat mobile banking</span></li>
+              <li class="flex gap-3"><i class="fa-solid fa-wallet text-brand-500 mt-1"></i><span>Top-up e-wallet</span>
+              </li>
+              <li class="flex gap-3"><i class="fa-solid fa-file-invoice-dollar text-brand-500 mt-1"></i><span>Pembayaran
+                  tagihan listrik atau air</span></li>
+            </ul>
+          </div>
+
+          <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100">
+            <h3 class="font-black text-xl mb-4">Kenapa perlu dibahas?</h3>
+            <p class="text-slate-600 leading-relaxed">
+              Karena makin banyak aktivitas online yang melibatkan <b>uang</b> dan <b>data pribadi</b>. Kalau pengguna
+              lengah, bisa jadi korban scam, phishing, pencurian akun, atau salah transfer.
+            </p>
+            <div class="mt-5 bg-amber-50 border border-amber-200 rounded-2xl p-5">
+              <div class="text-xs font-extrabold text-amber-700 uppercase tracking-widest">Intinya</div>
+              <div class="font-black text-slate-900 mt-1">Mudah itu bagus, tapi tetap harus aman.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1">
+          <div class="pill bg-red-50 text-red-600 border border-red-100">6.5.1 Risiko</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Risiko dalam transaksi digital</h2>
+          <p class="text-slate-600 text-lg mt-2">Kalau tidak hati-hati, ini beberapa masalah yang bisa terjadi.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5 mt-8 anim-2">
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-danger">
+            <div class="icon-bubble bg-red-50 text-danger mb-4"><i class="fa-solid fa-user-secret"></i></div>
+            <div class="font-black text-xl">Penipuan</div>
+            <ul class="mt-3 text-sm text-slate-600 space-y-2">
+              <li>• Barang tidak dikirim</li>
+              <li>• Mengaku admin dan minta OTP</li>
+              <li>• Link palsu untuk mencuri akun</li>
+            </ul>
+          </div>
+
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-warn">
+            <div class="icon-bubble bg-amber-50 text-warn mb-4"><i class="fa-solid fa-database"></i></div>
+            <div class="font-black text-xl">Kebocoran data</div>
+            <ul class="mt-3 text-sm text-slate-600 space-y-2">
+              <li>• Password atau PIN dicuri</li>
+              <li>• Nomor kartu disalahgunakan</li>
+              <li>• Data dipakai untuk kejahatan</li>
+            </ul>
+          </div>
+
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-skyx">
+            <div class="icon-bubble bg-sky-50 text-skyx mb-4"><i class="fa-solid fa-bug"></i></div>
+            <div class="font-black text-xl">Serangan siber</div>
+            <ul class="mt-3 text-sm text-slate-600 space-y-2">
+              <li>• Malware</li>
+              <li>• Keylogger</li>
+              <li>• Hacker mengambil alih akun</li>
+            </ul>
+          </div>
+
+          <div class="card-hover bg-white p-6 rounded-3xl shadow-md border-t-8 border-violetx">
+            <div class="icon-bubble bg-violet-50 text-violetx mb-4"><i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="font-black text-xl">Kesalahan pengguna</div>
+            <ul class="mt-3 text-sm text-slate-600 space-y-2">
+              <li>• Salah transfer</li>
+              <li>• Memberi data rahasia</li>
+              <li>• Transaksi pakai Wi-Fi publik</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 text-center">
+          <div class="pill bg-emerald-50 text-emerald-700 border border-emerald-100">6.5.2 Prinsip Keamanan</div>
+          <h2 class="text-5xl font-black text-slate-900 mt-4">5 prinsip agar transaksi tetap aman 🛡️</h2>
+          <p class="text-slate-600 mt-3 text-lg">Bukan cuma tahu risikonya, kamu juga harus tahu cara mencegahnya.</p>
+        </div>
+
+        <div class="grid md:grid-cols-5 gap-5 mt-10 anim-2">
+
+          <!-- 1 -->
+          <div class="bg-white p-5 rounded-3xl shadow-md border border-slate-100 text-center card-hover">
+            <i class="fa-solid fa-lock text-3xl text-safe mb-3"></i>
+            <div class="font-black">Password kuat</div>
+            <div class="text-sm text-slate-500 mt-2">
+              Minimal 8 karakter, kombinasi huruf, angka, simbol.
+            </div>
+          </div>
+
+          <!-- 2 -->
+          <div class="bg-white p-5 rounded-3xl shadow-md border border-slate-100 text-center card-hover">
+            <i class="fa-solid fa-shield-halved text-3xl text-safe mb-3"></i>
+            <div class="font-black">2FA aktif</div>
+            <div class="text-sm text-slate-500 mt-2">
+              Tambahan keamanan saat login.
+            </div>
+          </div>
+
+          <!-- 3 -->
+          <div class="bg-white p-5 rounded-3xl shadow-md border border-slate-100 text-center card-hover">
+            <i class="fa-solid fa-key text-3xl text-danger mb-3"></i>
+            <div class="font-black">Jangan kasih OTP</div>
+            <div class="text-sm text-slate-500 mt-2">
+              OTP hanya untuk kamu, bukan admin.
+            </div>
+          </div>
+
+          <!-- 4 -->
+          <div class="bg-white p-5 rounded-3xl shadow-md border border-slate-100 text-center card-hover">
+            <i class="fa-solid fa-globe text-3xl text-skyx mb-3"></i>
+            <div class="font-black">Cek situs resmi</div>
+            <div class="text-sm text-slate-500 mt-2">
+              Pastikan HTTPS & URL benar.
+            </div>
+          </div>
+
+          <!-- 5 -->
+          <div class="bg-white p-5 rounded-3xl shadow-md border border-slate-100 text-center card-hover">
+            <i class="fa-solid fa-star text-3xl text-warn mb-3"></i>
+            <div class="font-black">Cek penjual</div>
+            <div class="text-sm text-slate-500 mt-2">
+              Lihat rating & ulasan dulu.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-8 anim-3 text-center">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 text-slate-600 max-w-2xl mx-auto">
+            <b>Ingat:</b> Kalau sesuatu terasa mencurigakan, lebih baik berhenti daripada menyesal.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 text-center">
+          <div class="pill bg-indigo-50 text-indigo-700 border border-indigo-100">6.5.3 Tanggung Jawab</div>
+          <h2 class="text-5xl font-black text-slate-900 mt-4">Tanggung jawab kamu sebagai pengguna 💡</h2>
+          <p class="text-slate-600 mt-3 text-lg">Keamanan digital bukan cuma sistem, tapi juga perilaku kita.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-10 anim-2">
+
+          <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100 card-hover">
+            <div class="font-black text-xl mb-3">🔐 Jaga data pribadi</div>
+            <p class="text-slate-600 text-sm">Jangan share password, PIN, OTP, atau data penting ke siapa pun.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100 card-hover">
+            <div class="font-black text-xl mb-3">🤝 Transaksi jujur</div>
+            <p class="text-slate-600 text-sm">Tidak memalsukan bukti pembayaran atau menipu.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100 card-hover">
+            <div class="font-black text-xl mb-3">💰 Kelola uang dengan bijak</div>
+            <p class="text-slate-600 text-sm">Belanja sesuai kebutuhan & cek transaksi.</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100 card-hover">
+            <div class="font-black text-xl mb-3">🚨 Laporkan kejanggalan</div>
+            <p class="text-slate-600 text-sm">Hubungi bank / platform jika ada transaksi mencurigakan.</p>
+          </div>
+
+        </div>
+
+        <div class="mt-8 text-center anim-3">
+          <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 max-w-2xl mx-auto">
+            <b>Mindset penting:</b> Aman itu bukan kebetulan, tapi kebiasaan.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 (INTERACTIVE CASE) -->
+    <section class="slide">
+      <div class="max-w-6xl mx-auto">
+        <div class="anim-1 text-center">
+          <div class="pill bg-red-50 text-red-600 border border-red-100">Studi Kasus</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Kamu akan ngapain? 🤔</h2>
+          <p class="text-slate-600 mt-2">Klik pilihan yang menurut kamu benar.</p>
+        </div>
+
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 mt-8 anim-pop">
+
+          <p class="text-lg text-slate-700 mb-6">
+            Kamu mendapat SMS: <br><br>
+            <b>"Kode OTP kamu adalah 123456"</b><br>
+            Padahal kamu tidak login.
+          </p>
+
+          <div class="space-y-3">
+            <button onclick="case65(this,false)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-black">Berikan ke "admin"</button>
+
+            <button onclick="case65(this,true)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-black">Abaikan & ganti
+              password</button>
+
+            <button onclick="case65(this,false)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-black">Klik link di SMS</button>
+          </div>
+
+          <p id="caseResult65" class="mt-6 font-black text-xl h-8"></p>
+        </div>
+      </div>
+
+      <script>
+        function case65(btn, correct) {
+          const res = document.getElementById("caseResult65");
+
+          if (correct) {
+            btn.className = "w-full bg-green-500 text-white py-4 rounded-xl font-black";
+            res.innerText = "BENAR ✅ Ini tanda percobaan hack!";
+            res.className = "mt-6 font-black text-xl text-green-600";
+          } else {
+            btn.className = "w-full bg-red-500 text-white py-4 rounded-xl font-black";
+            res.innerText = "SALAH ❌ Ini berbahaya!";
+            res.className = "mt-6 font-black text-xl text-red-600";
+          }
+        }
+      </script>
+    </section>
+
+    <!-- SLIDE 7 (QUIZ) -->
+    <section class="slide">
+      <div class="max-w-5xl mx-auto text-center">
+        <div class="anim-1">
+          <div class="pill bg-slate-100 text-slate-600 border border-slate-200">Quiz</div>
+          <h2 class="text-4xl font-black text-slate-900 mt-4">Cek pemahaman kamu 🧠</h2>
+        </div>
+
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-100 mt-8 anim-pop">
+          <p class="text-xl text-slate-700 mb-6">
+            Mana yang merupakan tindakan aman saat transaksi digital?
+          </p>
+
+          <div class="space-y-3">
+            <button onclick="quiz65(this,true)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-black">
+              Mengaktifkan 2FA
+            </button>
+
+            <button onclick="quiz65(this,false)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-black">
+              Membagikan OTP
+            </button>
+
+            <button onclick="quiz65(this,false)"
+              class="w-full bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-black">
+              Login di Wi-Fi publik tanpa cek keamanan
+            </button>
+          </div>
+
+          <p id="quizResult65" class="mt-6 font-black text-xl h-8"></p>
+        </div>
+      </div>
+
+      <script>
+        function quiz65(btn, correct) {
+          const res = document.getElementById("quizResult65");
+
+          if (correct) {
+            btn.className = "w-full bg-green-500 text-white py-4 rounded-xl font-black";
+            res.innerText = "Benar! 🔥";
+            res.className = "mt-6 font-black text-xl text-green-600";
+          } else {
+            btn.className = "w-full bg-red-500 text-white py-4 rounded-xl font-black";
+            res.innerText = "Belum tepat ❌";
+            res.className = "mt-6 font-black text-xl text-red-600";
+          }
+        }
+      </script>
+    </section>
+
+    <!-- SLIDE 8 (CLOSING / SUMMARY) -->
+    <section class="slide">
+      <div class="max-w-5xl mx-auto text-center anim-1 flex flex-col items-center justify-center h-full">
+
+        <i class="fa-solid fa-shield-halved text-9xl text-brand-500 mb-8 animate-float"></i>
+
+        <h2 class="text-5xl font-black text-slate-800 mb-6">RINGKASAN</h2>
+
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 w-full max-w-4xl text-left">
+          <ul class="space-y-4 text-slate-700 text-lg">
+
+            <li class="flex gap-3">
+              <i class="fa-solid fa-check text-green-500 mt-1"></i>
+              <span>Transaksi digital memudahkan, tapi tetap memiliki risiko (scam, data bocor, dll).</span>
+            </li>
+
+            <li class="flex gap-3">
+              <i class="fa-solid fa-check text-green-500 mt-1"></i>
+              <span>Kamu harus memahami cara menjaga keamanan (password kuat, 2FA, tidak share OTP).</span>
+            </li>
+
+            <li class="flex gap-3">
+              <i class="fa-solid fa-check text-green-500 mt-1"></i>
+              <span>Selalu cek situs, link, dan identitas penjual sebelum transaksi.</span>
+            </li>
+
+            <li class="flex gap-3">
+              <i class="fa-solid fa-check text-green-500 mt-1"></i>
+              <span>Sebagai pengguna, kamu bertanggung jawab menjaga data dan bertransaksi dengan jujur.</span>
+            </li>
+
+            <li class="flex gap-3">
+              <i class="fa-solid fa-check text-green-500 mt-1"></i>
+              <span>Kalau ada hal mencurigakan → jangan lanjut, dan segera laporkan.</span>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="mt-8 bg-brand-50 border border-brand-100 rounded-2xl p-6 max-w-2xl">
+          <div class="text-sm font-extrabold text-brand-700 uppercase tracking-widest">Pesan penting</div>
+          <div class="font-black text-slate-900 mt-2 text-lg">
+            “Lebih baik berhenti sebentar daripada kehilangan semuanya.”
+          </div>
+        </div>
+
+        <button onclick="localStorage.removeItem('sesi65_access'); location.reload();"
+          class="mt-12 text-slate-400 hover:text-red-500 transition text-sm font-black uppercase tracking-widest group">
+          <i class="fa-solid fa-power-off mr-2 group-hover:scale-125 transition-transform"></i>
+          End Session
+        </button>
+
+      </div>
+    </section>
+
+  </main>
+
+ <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const slides = document.querySelectorAll(".slide");
+    const btnNext = document.getElementById("btnNext");
+    const btnPrev = document.getElementById("btnPrev");
+    const counter = document.getElementById("counter");
+    const totalSlides = document.getElementById("totalSlides");
+    const bar = document.getElementById("bar");
+
+    const accessOverlay = document.getElementById("accessOverlay");
+    const accessInput = document.getElementById("accessCodeInput");
+    const accessBtn = document.getElementById("accessBtn");
+    const accessError = document.getElementById("accessError");
+
+    const VALID_CODE = "RGMDSMS25";
+    const STORAGE_KEY = "sesi65_access";
+    let currentSlide = 0;
+
+    if (totalSlides) {
+      totalSlides.innerText = slides.length;
+    }
+
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === index);
+      });
+
+      if (counter) {
+        counter.innerText = index + 1;
+      }
+
+      if (bar) {
+        bar.style.width = `${((index + 1) / slides.length) * 100}%`;
+      }
+
+      if (btnPrev) {
+        btnPrev.disabled = index === 0;
+      }
+
+      if (btnNext) {
+        btnNext.disabled = index === slides.length - 1;
+      }
+    }
+
+    function isUnlocked() {
+      return localStorage.getItem(STORAGE_KEY) === "true";
+    }
+
+    function showOverlay() {
+      if (!accessOverlay) return;
+      accessOverlay.style.display = "flex";
+      accessOverlay.style.opacity = "1";
+      accessOverlay.style.pointerEvents = "auto";
+    }
+
+    function hideOverlay() {
+      if (!accessOverlay) return;
+      accessOverlay.style.opacity = "0";
+      accessOverlay.style.pointerEvents = "none";
+
+      setTimeout(() => {
+        accessOverlay.style.display = "none";
+      }, 300);
+    }
+
+    function unlockSlides() {
+      localStorage.setItem(STORAGE_KEY, "true");
+      if (accessError) {
+        accessError.style.opacity = "0";
+      }
+      hideOverlay();
+      showSlide(currentSlide);
+    }
+
+    function denyAccess() {
+      if (accessError) {
+        accessError.style.opacity = "1";
+      }
+
+      if (accessInput) {
+        accessInput.classList.add("border-red-500");
+
+        setTimeout(() => {
+          accessInput.classList.remove("border-red-500");
+        }, 500);
+      }
+    }
+
+    if (isUnlocked()) {
+      hideOverlay();
+    } else {
+      showOverlay();
+    }
+
+    if (accessBtn) {
+      accessBtn.addEventListener("click", () => {
+        const inputVal = accessInput ? accessInput.value.trim().toUpperCase() : "";
+
+        if (inputVal === VALID_CODE) {
+          unlockSlides();
+        } else {
+          denyAccess();
+        }
+      });
+    }
+
+    if (accessInput) {
+      accessInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (accessBtn) accessBtn.click();
+        }
+      });
+    }
+
+    if (btnNext) {
+      btnNext.addEventListener("click", () => {
+        if (!isUnlocked()) return;
+
+        if (currentSlide < slides.length - 1) {
+          currentSlide++;
+          showSlide(currentSlide);
+        }
+      });
+    }
+
+    if (btnPrev) {
+      btnPrev.addEventListener("click", () => {
+        if (!isUnlocked()) return;
+
+        if (currentSlide > 0) {
+          currentSlide--;
+          showSlide(currentSlide);
+        }
+      });
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (!isUnlocked()) return;
+
+      if (e.key === "ArrowRight" && btnNext && !btnNext.disabled) {
+        btnNext.click();
+      }
+
+      if (e.key === "ArrowLeft" && btnPrev && !btnPrev.disabled) {
+        btnPrev.click();
+      }
+    });
+
+    showSlide(currentSlide);
+  });
+</script>
+</body>
+</html>
